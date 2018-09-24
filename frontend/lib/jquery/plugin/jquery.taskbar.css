@@ -1,0 +1,8 @@
+.ui-dialog .ui-dialog-titlebar-minimize { position: absolute; right: .3em; top: 50%; width: 19px; margin: -10px 20px 0 0; padding: 1px; height: 18px; }
+.ui-dialog .ui-dialog-titlebar-minimize span { display: block; margin: 1px; }
+.ui-dialog .ui-dialog-titlebar-minimize:hover, .ui-dialog .ui-dialog-titlebar-minimize:focus { padding: 0; }
+
+.ui-taskbar { padding:2px 0 2px 4px; text-align:left; cursor: pointer }
+.ui-taskbar .ui-taskbar-tile { margin: .1em 0; padding: .4em 1em; position: relative;  }
+
+.ui-dialog-placeholder { position: absolute; border: 3px solid gray; }

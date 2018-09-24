@@ -1,0 +1,25 @@
+.leaflet-zoom-box-control {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border:2px solid #006dcc !important;
+    overflow:hidden;
+    box-shadow: 0 0 3px gray;
+    display: block !important;
+    background-color: #006dcc;
+ }
+.leaflet-zoom-box-control.active a {
+    background-color: #8bba23 !important;
+}
+.leaflet-zoom-box-crosshair {
+    cursor: crosshair !important;
+}
+.leaflet-zoom-box-icon {
+    width: 100% !important;
+    height: 100% !important;
+    background-image: url(../../../images/icon/crop.png);
+    background-color: #006dcc !important;
+}
+.leaflet-zoom-box-icon.leaflet-disabled{
+    background-image: url(../../../images/icon/crop.png);
+}

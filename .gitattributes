@@ -1,0 +1,3 @@
+# Declare files that will always have CRLF line endings on checkout.
+frontend/lib/**/*.js linguist-vendored=false
+frontend/lib/**/*.css linguist-vendored=false

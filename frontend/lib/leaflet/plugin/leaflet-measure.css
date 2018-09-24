@@ -1,0 +1,119 @@
+.leaflet-control-measure h3,
+.leaflet-measure-resultpopup h3 {
+    margin: 0 0 12px 0;
+    padding-bottom: 10px;
+    line-height: 1em;
+    font-weight: normal;
+    font-size: 1.1em;
+    border-bottom: solid 1px #DDD
+}
+.leaflet-control-measure p,
+.leaflet-measure-resultpopup p {
+    margin: 10px 0 0;
+    line-height: 1em
+}
+.leaflet-control-measure p:first-child,
+.leaflet-measure-resultpopup p:first-child {
+    margin-top: 0
+}
+.leaflet-control-measure a,
+.leaflet-measure-resultpopup a {
+    color: #4E60AA;
+    text-decoration: none
+}
+.leaflet-control-measure a:hover,
+.leaflet-measure-resultpopup a:hover {
+    opacity: 0.5;
+    text-decoration: none
+}
+.leaflet-control-measure .tasks,
+.leaflet-measure-resultpopup .tasks {
+    margin: 12px 0 0;
+    padding: 10px 0 0;
+    border-top: solid 1px #DDD;
+    list-style: none;
+}
+.leaflet-control-measure .tasks li,
+.leaflet-measure-resultpopup .tasks li {
+    display: inline;
+    margin: 0 10px 0 0
+}
+.leaflet-control-measure .tasks li:last-child,
+.leaflet-measure-resultpopup .tasks li:last-child {
+    margin-right: 0
+}
+.leaflet-control-measure .coorddivider,
+.leaflet-measure-resultpopup .coorddivider {
+    color: #999
+}
+.leaflet-control-measure {
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4)
+}
+.leaflet-control-measure .leaflet-control-measure-toggle,
+.leaflet-control-measure .leaflet-control-measure-toggle:hover {
+    display: block;
+    width: 40px;
+    height: 40px;
+    background: #4E60AA url(../../../images/icon/ruler.png) no-repeat 50% 50%;
+    border-radius: 50%;
+    border: 2px solid #4E60AA;
+    box-shadow: 0 0 3px gray;
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden
+}
+.leaflet-retina .leaflet-control-measure .leaflet-control-measure-toggle,
+.leaflet-retina .leaflet-control-measure .leaflet-control-measure-toggle:hover {
+    background-image: url(../../../images/icon/ruler_blue.png);
+    background-size: 32px 32px
+}
+.leaflet-touch .leaflet-control-measure .leaflet-control-measure-toggle,
+.leaflet-touch .leaflet-control-measure .leaflet-control-measure-toggle:hover {
+    width: 40px;
+    height: 40px;
+}
+.leaflet-control-measure .startprompt h3 {
+    margin-bottom: 10px
+}
+.leaflet-control-measure .startprompt .tasks {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0
+}
+.leaflet-control-measure .leaflet-control-measure-interaction {
+    padding: 10px 12px;
+    background: white;
+}
+.leaflet-control-measure .results .group {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: dotted 1px #eaeaea
+}
+.leaflet-control-measure .results .group:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0
+}
+.leaflet-control-measure .results .heading {
+    margin-right: 5px;
+    color: #999
+}
+.leaflet-control-measure a.start {
+    padding-left: 18px;
+}
+.leaflet-retina .leaflet-control-measure a.start {
+    background-size: 12px 12px
+}
+.leaflet-control-measure a.cancel {
+    padding-left: 18px;
+    background: no-repeat 0% 50%;
+}
+.leaflet-retina .leaflet-control-measure a.cancel {
+    background-size: 12px 12px
+}
+.leaflet-control-measure a.finish {
+    padding-left: 18px;
+}
+.leaflet-measure-resultpopup a.deletemarkup {
+    padding-left: 18px;
+}

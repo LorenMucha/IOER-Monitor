@@ -179,15 +179,15 @@ const legende = {
                 let grades = [];
 
                 $.each(klassengrenzen.getKlassen(), function (key, value) {
-                    let minus_max = value.Wert_Obergrenze - 1000000000,
-                        minus_min = value.Wert_Untergrenze - 1000000000,
+                    let minus_max = value.Wert_Obergrenze,
+                        minus_min = value.Wert_Untergrenze,
                         round_max = (Math.round(minus_max * 100) / 100).toFixed(2),
                         round_min = (Math.round(minus_min * 100) / 100).toFixed(2);
 
                     grades.push({
                         "max": round_max,
                         "min": round_min,
-                        "farbe": '#' + value.Farbwert
+                        "farbe": value.Farbwert
                     });
                 });
 

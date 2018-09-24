@@ -70,32 +70,6 @@ function getGeoJSON(ind,time,_raumgliederung,ags_array){
         }
     });
 }
-function getGeneratedClasses(indikator,time,raumgl,klassifizierung,klassenanzahl){
-    request_classes = $.ajax({
-        url: url_backend+"/map/klassenbildung.php",
-        type: "GET",
-        dataType: 'json',
-        data: {
-            indikator:indikator,
-            KLASSIFIZIERUNG: klassifizierung,
-            KLASSENANZAHL: klassenanzahl,
-            hex_min:farbschema.getHexMin(),
-            hex_max: farbschema.getHexMax(),
-            raumgl:raumgl,
-            time:time
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            if (thrownError !== 'abort') {
-                progressbar.remove();
-                console.log(thrownError);
-                alertError();
-            }
-        },success:function(data){
-            //callback
-        }
-    });
-    return request_classes;
-}
 function getRasterMap(time,ind,_raumgliederung,klassifizierung,klassenanzahl,darstellung_map,_seite){
     return $.ajax({
         type: "GET",

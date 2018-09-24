@@ -271,8 +271,8 @@ const indikatorJSON = {
 
         function defCalls() {
             let requests = [
-                getGeoJSON(ind, time, raumgliederung_set, ags_set),
-                getGeneratedClasses(ind, time, raumgliederung_set, klassifizierung_set, klassenanzahl_set)
+                getGeoJSON(ind, time, raumgliederung_set, ags_set)
+                //getGeneratedClasses(ind, time, raumgliederung_set, klassifizierung_set, klassenanzahl_set)
             ];
             $.when.apply($, requests).done(function () {
                 def.resolve(arguments);
@@ -283,17 +283,17 @@ const indikatorJSON = {
         defCalls().done(function (arr) {
             //now we have access to array of data
             try{
-                object.json_file = JSON.parse(arr[0][0]);
+                object.json_file = JSON.parse(arr[0]);
             }catch(err){
-                object.json_file = arr[0][0]
+                object.json_file = arr[0]
             }
 
             if (getArtDarstellung() === "auto") {
-                klassengrenzen.setKlassen(arr[1][0]);
+                klassengrenzen.setKlassen(object.json_file.classes);
             }
 
            indikatorJSON.addToMap();
-           grundakt_layer.init();
+           //grundakt_layer.init();
            table.create();
            gebietsauswahl.init();
            legende.fillContent();
@@ -834,12 +834,12 @@ const klassengrenzen = {
     getKlassen: function(){return this.klassen},
     getMax:function(){
         return Math.max.apply(Math, this.klassen.map(function (o) {
-            return o.Wert_Obergrenze - 1000000000;
+            return o.Wert_Obergrenze;
         }));
     },
     getMin:function(){
         return Math.min.apply(Math, this.klassen.map(function (o) {
-            return o.Wert_Untergrenze - 1000000000;}));
+            return o.Wert_Untergrenze;}));
     },
     getColor:function(layer_value){
         let klassenJson = this.getKlassen(),
@@ -848,25 +848,25 @@ const klassengrenzen = {
         for (let i = 0; i < klassenJson.length; i++) {
             let obj = klassenJson[i];
             let max = klassenJson.length-1;
-            let obergrenze = obj.Wert_Obergrenze - 1000000000;
-            let untergrenze = obj.Wert_Untergrenze - 1000000000;
+            let obergrenze = obj.Wert_Obergrenze;
+            let untergrenze = obj.Wert_Untergrenze;
 
             let value_ind = (Math.round(layer_value * 100) / 100).toFixed(2);
 
             if (value_ind <= obergrenze && value_ind >= untergrenze) {
-                return '#' + obj.Farbwert;
+                return obj.Farbwert;
             }
             else if (value_ind < untergrenze_min > 0) {
-                return '#' + obj.Farbwert;
+                return obj.Farbwert;
             }
             else if (value_ind === 0) {
-                return '#' + obj.Farbwert;
+                return obj.Farbwert;
             }
             else if (value_ind > obergrenze_max) {
-                return '#' + klassenJson[max].Farbwert;
+                return klassenJson[max].Farbwert;
             }
             else if (value_ind === obergrenze_max) {
-                return '#' + obj.Farbwert;
+                return obj.Farbwert;
             }
         }
     },

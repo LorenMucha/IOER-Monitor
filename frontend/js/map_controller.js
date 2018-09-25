@@ -667,7 +667,7 @@ const raster_split={
                     klassifizierung = settings[0].klassifizierung,
                     klassenanzahl = settings[0].klassenanzahl;
 
-                $.when(getRasterMap(time, ind, raumgl_set, klassifizierung, klassenanzahl, getArtDarstellung()))
+                $.when(getRasterMap(time, ind, raumgl_set, klassifizierung, klassenanzahl, farbliche_darstellungsart.getSelectionId()))
                     .done(function (data) {
                         let txt = data;
                         let x = txt.split('##');

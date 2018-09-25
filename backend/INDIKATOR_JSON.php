@@ -12,7 +12,7 @@ class INDIKATOR_JSON
     protected static $instance = NULL;
     private $json;
 
-    public function __construct($indicator_id,$year,$spatial_extend,$ags_array_user) {
+    public function __construct($indicator_id,$year,$spatial_extend,$ags_array_user,$classification) {
 
         $this->indicator_id = $indicator_id;
         $this->year = $year;
@@ -20,6 +20,7 @@ class INDIKATOR_JSON
         $this->spatial_extend = $spatial_extend;
         $this->ags_array_user = $ags_array_user;
         $this->colors = MYSQL_QUERIES::get_instance()->getIndicatorColors($indicator_id);
+        $this->classification = $classification;
     }
     function getJSON(){
         /*$cache_manager = new INDIKATOR_CACHE_MANAGER($this->indicator_id,$this->year,$this->spatial_extend,$this->ags_array);

@@ -10,8 +10,8 @@ const indikator_raster = {
         let darstellung_map = glaetten.getState(),
             ind = indikatorauswahl.getSelectedIndikator(),
             time = zeit_slider.getTimeSet(),
-            klassifizierung = getKlassifizierung(),
-            klassenanzahl = getKlassenanzahl(),
+            klassifizierung = klassifzierung.getSelectionId(),
+            klassenanzahl = klassenanzahl.getSelectionId(),
             raumgliederung_set = raeumliche_analyseebene.getSelectionId();
 
         map.off('click', object.onClick);
@@ -243,9 +243,9 @@ const indikatorJSON = {
     init:function(raumgl, callback) {
         const object = this;
         let ind = indikatorauswahl.getSelectedIndikator(),
-            klassifizierung_set = getKlassifizierung(),
+            klassifizierung_set = klassifzierung.getSelectionId(),
             raumgliederung_set = raeumliche_analyseebene.getSelectionId(),
-            klassenanzahl_set = getKlassenanzahl(),
+            klassenanzahl_set = klassenanzahl.getSelectionId(),
             time = zeit_slider.getTimeSet(),
             ags_set = gebietsauswahl.getAddedAGS();
 
@@ -288,7 +288,7 @@ const indikatorJSON = {
                 object.json_file = arr[0]
             }
 
-            if (getArtDarstellung() === "auto") {
+            if (farbliche_darstellungsart.getSelectionId() === "auto") {
                 klassengrenzen.setKlassen(object.json_file.classes);
             }
 
@@ -513,7 +513,7 @@ const grundakt_layer = {
                 function defCalls() {
                     let requests = [
                         getGeoJSON('Z00AG', zeit_slider.getTimeSet(), raeumliche_analyseebene.getSelectionId(), gebietsauswahl.getAddedAGS()),
-                        getGeneratedClasses('Z00AG', zeit_slider.getTimeSet(),raeumliche_analyseebene.getSelectionId(),getKlassifizierung(), getKlassenanzahl())
+                        getGeneratedClasses('Z00AG', zeit_slider.getTimeSet(),raeumliche_analyseebene.getSelectionId(),klassifzierung.getSelectionId(), klassenanzahl.getSelectionId())
                     ];
                     $.when.apply($, requests).done(function () {
                         def.resolve(arguments);
@@ -529,7 +529,7 @@ const grundakt_layer = {
                         object.json_file = arr[0][0]
                     }
 
-                    if (getArtDarstellung() === "auto") {
+                    if (farbliche_darstellungsart.getSelectionId() === "auto") {
                         object.klassen = arr[1][0];
                     }
 

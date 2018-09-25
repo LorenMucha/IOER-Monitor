@@ -50,7 +50,7 @@ function getIndZusatzinformationen(ind,time){
     });
 }
 function getGeoJSON(ind,time,_raumgliederung,ags_array){
-    let json = JSON.parse('{"ind":{"id":"'+ind+'","time":"'+time+'","raumgliederung":"'+_raumgliederung+'","ags_array":"'+ags_array.toString()+'"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+'"},"query":"getJSON"}');
+    let json = JSON.parse('{"ind":{"id":"'+ind+'","time":"'+time+'","raumgliederung":"'+_raumgliederung+'","ags_array":"'+ags_array.toString()+'","klassifizierung":"'+klassifzierung.getSelectionId()+'"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+'"},"query":"getJSON"}');
     return $request_geojson = $.ajax({
         url: url_backend+"/query.php",
         type: "GET",
@@ -96,7 +96,7 @@ function getColorHTML(array, id) {
         data: {
             colmax_rgb: array[0],
             colmin_rgb: array[1],
-            anz_klassen: getKlassenanzahl(),
+            anz_klassen: klassenanzahl.getSelectionId(),
             id: id
         }
     });

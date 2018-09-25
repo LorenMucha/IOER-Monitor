@@ -171,11 +171,11 @@ const legende = {
             }
         });
         /*-------------------------KLasseneinteilung---------------------------------------------*/
-        klasseneinteilung_contaiener.text($('#' + getKlassifizierung("gebiete") + '_label').text());
+        klasseneinteilung_contaiener.text($('#' + klassifzierung.getSelectionId("gebiete") + '_label').text());
 
         /*create the histogramm and Legende------------------------------*/
         if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'gebiete') {
-            if (getArtDarstellung() === "auto") {
+            if (farbliche_darstellungsart.getSelectionId()=== "auto") {
                 let grades = [];
 
                 $.each(klassengrenzen.getKlassen(), function (key, value) {
@@ -220,7 +220,7 @@ const legende = {
         else {
             $.ajax({
                 type:"GET",
-                url :urlparamter.getURL_RASTER() + "php/histogramm.php?Jahr=" + zeit_slider.getTimeSet() + "&Kategorie=" + indikatorauswahl.getSelectedIndikatorKategorie() + "&Indikator=" + indikatorauswahl.getSelectedIndikator() + "&Raumgliederung=" + raeumliche_analyseebene.getSelectionId() + "&Klassifizierung=" + getKlassifizierung() + "&AnzKlassen=" + getKlassenanzahl(),
+                url :urlparamter.getURL_RASTER() + "php/histogramm.php?Jahr=" + zeit_slider.getTimeSet() + "&Kategorie=" + indikatorauswahl.getSelectedIndikatorKategorie() + "&Indikator=" + indikatorauswahl.getSelectedIndikator() + "&Raumgliederung=" + raeumliche_analyseebene.getSelectionId() + "&Klassifizierung=" + klassifzierung.getSelectionId() + "&AnzKlassen=" + klassenanzahl.getSelectionId(),
                 success:function(data){
                     histogramm_container.empty().append('<img style="width:100%;" src="'+data+'"/>');
                 }

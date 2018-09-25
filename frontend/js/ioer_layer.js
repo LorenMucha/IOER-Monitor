@@ -10,8 +10,8 @@ const indikator_raster = {
         let darstellung_map = glaetten.getState(),
             ind = indikatorauswahl.getSelectedIndikator(),
             time = zeit_slider.getTimeSet(),
-            klassifizierung = getKlassifizierung(),
-            klassenanzahl = getKlassenanzahl(),
+            klassifizierung = klassifzierung.getSelectionId(),
+            klassenanzahl = klassenanzahl.getSelectionId(),
             raumgliederung_set = raeumliche_analyseebene.getSelectionId();
 
         map.off('click', object.onClick);
@@ -243,9 +243,9 @@ const indikatorJSON = {
     init:function(raumgl, callback) {
         const object = this;
         let ind = indikatorauswahl.getSelectedIndikator(),
-            klassifizierung_set = getKlassifizierung(),
+            klassifizierung_set = klassifzierung.getSelectionId(),
             raumgliederung_set = raeumliche_analyseebene.getSelectionId(),
-            klassenanzahl_set = getKlassenanzahl(),
+            klassenanzahl_set = klassenanzahl.getSelectionId(),
             time = zeit_slider.getTimeSet(),
             ags_set = gebietsauswahl.getAddedAGS();
 
@@ -287,17 +287,16 @@ const indikatorJSON = {
             }catch(err){
                 object.json_file = arr[0][0]
             }
-
-            if (getArtDarstellung() === "auto") {
+            if (farbliche_darstellungsart.getSelectionId() === "auto") {
                 klassengrenzen.setKlassen(arr[1][0]);
             }
 
-           indikatorJSON.addToMap();
-           grundakt_layer.init();
-           table.create();
-           gebietsauswahl.init();
-           legende.fillContent();
-           farbschema.fill();
+            indikatorJSON.addToMap();
+            grundakt_layer.init();
+            table.create();
+            gebietsauswahl.init();
+            legende.fillContent();
+            farbschema.fill();
 
             if (callback) callback();
         });
@@ -316,7 +315,7 @@ const indikatorJSON = {
 
         //let einheit = geoJson.feature[0].properties.einheit;
         $.each(geoJson.features, function(key, value) {
-            if(key == 0) {
+            if(key== 0) {
                 einheit = String(value.properties.einheit);
             }
         });
@@ -346,7 +345,6 @@ const indikatorJSON = {
         if(layer_control.zusatzlayer.getState()){layer_control.zusatzlayer.setForward()};
     },
     setPopUp:function(e){
-        console.log(e.target);
         let layer = e.target,
             gen = layer.feature.properties.gen.toString(),
             value_ags = layer.feature.properties.value_comma,
@@ -513,7 +511,7 @@ const grundakt_layer = {
                 function defCalls() {
                     let requests = [
                         getGeoJSON('Z00AG', zeit_slider.getTimeSet(), raeumliche_analyseebene.getSelectionId(), gebietsauswahl.getAddedAGS()),
-                        getGeneratedClasses('Z00AG', zeit_slider.getTimeSet(),raeumliche_analyseebene.getSelectionId(),getKlassifizierung(), getKlassenanzahl())
+                        getGeneratedClasses('Z00AG', zeit_slider.getTimeSet(),raeumliche_analyseebene.getSelectionId(),klassifzierung.getSelectionId(), klassenanzahl.getSelectionId())
                     ];
                     $.when.apply($, requests).done(function () {
                         def.resolve(arguments);
@@ -529,7 +527,7 @@ const grundakt_layer = {
                         object.json_file = arr[0][0]
                     }
 
-                    if (getArtDarstellung() === "auto") {
+                    if (farbliche_darstellungsart.getSelectionId() === "auto") {
                         object.klassen = arr[1][0];
                     }
 
@@ -555,14 +553,15 @@ const grundakt_layer = {
                         Raumgliederung: raeumliche_analyseebene.getSelectionId()
                     },
                     success: function (data) {
-                        let txt_datenakt = data;
-                        let x_datenakt = txt_datenakt.split('##');
-                        let datenalter_mapfile = x_datenakt[0].replace(/^( +)/g, '');
-                        let datenalter_legende = x_datenakt[1];
-                        let datenalter_layer = x_datenakt[2];
+                        let txt_datenakt = data,
+                            x_datenakt = txt_datenakt.split('##'),
+                            datenalter_mapfile = x_datenakt[0].replace(/^( +)/g, ''),
+                            datenalter_legende = x_datenakt[1],
+                            datenalter_layer = x_datenakt[2],
+                            grundaktmap = $("#grundaktmap");
 
                         $('#datenalter_container').show();
-                        $('#grundaktmap').empty();
+                        grundaktmap.empty();
 
                         grundaktlayer = new L.tileLayer.wms('https://maps.ioer.de/cgi-bin/mapserv_dv?Map=' + datenalter_mapfile,
                             {
@@ -579,7 +578,7 @@ const grundakt_layer = {
                             zoomLevelOffset: -3,
                             aimingRectOptions: rect1
                         }).addTo(map);
-                        let grundaktmap = $("#grundaktmap");
+
                         grundaktmap.append(miniMapDiv.getContainer());
                         grundaktmap.find('.leaflet-control-minimap-toggle-display').remove();
                         $('#grundakt_legende').empty().load(datenalter_legende, function () {
@@ -846,10 +845,10 @@ const klassengrenzen = {
             obergrenze_max = this.getMax(),
             untergrenze_min = this.getMin();
         for (let i = 0; i < klassenJson.length; i++) {
-            let obj = klassenJson[i];
-            let max = klassenJson.length-1;
-            let obergrenze = obj.Wert_Obergrenze - 1000000000;
-            let untergrenze = obj.Wert_Untergrenze - 1000000000;
+            let obj = klassenJson[i],
+                max = klassenJson.length-1,
+                obergrenze = obj.Wert_Obergrenze - 1000000000,
+                untergrenze = obj.Wert_Untergrenze - 1000000000;
 
             let value_ind = (Math.round(layer_value * 100) / 100).toFixed(2);
 

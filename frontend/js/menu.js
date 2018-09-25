@@ -1,7 +1,6 @@
 var page_init = true,
     splitter_width = null,
     changed = false,
-    raeumliche_gliederung = 'gebiete',
     step;
 
 $(function menu_interaction() {
@@ -50,94 +49,7 @@ $(function menu_interaction() {
             $('#' + drop_menu).addClass('pinned');
         }
     });
-
-    //klassifizierungsmenu
-    $('#menu_klassifizierung').find('input').change(function () {
-        let value = $(this).val();
-        resetArtDarstellung();
-        urlparamter.updateURLParameter('klassifizierung',value);
-        if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete'){
-            if(typeof raumgliederung.getSelectedId() !=='undefined'){
-                indikatorJSON.init(raumgliederung.getSelectedId());
-            }else{
-                indikatorJSON.init();
-            }
-        }else{
-            indikator_raster.init();
-        }
-    });
-
-    //change the number of classes
-    $('#Klassenanzahl').change(function(){
-        resetArtDarstellung();
-        let value =$(this).val();
-        let param = urlparamter.getUrlParameter('klassenanzahl');
-        if(!param){
-            urlparamter.setUrlParameter('klassenanzahl',value);
-        }else{
-            urlparamter.updateURLParameter('klassenanzahl',value);
-        }
-        if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete'){
-            if(typeof raumgliederung.getSelectedId() !=='undefined'){
-                indikatorJSON.init(raumgliederung.getSelectedId());
-            }else{
-                indikatorJSON.init();
-            }
-        }else{
-            indikator_raster.init();
-        }
-    });
-
-    //art of the vizualization
-    $('#menu_darstellung').find('input').change(function () {
-        let value = $(this).val();
-        urlparamter.updateURLParameter('darstellung',value);
-        if(value =="auto"){
-            if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete'){
-                indikatorJSON.init()
-            }else{
-                indikator_raster.init();
-            }
-        }
-    });
 });
-function getArtDarstellung(){
-    let parameter = urlparamter.getUrlParameter('darstellung');
-    if(!parameter){
-        urlparamter.setUrlParameter('darstellung','auto');
-    }
-    return urlparamter.getUrlParameter('darstellung');
-}
-//modus is optional
-function getKlassifizierung(modus){
-    let parameter = urlparamter.getUrlParameter('klassifizierung');
-    if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete' || modus==="gebiete") {
-        if (!parameter) {
-            urlparamter.setUrlParameter('klassifizierung', 'haeufigkeit');
-        }
-        return urlparamter.getUrlParameter('klassifizierung');
-    }else{
-        let values = ['gleicheAnzahl','gleicheBreite'];
-        if(parameter === 'haeufigkeit'){
-            return values[0];
-        }else{
-            return values[1];
-        }
-    }
-}
-function getKlassenanzahl(){
-    let parameter = urlparamter.getUrlParameter('klassenanzahl');
-    if(!parameter){
-        urlparamter.setUrlParameter('klassenanzahl',7);
-    }else{
-        $('#klassi_'+parameter).prop("selected",true);
-    }
-    return parseInt(urlparamter.getUrlParameter('klassenanzahl'));
-}
-function resetArtDarstellung(){
-    urlparamter.updateURLParameter('darstellung','auto');
-    $('#farbreihe_auto').prop('checked', true);
-}
 //Models--------------------------------------------------------------------
 //Toolbar
 const toolbar = {
@@ -267,7 +179,7 @@ const indikatorauswahl ={
                     menu.previous_indikator=value;
                     menu.setIndicator(value);
                     if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'gebiete') {
-                        resetArtDarstellung();
+                        farbliche_darstellungsart.resetSelection();
                         clearChartArray();
                         table_expand_panel.close();
                     }
@@ -1054,7 +966,7 @@ const farbschema = {
     },
     paramter: 'farbschema',
     getDOMObject: function () {
-        $elem = $('#color_schema');
+        $elem = $('#farbwahl');
         return $elem;
     },
     getFarbwahlButtonDomObject: function () {
@@ -1074,11 +986,9 @@ const farbschema = {
         urlparamter.removeUrlParameter(this.paramter);
     },
     fill: function () {
-        let color_container = $('#color_schema'),
-            def = $.Deferred();
-
         const object = this;
-
+        let color_container =  object.getDOMObject().find('#color_schema'),
+            def = $.Deferred();
         function defCalls() {
             let requests = [];
             $.each(object.farben, function (key, value) {
@@ -1121,7 +1031,7 @@ const farbschema = {
             object.getFarbwahlButtonDomObject()
                 .empty()
                 .append('Bitte Wählen..<span class="caret"></span>');
-            object.getDOMObject().show();
+            object.getDOMObject().find('#color_schema').show();
             if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'raster') {
                 indikator_raster.init();
             }
@@ -1134,14 +1044,14 @@ const farbschema = {
             }
         });
         //the color schema
-        object.getDOMObject()
+        object.getFarbwahlButtonDomObject()
             .unbind()
             .click(function () {
             if(click_farb==0) {
-                object.getDOMObject().show();
+                object.getDOMObject().find('#color_schema').show();
                 click_farb++;
             }else{
-                object.getDOMObject().hide();
+                object.getDOMObject().find('#color_schema').hide();
                 click_farb = 0;
             }
 
@@ -1188,5 +1098,160 @@ const farbschema = {
             return_value = value[1];
         }
         return return_value;
+    }
+};
+const klassifzierung = {
+    paramter:"klassifizierung",
+    getDOMObject:function(){
+        $elem = $('#menu_klassifizierung');
+        return $elem;
+    },
+    getParamter:function(){
+        return urlparamter.getUrlParameter(this.paramter);
+    },
+    setParamter:function(_value){
+        urlparamter.setUrlParameter(this.paramter,_value);
+    },
+    updateParamter:function(_value){
+        urlparamter.updateURLParameter(this.paramter,_value);
+    },
+    removeParameter:function(){
+      urlparamter.removeUrlParameter(this.paramter);
+    },
+    getSelectionId:function(_modus){
+        const object = this;
+        let parameter = this.getParamter();
+        if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete'|| _modus==="gebiete") {
+            if (!parameter) {
+                object.setParamter('haeufigkeit');
+            }
+            return object.getParamter();
+        }else{
+            //raster
+            let values = ['gleicheAnzahl','gleicheBreite'];
+            if(parameter === 'haeufigkeit'){
+                return values[0];
+            }else{
+                return values[1];
+            }
+        }
+    },
+    init:function(){
+        const object = this;
+        object.getDOMObject()
+            .find('input')
+            .unbind()
+            .change(function () {
+                let value = $(this).val();
+                farbliche_darstellungsart.resetSelection();
+                object.updateParamter(value);
+                if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete'){
+                    if(typeof raumgliederung.getSelectedId() !=='undefined'){
+                        indikatorJSON.init(raumgliederung.getSelectedId());
+                    }else{
+                        indikatorJSON.init();
+                    }
+                }else{
+                    indikator_raster.init();
+                }
+            });
+        }
+};
+const klassenanzahl = {
+    paramter:'klassenanzahl',
+    getDOMObject:function(){
+        $elem = $('#Klassenanzahl');
+        return $elem;
+    },
+    getParamter:function(){
+        return urlparamter.getUrlParameter(this.paramter);
+    },
+    setParamter:function(_value){
+        urlparamter.setUrlParameter(this.paramter,_value);
+    },
+    updateParamter:function(_value){
+        urlparamter.updateURLParameter(this.paramter,_value);
+    },
+    removeParameter:function(){
+        urlparamter.removeUrlParameter(this.paramter);
+    },
+    getSelectionId:function(){
+        const object = this;
+        let parameter = object.getParamter();
+        if(!parameter){
+            object.setParamter(7);
+        }else{
+            $('#klassi_'+parameter).prop("selected",true);
+        }
+        return parseInt(object.getParamter());
+    },
+    init:function(){
+        const object = this;
+        object.getDOMObject()
+            .unbind()
+            .change(function(){
+                farbliche_darstellungsart.resetSelection();
+                let value =$(this).val();
+                object.updateParamter(value);
+                if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete'){
+                    if(typeof raumgliederung.getSelectedId() !=='undefined'){
+                        indikatorJSON.init(raumgliederung.getSelectedId());
+                    }else{
+                        indikatorJSON.init();
+                    }
+                }else{
+                    indikator_raster.init();
+                }
+            });
+    }
+};
+const farbliche_darstellungsart = {
+    paramter:'darstellung',
+    getDOMObject:function(){
+        $elem = $('#menu_darstellung');
+        return $elem;
+    },
+    getParamter:function(){
+        return urlparamter.getUrlParameter(this.paramter);
+    },
+    setParamter:function(_value){
+        urlparamter.setUrlParameter(this.paramter,_value);
+    },
+    updateParamter:function(_value){
+        urlparamter.updateURLParameter(this.paramter,_value);
+    },
+    removeParameter:function(){
+        urlparamter.removeUrlParameter(this.paramter);
+    },
+    getSelectionId:function(){
+        const object = this;
+        let parameter = object.getParamter();
+        if(!parameter){
+            object.setParamter('auto');
+        }
+        return object.getParamter();
+
+    },
+    resetSelection:function(){
+        this.updateParamter('auto');
+        $('#farbreihe_auto').prop('checked', true);
+    },
+    init:function(){
+        const object = this;
+        //art of the vizualization
+        object.getDOMObject()
+            .find('input')
+            .unbind()
+            .change(function () {
+                let value = $(this).val();
+                object.updateParamter(value);
+                if(value==="auto"){
+                    if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete'){
+                        indikatorJSON.init()
+                    }else{
+                        indikator_raster.init();
+                    }
+                }
+            });
     }
 };

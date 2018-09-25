@@ -17,6 +17,9 @@ $(document).ready(function() {
         webTour.init();
         toolbar.init();
         opacity_slider.init();
+        klassifzierung.init();
+        klassenanzahl.init();
+        farbliche_darstellungsart.init();
         $.when(mainView.restoreView())
             .then(leftView.setMapView())
             .then(function () {

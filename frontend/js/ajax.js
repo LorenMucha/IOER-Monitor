@@ -50,7 +50,7 @@ function getIndZusatzinformationen(ind,time){
     });
 }
 function getGeoJSON(ind,time,_raumgliederung,ags_array){
-    let json = JSON.parse('{"ind":{"id":"'+ind+'","time":"'+time+'","raumgliederung":"'+_raumgliederung+'","ags_array":"'+ags_array.toString()+'"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+'"},"query":"getJSON"}');
+    let json = JSON.parse('{"ind":{"id":"'+ind+'","time":"'+time+'","raumgliederung":"'+_raumgliederung+'","ags_array":"'+ags_array.toString()+'","klassifizierung":"'+klassifzierung.getSelectionId()+'"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+'"},"query":"getJSON"}');
     return $request_geojson = $.ajax({
         url: url_backend+"/query.php",
         type: "GET",
@@ -71,7 +71,7 @@ function getGeoJSON(ind,time,_raumgliederung,ags_array){
     });
 }
 function getGeneratedClasses(indikator,time,raumgl,klassifizierung,klassenanzahl){
-    request_classes = $.ajax({
+    return $.ajax({
         url: url_backend+"/map/klassenbildung.php",
         type: "GET",
         dataType: 'json',
@@ -91,10 +91,8 @@ function getGeneratedClasses(indikator,time,raumgl,klassifizierung,klassenanzahl
                 alertError();
             }
         },success:function(data){
-            //callback
         }
     });
-    return request_classes;
 }
 function getRasterMap(time,ind,_raumgliederung,klassifizierung,klassenanzahl,darstellung_map,_seite){
     return $.ajax({
@@ -122,8 +120,16 @@ function getColorHTML(array, id) {
         data: {
             colmax_rgb: array[0],
             colmin_rgb: array[1],
-            anz_klassen: getKlassenanzahl(),
+            anz_klassen: klassenanzahl.getSelectionId(),
             id: id
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.log(this.url);
+            progressbar.remove();
+            console.log(thrownError);
+        },
+        success:function(data){
+            //callback
         }
     });
 }

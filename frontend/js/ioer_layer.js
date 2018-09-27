@@ -7,25 +7,25 @@ const indikator_raster = {
     raster_layer:'',
     init:function(hex_min, hex_max, _seite, _settings,callback) {
         const object = this;
-        let darstellung_map = glaetten.getState(),
-            ind = indikatorauswahl.getSelectedIndikator(),
-            time = zeit_slider.getTimeSet(),
-            klassifizierung = klassifzierung.getSelectionId(),
-            klassenanzahl = klassenanzahl.getSelectionId(),
-            raumgliederung_set = raeumliche_analyseebene.getSelectionId();
+        let _darstellung_map = glaetten.getState(),
+            _ind = indikatorauswahl.getSelectedIndikator(),
+            _time = zeit_slider.getTimeSet(),
+            _klassifizierung = klassifzierung.getSelectionId(),
+            _klassenanzahl = klassenanzahl.getSelectionId(),
+            _raumgliederung = raeumliche_analyseebene.getSelectionId();
 
         map.off('click', object.onClick);
 
         //settings for split map request
         if (_seite === 'rechts') {
-            ind = _settings[0].ind;
-            time = _settings[0].time;
-            raumgliederung_set = _settings[0].raumgl;
-            klassifizierung = _settings[0].klassifizierung;
-            klassenanzahl = _settings[0].klassenanzahl;
+            _ind = _settings[0].ind;
+            _time = _settings[0].time;
+            _raumgliederung = _settings[0].raumgl;
+            _klassifizierung = _settings[0].klassifizierung;
+            _klassenanzahl = _settings[0].klassenanzahl;
         }
 
-        $.when(getRasterMap(time, ind, raumgliederung_set, klassifizierung, klassenanzahl, darstellung_map, _seite))
+        $.when(getRasterMap(_time, _ind, _raumgliederung, _klassifizierung, _klassenanzahl, _darstellung_map, _seite))
             .then(function (data) {
                 let txt = data,
                     x = txt.split('##'),
@@ -247,7 +247,7 @@ const indikatorJSON = {
             raumgliederung_set = raeumliche_analyseebene.getSelectionId(),
             klassenanzahl_set = klassenanzahl.getSelectionId(),
             time = zeit_slider.getTimeSet(),
-            ags_set = gebietsauswahl.getAddedAGS();
+            ags_set = gebietsauswahl.getSelection();
 
         $.when(progressbar.init())
             .then(indikatorRasterGroup.clean())
@@ -305,6 +305,7 @@ const indikatorJSON = {
     addToMap:function(geoJson_set, klassenJson_set){
         const object = this;
         let geoJson = this.json_file;
+        indikatorJSONGroup.clean();
         //optional parameter for undependant creation
         if(geoJson_set){
             geoJson = geoJson_set;
@@ -510,7 +511,7 @@ const grundakt_layer = {
 
                 function defCalls() {
                     let requests = [
-                        getGeoJSON('Z00AG', zeit_slider.getTimeSet(), raeumliche_analyseebene.getSelectionId(), gebietsauswahl.getAddedAGS()),
+                        getGeoJSON('Z00AG', zeit_slider.getTimeSet(), raeumliche_analyseebene.getSelectionId(), gebietsauswahl.getSelection()),
                         getGeneratedClasses('Z00AG', zeit_slider.getTimeSet(),raeumliche_analyseebene.getSelectionId(),klassifzierung.getSelectionId(), klassenanzahl.getSelectionId())
                     ];
                     $.when.apply($, requests).done(function () {

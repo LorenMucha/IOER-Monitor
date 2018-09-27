@@ -91,6 +91,7 @@ function getGeneratedClasses(indikator,time,raumgl,klassifizierung,klassenanzahl
                 alertError();
             }
         },success:function(data){
+            console.log(this.url);
         }
     });
 }

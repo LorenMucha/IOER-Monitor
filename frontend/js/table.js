@@ -3,7 +3,6 @@ const table = {
     table_classes : 'tablesorter',
     excludedAreas:['Gemeindefreies Gebiet'],
     expandState:false,
-    set_width:false,
     getDOMObject: function(){
         $table = $('#table_ags');
         return $table;
@@ -175,21 +174,22 @@ const table = {
         table_filter_panel.init();
         //create the main Table header
         function createTableHeader(){
-            var value_text = indikatorauswahl.getSelectedIndikator().toUpperCase()+" ("+indikatorauswahl.getIndikatorEinheit()+")";
-            var colspan = 4;
+            let value_text = indikatorauswahl.getSelectedIndikator().toUpperCase()+" ("+indikatorauswahl.getIndikatorEinheit()+")",
+                colspan = 4;
             if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
                 colspan=5;
             }
 
-            var html = '<thead id="thead" class="full-width">'+
-                '<tr id="first_row_head">' +
-                '<th colspan="'+colspan+'" data-sorter="false" class="sorter-false expand" id="header_ind_set">'+indikatorauswahl.getSelectedIndikatorText_Lang()+' ('+zeit_slider.getTimeSet()+')</th>'+
-                '</tr>'+
-                '<tr class="header" id="second_row_head">' +
-                '<th class="th_head" id="tr_rang">lfd. Nr.</th>'+
-                '<th class="th_head ags">AGS</th>'+
-                '<th class="th_head gebietsname">Gebietsname</th>'+
-                '<th id="tabel_header_raumgl" class="th_head">'+value_text+'</th>';
+           let html = '<thead id="thead" class="full-width">'+
+                    '<tr id="first_row_head">' +
+                    '<th colspan="'+colspan+'" data-sorter="false" class="sorter-false expand" id="header_ind_set">'+indikatorauswahl.getSelectedIndikatorText_Lang()+' ('+zeit_slider.getTimeSet()+')</th>'+
+                    '</tr>'+
+                    '<tr class="header" id="second_row_head">' +
+                    '<th class="th_head" id="tr_rang">lfd. Nr.</th>'+
+                    '<th class="th_head ags">AGS</th>'+
+                    '<th class="th_head gebietsname">Gebietsname</th>'+
+                    '<th id="tabel_header_raumgl" class="th_head">'+value_text+'</th>';
+
             if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
                 html += '<th class="th_head grundakt_head" id="grundakt_head">Mittlere Grund- aktualität</th>';
             }
@@ -225,7 +225,7 @@ const table = {
                     raumgl= raumgliederung.getSelectedId();
                 }
 
-                if(name === layer_array[i].gen && raumgl==='krs' || raumgl==='gem'){
+                if(name === layer_array[i].gen){
                     name = name+" ("+des+")";
                 }
 
@@ -353,8 +353,6 @@ const table = {
             table_body = this.getTableBodyObject(),
             footer_brd = $('#tfoot_99'),
             def = $.Deferred();
-
-        table.set_width = false;
 
         //reset the colspa
         if(!indikatorauswahl.getSelectedIndiktorGrundaktState()){table.setColspanHeader(4);}
@@ -652,10 +650,7 @@ const table = {
             progressbar.remove();
             table.setTableSorter();
             table.expandState= true;
-            if(table.getWidth()>450){
-                table.set_width = table.getWidth()+80;
-                mainView.resizeSplitter(table.getWidth()+80);
-            }
+            mainView.resizeSplitter(table.getWidth()+80);
         });
         //function to get the order state inside the table, based on the given number
         function getExpandValue(id,key_set){
@@ -689,20 +684,17 @@ const table = {
         }
         //get the dufference between the year's
         function getDiff_Grundakt(values_ind,values_set){
-            let date_set = new Date(parseFloat(values_set[1]),parseFloat(values_set[0]));
-            let date_ind = new Date(parseFloat(values_ind[1]),parseFloat(values_ind[0]));
+            let date_set = new Date(parseFloat(values_set[1]),parseFloat(values_set[0])),
+                date_ind = new Date(parseFloat(values_ind[1]),parseFloat(values_ind[0])),
             //solution to calc the difference from http://www.splessons.com/how-do-i-find-the-difference-between-two-dates-using-jquery/
-            let diff_date = date_ind - date_set;
-            let years = Math.floor(diff_date/31536000000);
-            let months = Math.floor((diff_date % 31536000000)/2628000000);
+                diff_date = date_ind - date_set,
+                years = Math.floor(diff_date/31536000000),
+                months = Math.floor((diff_date % 31536000000)/2628000000);
             return (years-(months/12)).toFixed(1).toString().replace('.',',');
         }
     },
-    setExandState:function(_state){
+    setExpandState:function(_state){
       this.expandState = _state;
-      if(!_state){
-          this.set_width=false;
-      }
     },
     setRang:function(){
         let i=0;
@@ -806,11 +798,7 @@ const table = {
         }
     },
     getWidth:function(){
-        let return_width = this.getContainer().width();
-        if(this.set_width){
-            return_width = this.set_width;
-        }
-        return return_width;
+        return this.getContainer().width();
     },
 };
 const table_expand_panel = {
@@ -1037,7 +1025,7 @@ const table_expand_panel = {
                 $('#header_ind_set').attr("colspan",5);
                 panel.fill();
                 panel.close();
-                table.setExandState(false);
+                table.setExpandState(false);
                 mainView.resizeSplitter(table.getWidth());
             });
         //bind the semantic zu functionality

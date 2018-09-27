@@ -1,4 +1,5 @@
 <?php
+header('Access-Control-Allow-Origin: *');
 header('Content-type: application/json; charset=utf-8');
 require("database/MYSQL_QUERIES.php");
 require("HELPER.php");

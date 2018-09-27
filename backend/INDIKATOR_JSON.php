@@ -22,7 +22,7 @@ class INDIKATOR_JSON
         $this->colors = MYSQL_QUERIES::get_instance()->getIndicatorColors($indicator_id);
     }
     function getJSON(){
-        /*$cache_manager = new INDIKATOR_CACHE_MANAGER($this->indicator_id,$this->year,$this->spatial_extend,$this->ags_array);
+        $cache_manager = new INDIKATOR_CACHE_MANAGER($this->indicator_id,$this->year,$this->spatial_extend,$this->ags_array_user);
         try{
             if (!$cache_manager->check_cached()) {
                 $json = $this->createJSON();
@@ -35,8 +35,7 @@ class INDIKATOR_JSON
         }catch(Error $e){
             $trace = $e->getTrace();
             echo $e->getMessage().' in '.$e->getFile().' on line '.$e->getLine().' called from '.$trace[0]['file'].' on line '.$trace[0]['line'];
-        }*/
-        return $this->createJSON();
+        }
     }
     function createJSON(){
             # Build GeoJSON

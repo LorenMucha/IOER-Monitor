@@ -65,6 +65,6 @@ class POSTGRESQL_QUERIES extends POSTGRESQL_MANAGER
         }
         $sql ="select gen from vg250_".$raumgliederung."_".$year."_grob where ags ='".$ags."'";
         $rs = $this->query($sql);
-        return $rs->gen;
+        return $rs[0]->gen;
     }
 }

@@ -15,40 +15,6 @@ $(function menu_interaction() {
     $( ".kennblatt" ).click(function() {
         openKennblatt();
     });
-
-    //open and close the dropdown's
-    $(".hh_sf").click(function(event) {
-        let ddm = $(this).find('i').data('ddm'),
-            ddm_container = $('#'+ddm);
-
-        if(ddm_container.hasClass('pinned')===false && !ddm_container.is(':visible')){
-            ddm_container.slideDown();
-        }else if(ddm_container.is(':visible')===true &&ddm_container.hasClass('pinned')===false){
-            ddm_container.slideUp();
-        }
-        $('.dropdown_menu').each(function(){
-            if($(this).is('#'+ddm)===false && $(this).hasClass('pinned')===false){
-                $(this).slideUp();
-            }
-        });
-        //set the height og the overflow content inside the menu bar
-        if(mainView.getHeight() <= 1000 && viewState.getViewState() ==='mw') {
-            let height = toolbar.getHeight() - $('#no_overflow').height() - 60;
-            $('#overflow_content').css("height",height+50);
-        }
-    });
-    //pin the element in the menu and unpin
-    $('.pin').click(function(event){
-        let drop_menu = $(this).find('i').data('ddm');
-        let icon =  $(this).find('i');
-        if(icon.hasClass('arrow_pinned')){
-            icon.removeClass('arrow_pinned');
-            $('#'+drop_menu).removeClass('pinned');
-        }else {
-            icon.addClass('arrow_pinned');
-            $('#' + drop_menu).addClass('pinned');
-        }
-    });
 });
 //Models--------------------------------------------------------------------
 //Toolbar
@@ -93,6 +59,47 @@ const toolbar = {
         setTimeout(function(){
             map_indikator_infos.resize();
         },1000);
+
+        //open and close the dropdown's
+        object.getDOMObject()
+            .find(".hh_sf")
+            .unbind()
+            .click(function(event) {
+                let ddm = $(this).find('i').data('ddm'),
+                    ddm_container = $('#'+ddm);
+
+                if(ddm_container.hasClass('pinned')===false && !ddm_container.is(':visible')){
+                    ddm_container.slideDown();
+                }else if(ddm_container.is(':visible')===true &&ddm_container.hasClass('pinned')===false){
+                    ddm_container.slideUp();
+                }
+                $('.dropdown_menu').each(function(){
+                    if($(this).is('#'+ddm)===false && $(this).hasClass('pinned')===false){
+                        $(this).slideUp();
+                    }
+                });
+                //set the height og the overflow content inside the menu bar
+                if(mainView.getHeight() <= 1000 && viewState.getViewState() ==='mw') {
+                    let height = toolbar.getHeight() - $('#no_overflow').height() - 60;
+                    $('#overflow_content').css("height",height+50);
+                }
+            });
+
+        //pin the element in the menu and unpin
+        object.getDOMObject()
+            .find('.pin')
+            .unbind()
+            .click(function(event){
+                let drop_menu = $(this).find('i').data('ddm'),
+                    icon =  $(this).find('i');
+                if(icon.hasClass('arrow_pinned')){
+                    icon.removeClass('arrow_pinned');
+                    $('#'+drop_menu).removeClass('pinned');
+                }else {
+                    icon.addClass('arrow_pinned');
+                    $('#' + drop_menu).addClass('pinned');
+                }
+            });
     },
     getHeight:function(){
         return this.getDOMObject().height();
@@ -676,8 +683,8 @@ const gebietsauswahl = {
     setMapLayer:function(array){this.mapLayer=array;},
     getMapLayerGrund:function(){return this.mapLayerGrund;},
     setMapLayerGrund:function(array){this.mapLayerGrund=array;},
-    getAddedAGS:function(){return this.addedAGS;},
-    setAddedAGS:function(array){this.addedAGS=array;},
+    getSelection:function(){return this.addedAGS;},
+    setSelection:function(array){this.addedAGS=array;},
     clearAddedAGS:function(){
         this.addedAGS = [];
         urlparamter.removeUrlParameter(this.paramter);
@@ -738,7 +745,7 @@ const gebietsauswahl = {
                         }
                         object.setMapLayer(mapLayer);
                         object.setMapLayerGrund(mapLayer_grund);
-                        object.setAddedAGS(ags_array);
+                        object.setSelection(ags_array);
                         if(raumgliederung.getSelectedId() && !page_init){
                             indikatorJSON.init(raumgliederung.getSelectedId());
                         }else {
@@ -781,7 +788,7 @@ const gebietsauswahl = {
     removeSelectedLayersFromMap:function(value){
         let mapLayer = this.getMapLayer(),
             mapLayer_grund = this.getMapLayerGrund(),
-            ags_array= this.getAddedAGS();
+            ags_array= this.getSelection();
         for (let i = 0; i < mapLayer.length; i++) {
             if (mapLayer[i].properties.ags == value) {
                 mapLayer.splice(i, 1);
@@ -803,7 +810,7 @@ const gebietsauswahl = {
         this.updateParamter(ags_array.toString());
         this.setMapLayer(mapLayer);
         this.setMapLayerGrund(mapLayer_grund);
-        this.setAddedAGS(ags_array);
+        this.setSelection(ags_array);
         if(raumgliederung.getSelectedId()) {
             indikatorJSON.init(raumgliederung.getSelectedId());
 

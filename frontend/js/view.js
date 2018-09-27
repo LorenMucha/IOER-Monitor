@@ -325,7 +325,7 @@ const rightView = {
 };
 const viewState = {
     state: "mw",
-    test_system:true,
+    test_system:false,
     unit:false,
     getUnitTestState:function(){
         if(urlparamter.getUrlParameter('test')){

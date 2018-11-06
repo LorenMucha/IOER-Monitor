@@ -142,12 +142,13 @@ const zeit_slider={
     },
     init:function(jahre) {
           const object = this;
-          var time_param = this.getTimeSet(),
+          let time_param = this.getTimeSet(),
               value_set=jahre.length-1,
               slider = this.getSliderDOMObject();
 
         //show the time container
         object.jahre= jahre;
+        object.show();
 
       if(!time_param){
           object.setParam(jahre[value_set]);
@@ -157,7 +158,7 @@ const zeit_slider={
           if(jahre.length == 1){
               object.updateParam(jahre[value_set]);
               alertOneTimeShift();
-              zeit_slider.hide();
+             object.hide();
           }
           else if($.inArray(parseInt(time_param),jahre)!= -1){
               object.updateParam(jahre[$.inArray(parseInt(time_param),jahre)]);

@@ -212,15 +212,15 @@ const legende = {
                 legende_colors.append(zusatzlayer);
             }
             /*------Histogramm------------------------------------------------------------------------*/
-            $.when(getHistogramm()).done(function (data) {
+            /*$.when(getHistogramm()).done(function (data) {
                 $('#iconhistogramm').attr("src", "");
                 histogramm_container.empty().append(data);
-            });
+            });*/
         }
         else {
             $.ajax({
                 type:"GET",
-                url :urlparamter.getURL_RASTER() + "php/histogramm.php?Jahr=" + zeit_slider.getTimeSet() + "&Kategorie=" + indikatorauswahl.getSelectedIndikatorKategorie() + "&Indikator=" + indikatorauswahl.getSelectedIndikator() + "&Raumgliederung=" + raeumliche_analyseebene.getSelectionId() + "&Klassifizierung=" + klassifzierung.getSelectionId() + "&AnzKlassen=" + klassenanzahl.getSelectionId(),
+                url :urlparamter.getURL_RASTER() + "php/histogramm.php?Jahr=" + zeit_slider.getTimeSet() + "&Kategorie=" + indikatorauswahl.getSelectedIndikatorKategorie() + "&Indikator=" + indikatorauswahl.getSelectedIndikator() + "&Raumgliederung=" + raeumliche_analyseebene.getSelectionId() + "&Klassifizierung=" + klassifzierung.getSelectionId() + "&AnzKlassen=" + klassenanzahl.getSelection(),
                 success:function(data){
                     histogramm_container.empty().append('<img style="width:100%;" src="'+data+'"/>');
                 }

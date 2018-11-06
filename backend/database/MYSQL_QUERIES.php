@@ -50,7 +50,6 @@ class MYSQL_QUERIES extends MYSQL_MANAGER {
         return $this->query($sql);
     }
     function getIndicatorInSpatialExtend($year,$indikator_id,$ags){
-        $sql = '';
         if($indikator_id !=='Z00AG') {
             $sql = "SELECT i.INDIKATORWERT AS value, i.ID_INDIKATOR as ind, z.EINHEIT as einheit,i.FEHLERCODE as fc, i.HINWEISCODE as hc, i.AGS as ags, z.RUNDUNG_NACHKOMMASTELLEN as rundung
                                     FROM m_indikatorwerte_" . $year . " i, m_indikator_freigabe f, m_indikatoren z
@@ -154,6 +153,9 @@ class MYSQL_QUERIES extends MYSQL_MANAGER {
     function getIndicatorColors($ind){
         $sql = "SELECT FARBWERT_MAX as max,FARBWERT_MIN as min FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$ind."'";
         $rs = $this->query($sql);
+        if(!$rs){
+
+        }
         return $rs;
     }
     function getGrundaktState($ind){

@@ -178,6 +178,7 @@ Slider
 }
 .ui.search .prompt {
     border-radius: 0 !important;
+    border:1px solid black;
 }
 
 /*Dialog*/
@@ -243,10 +244,9 @@ Feedack
     padding: 10px;
     border-radius: 15px;
 }
-#progress_div #cancel_btn {
-    margin-top: 20px;
+#progress_div #abort_btn {
     width: 50%;
-    margin-right: 30%;
+    margin-left: 20%;
     background-color: #8CB91B;
     color:white;
 }

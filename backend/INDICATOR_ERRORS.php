@@ -1,6 +1,7 @@
 <?php
 require_once ('database/MYSQL_MANAGER.php');
-class INDIKATOR_ERRORS extends MYSQL_MANAGER
+
+class INDICATOR_ERRORS extends MYSQL_MANAGER
 {
     private $errors;
     protected static $instance = NULL;

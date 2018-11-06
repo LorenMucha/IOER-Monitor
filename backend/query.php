@@ -1,14 +1,19 @@
 <?php
+header('Access-Control-Allow-Origin: *');
 header('Content-type: application/json; charset=utf-8');
 require("database/MYSQL_QUERIES.php");
 require("HELPER.php");
-require('INDIKATOR_JSON.php');
+require('INDICATOR_JSON.php');
+require('CLASSIFY.php');
+require_once('CACHE_MANAGER.php');
 $q =  $_GET["values"];
 $json_obj = json_decode($q, true);
 $modus = $json_obj['format']['id'];
 $indicator = $json_obj['ind']['id'];
 $year =$json_obj['ind']['time'];
 $raumgliederung =$json_obj['ind']['raumgliederung'];
+$klassifizierung = $json_obj['ind']['klassifizierung'];
+$klassenanzahl = $json_obj['ind']['klassenzahl'];
 $query = $json_obj['query'];
 
 try{
@@ -16,9 +21,24 @@ try{
     if($query==='getJSON'){
         $ags_array = $json_obj['ind']['ags_array'];
         $ags_array = explode(",",$ags_array);
-        //echo json_encode($ags_array);
-        $test = new INDIKATOR_JSON($indicator,$year,$raumgliederung,$ags_array);
-        echo $test->getJSON();
+        //check if the json exist in the database
+        $cache_manager = new CACHE_MANAGER($indicator,$year,$raumgliederung,$ags_array,$klassifizierung);
+        try{
+            if (!$cache_manager->check_cached()) {
+                $indicator_json = new INDICATOR_JSON($indicator,$year,$raumgliederung,$ags_array);
+                $geometry_values = $indicator_json->createJSON();
+                $class_json = new CLASSIFY($geometry_values,$klassenanzahl,false,$indicator,$klassifizierung);
+                $json = json_encode(array_merge($geometry_values,array("classes"=>$class_json->classify())));
+                //save the cache
+                 $cache_manager->insert($json);
+                 echo $json;
+            }else{
+                echo $cache_manager->get_cached();
+            }
+        }catch(Error $e){
+            $trace = $e->getTrace();
+            echo $e->getMessage().' in '.$e->getFile().' on line '.$e->getLine().' called from '.$trace[0]['file'].' on line '.$trace[0]['line'];
+        }
     }
     //get all possible Indicators
     else if($query==='getAllIndicators'){

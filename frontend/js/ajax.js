@@ -1,4 +1,5 @@
-var url_backend = urlparamter.getURL_SVG()+"backend";
+let url_backend = urlparamter.getURL_SVG()+"backend",
+    ajax_call;
 
 /*
 AJAX GETTER Functions------------------------------------------------------------
@@ -50,8 +51,8 @@ function getIndZusatzinformationen(ind,time){
     });
 }
 function getGeoJSON(ind,time,_raumgliederung,ags_array){
-    let json = JSON.parse('{"ind":{"id":"'+ind+'","time":"'+time+'","raumgliederung":"'+_raumgliederung+'","ags_array":"'+ags_array.toString()+'","klassifizierung":"'+klassifzierung.getSelectionId()+'"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+'"},"query":"getJSON"}');
-    return $request_geojson = $.ajax({
+    let json = JSON.parse('{"ind":{"id":"'+ind+'","time":"'+time+'","raumgliederung":"'+_raumgliederung+'","ags_array":"'+ags_array.toString()+'","klassifizierung":"'+klassifzierung.getSelectionId()+'","klassenzahl":"'+klassenanzahl.getSelection()+'"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+'"},"query":"getJSON"}');
+    ajax_call = $.ajax({
         url: url_backend+"/query.php",
         type: "GET",
         data: {
@@ -67,8 +68,10 @@ function getGeoJSON(ind,time,_raumgliederung,ags_array){
         },
         success:function(data){
             //console.log(this.url);
+            console.log(data);
         }
     });
+    return ajax_call;
 }
 function getRasterMap(time,ind,_raumgliederung,klassifizierung,klassenanzahl,darstellung_map,_seite){
     return $.ajax({
@@ -96,7 +99,7 @@ function getColorHTML(array, id) {
         data: {
             colmax_rgb: array[0],
             colmin_rgb: array[1],
-            anz_klassen: klassenanzahl.getSelectionId(),
+            anz_klassen: klassenanzahl.getSelection(),
             id: id
         }
     });
@@ -112,6 +115,8 @@ function getIndicatorValueByMapAGS(json,ags_array){
         url: url_backend+"/html/indicator_values.php",
         type: "POST",
         data:{
+            time:zeit_slider.getTimeSet(),
+            indicator:indikatorauswahl.getSelectedIndikator(),
             values:json,
             ags_array_string: JSON.stringify(ags_set),
             grundakt_set: indikatorauswahl.getSelectedIndiktorGrundaktState()

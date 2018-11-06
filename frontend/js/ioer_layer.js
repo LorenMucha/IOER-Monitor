@@ -7,25 +7,25 @@ const indikator_raster = {
     raster_layer:'',
     init:function(hex_min, hex_max, _seite, _settings,callback) {
         const object = this;
-        let darstellung_map = glaetten.getState(),
-            ind = indikatorauswahl.getSelectedIndikator(),
-            time = zeit_slider.getTimeSet(),
-            klassifizierung = klassifzierung.getSelectionId(),
-            klassenanzahl = klassenanzahl.getSelectionId(),
-            raumgliederung_set = raeumliche_analyseebene.getSelectionId();
+        let _darstellung_map = glaetten.getState(),
+            _ind = indikatorauswahl.getSelectedIndikator(),
+            _time = zeit_slider.getTimeSet(),
+            _klassifizierung = klassifzierung.getSelectionId(),
+            _klassenanzahl = klassenanzahl.getSelection(),
+            _raumgliederung_set = raeumliche_analyseebene.getSelectionId();
 
         map.off('click', object.onClick);
 
         //settings for split map request
         if (_seite === 'rechts') {
-            ind = _settings[0].ind;
-            time = _settings[0].time;
-            raumgliederung_set = _settings[0].raumgl;
-            klassifizierung = _settings[0].klassifizierung;
-            klassenanzahl = _settings[0].klassenanzahl;
+            _ind = _settings[0].ind;
+            _time = _settings[0].time;
+            _raumgliederung_set = _settings[0].raumgl;
+            _klassifizierung = _settings[0].klassifizierung;
+            _klassenanzahl = _settings[0].klassenanzahl;
         }
 
-        $.when(getRasterMap(time, ind, raumgliederung_set, klassifizierung, klassenanzahl, darstellung_map, _seite))
+        $.when(getRasterMap(_time, _ind, _raumgliederung_set, _klassifizierung, _klassenanzahl, _darstellung_map, _seite))
             .then(function (data) {
                 let txt = data,
                     x = txt.split('##'),
@@ -245,9 +245,9 @@ const indikatorJSON = {
         let ind = indikatorauswahl.getSelectedIndikator(),
             klassifizierung_set = klassifzierung.getSelectionId(),
             raumgliederung_set = raeumliche_analyseebene.getSelectionId(),
-            klassenanzahl_set = klassenanzahl.getSelectionId(),
+            klassenanzahl_set = klassenanzahl.getSelection(),
             time = zeit_slider.getTimeSet(),
-            ags_set = gebietsauswahl.getAddedAGS();
+            ags_set = gebietsauswahl.getSelection();
 
         $.when(progressbar.init())
             .then(indikatorRasterGroup.clean())
@@ -267,40 +267,29 @@ const indikatorJSON = {
             }, 100)
         });
 
-        let def = $.Deferred();
+        $.when(getGeoJSON(ind, time, raumgliederung_set, ags_set))
+            .done(function(arr){
+                //now we have access to array of data
+                try{
+                    object.json_file = JSON.parse(arr);
+                }catch(err){
+                    object.json_file = arr
+                }
 
-        function defCalls() {
-            let requests = [
-                getGeoJSON(ind, time, raumgliederung_set, ags_set)
-                //getGeneratedClasses(ind, time, raumgliederung_set, klassifizierung_set, klassenanzahl_set)
-            ];
-            $.when.apply($, requests).done(function () {
-                def.resolve(arguments);
+                if (farbliche_darstellungsart.getSelectionId() === "auto") {
+                    klassengrenzen.setKlassen(object.json_file.classes);
+                }
+
+                object.addToMap();
+                grundakt_layer.init();
+                table.create();
+                gebietsauswahl.init();
+                legende.fillContent();
+                farbschema.fill();
+
+                if (callback) callback();
             });
-            return def.promise();
-        }
 
-        defCalls().done(function (arr) {
-            //now we have access to array of data
-            try{
-                object.json_file = JSON.parse(arr[0]);
-            }catch(err){
-                object.json_file = arr[0]
-            }
-
-            if (farbliche_darstellungsart.getSelectionId() === "auto") {
-                klassengrenzen.setKlassen(object.json_file.classes);
-            }
-
-           indikatorJSON.addToMap();
-           //grundakt_layer.init();
-           table.create();
-           gebietsauswahl.init();
-           legende.fillContent();
-           farbschema.fill();
-
-            if (callback) callback();
-        });
         page_init = false;
     },
     addToMap:function(geoJson_set, klassenJson_set){
@@ -505,32 +494,27 @@ const grundakt_layer = {
         disableElement('#datenalter','Nicht verfügbar');
         //hole JSON
         const object = this;
+        let grundaktmap = $("#grundaktmap");
         if(indikatorauswahl.getSelectedIndiktorGrundaktState()) {
-            if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'gebiete' && raumgliederung.getSelectedId() !== 'gem' && raeumliche_analyseebene.getSelectionId()!=='gem' && zeit_slider.getTimeSet() > 2000) {
+            if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'gebiete'
+                && raumgliederung.getSelectedId() !== 'vwg'
+                && raeumliche_analyseebene.getSelectionId()!=='vwg'
+                && raumgliederung.getSelectedId() !== 'gem'
+                && raeumliche_analyseebene.getSelectionId()!=='gem'
+                && zeit_slider.getTimeSet() > 2000) {
                 enableElement('#datenalter', 'Zeige die Karte des Datenalters an.');
                 let def = $.Deferred();
 
-                function defCalls() {
-                    let requests = [
-                        getGeoJSON('Z00AG', zeit_slider.getTimeSet(), raeumliche_analyseebene.getSelectionId(), gebietsauswahl.getAddedAGS()),
-                        getGeneratedClasses('Z00AG', zeit_slider.getTimeSet(),raeumliche_analyseebene.getSelectionId(),klassifzierung.getSelectionId(), klassenanzahl.getSelectionId())
-                    ];
-                    $.when.apply($, requests).done(function () {
-                        def.resolve(arguments);
-                    });
-                    return def.promise();
-                }
-
-                defCalls().done(function (arr) {
+                $.when(getGeoJSON('Z00AG', zeit_slider.getTimeSet(), raeumliche_analyseebene.getSelectionId(), gebietsauswahl.getSelection())).done(function(arr){
                     //now we have access to array of data
                     try{
-                        object.json_file = JSON.parse(arr[0][0]);
+                        object.json_file = JSON.parse(arr);
                     }catch(err){
-                        object.json_file = arr[0][0]
+                        object.json_file = arr
                     }
 
                     if (farbliche_darstellungsart.getSelectionId() === "auto") {
-                        object.klassen = arr[1][0];
+                        object.klassen = object.json_file.classes;
                     }
 
                     //no grunakt avaliable
@@ -562,7 +546,7 @@ const grundakt_layer = {
                         let datenalter_layer = x_datenakt[2];
 
                         $('#datenalter_container').show();
-                        $('#grundaktmap').empty();
+                       grundaktmap.empty();
 
                         grundaktlayer = new L.tileLayer.wms('https://maps.ioer.de/cgi-bin/mapserv_dv?Map=' + datenalter_mapfile,
                             {
@@ -579,7 +563,7 @@ const grundakt_layer = {
                             zoomLevelOffset: -3,
                             aimingRectOptions: rect1
                         }).addTo(map);
-                        let grundaktmap = $("#grundaktmap");
+
                         grundaktmap.append(miniMapDiv.getContainer());
                         grundaktmap.find('.leaflet-control-minimap-toggle-display').remove();
                         $('#grundakt_legende').empty().load(datenalter_legende, function () {
@@ -652,10 +636,10 @@ const grundakt_layer = {
         function getColor(d) {
             for (let i = 0; i < klassen_set.length; i++) {
                 let obj = klassen_set[i],
-                    obergrenze = obj.Wert_Obergrenze - 1000000000,
-                    untergrenze = obj.Wert_Untergrenze - 1000000000;
+                    obergrenze = obj.Wert_Obergrenze,
+                    untergrenze = obj.Wert_Untergrenze;
                 if (d.value <= obergrenze && d.value >= untergrenze) {
-                    return '#' + obj.Farbwert;
+                    return obj.Farbwert;
                 }
             }
         }
@@ -677,9 +661,10 @@ const grundakt_layer = {
         jsongroup_grund.removeFrom(map);
         jsongroup_grund.addLayer(object.json_layer);
 
+        //TODO: Legende
         $.each(klassen_set, function (key, value) {
-            let minus_max = value.Wert_Obergrenze - 1000000000,
-                minus_min = value.Wert_Untergrenze - 1000000000,
+            let minus_max = value.Wert_Obergrenze,
+                minus_min = value.Wert_Untergrenze,
                 round_max = (Math.round(minus_max * 100) / 100).toFixed(2),
                 round_min = (Math.round(minus_min * 100) / 100).toFixed(2);
             grades.push({

@@ -1,8 +1,7 @@
 <?php
 require_once ('database/MYSQL_QUERIES.php');
-require_once ('database/MYSQL_QUERIES.php');
 
-class INDIKATOR_NOTES extends MYSQL_MANAGER{
+class INDICATOR_NOTES extends MYSQL_MANAGER{
     private $notes;
     protected static $instance = NULL;
     public static function get_instance()

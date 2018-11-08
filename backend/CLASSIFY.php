@@ -42,40 +42,6 @@ class CLASSIFY
         if($this->klassifizierung==="gleich"){
             return $this->classify_gleich();
         }else{
-            /*$result = null;
-            $class_set = $this->classes;
-            $i=$this->classes;
-            //test if classes are possible
-            while($i>0){
-                $array = $this->classify_haeufig();
-                $test = $array[(count($array)-1)]["Wert_Obergrenze"];
-                if($test==0){
-                    $this->classes = $this->classes-1;
-                    $this->classify_haeufig();
-                }else{
-                    $result = $array;
-                    break;
-                }
-                $i--;
-            }
-            //kein ergebnis möglich ->klassen müssen erhöht werden
-            if(is_null($result)){
-                $this->classes=$class_set;
-                $i=$this->classes;
-                while($i<100){
-                    $array = $this->classify_haeufig();
-                    $test = $array[(count($array)-1)]["Wert_Obergrenze"];
-                    if($test==0){
-                        $this->classes = $this->classes+1;
-                        $this->classify_haeufig();
-                    }else{
-                        $result = $array;
-                        break;
-                    }
-                    $i++;
-                }
-            }
-            return $result;*/
             return $this->classify_haeufig();
         }
     }
@@ -89,9 +55,9 @@ class CLASSIFY
         $classify = array();
         foreach ($colors as $c) {
             array_push($classify, array(
-                "Wert_Untergrenze" => round($i,$this->rundung),
-                "Wert_Obergrenze" => round($i + $counter, $this->rundung),
-                "Farbwert" => $c
+                "min" => round($i,$this->rundung),
+                "max" => round($i + $counter, $this->rundung),
+                "color" => $c
             ));
             $i += $counter;
         }
@@ -117,17 +83,17 @@ class CLASSIFY
         $classify = array();
         foreach($colors as $c){
             array_push($classify, array(
-                "Wert_Untergrenze" => round($this->ags_values[$i],$this->rundung),
-                "Wert_Obergrenze" => round($this->ags_values[($i+$counter)],$this->rundung),
-                "Farbwert" => $c
+                "min" => round($this->ags_values[$i],$this->rundung),
+                "max" => round($this->ags_values[($i+$counter)],$this->rundung),
+                "color" => $c
             ));
             $i += $counter;
         }
         //check max value is correct
        $max_value = round(max($this->ags_values),$this->rundung);
-        $test = $classify[(count($classify)-1)]["Wert_Obergrenze"];
+        $test = $classify[(count($classify)-1)]["max"];
         if($test==0 || $test!==$max_value){
-            $classify[(count($classify)-1)]["Wert_Obergrenze"] = $max_value;
+            $classify[(count($classify)-1)]["max"] = $max_value;
         }
         return $classify;
     }

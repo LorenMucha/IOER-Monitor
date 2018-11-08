@@ -68,7 +68,7 @@ function getGeoJSON(ind,time,_raumgliederung,ags_array){
         },
         success:function(data){
             //console.log(this.url);
-            console.log(data);
+            //console.log(data);
         }
     });
     return ajax_call;

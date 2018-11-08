@@ -636,10 +636,10 @@ const grundakt_layer = {
         function getColor(d) {
             for (let i = 0; i < klassen_set.length; i++) {
                 let obj = klassen_set[i],
-                    obergrenze = obj.Wert_Obergrenze,
-                    untergrenze = obj.Wert_Untergrenze;
+                    obergrenze = obj.max,
+                    untergrenze = obj.min;
                 if (d.value <= obergrenze && d.value >= untergrenze) {
-                    return obj.Farbwert;
+                    return obj.color;
                 }
             }
         }
@@ -663,14 +663,14 @@ const grundakt_layer = {
 
         //TODO: Legende
         $.each(klassen_set, function (key, value) {
-            let minus_max = value.Wert_Obergrenze,
-                minus_min = value.Wert_Untergrenze,
+            let minus_max = value.max,
+                minus_min = value.min,
                 round_max = (Math.round(minus_max * 100) / 100).toFixed(2),
                 round_min = (Math.round(minus_min * 100) / 100).toFixed(2);
             grades.push({
                 "max": round_max,
                 "min": round_min,
-                "farbe": '#' + value.Farbwert
+                "farbe": '#' + value.color
             });
         });
 
@@ -819,39 +819,39 @@ const klassengrenzen = {
     getKlassen: function(){return this.klassen},
     getMax:function(){
         return Math.max.apply(Math, this.klassen.map(function (o) {
-            return o.Wert_Obergrenze;
+            return o.max;
         }));
     },
     getMin:function(){
         return Math.min.apply(Math, this.klassen.map(function (o) {
-            return o.Wert_Untergrenze;}));
+            return o.min;}));
     },
     getColor:function(layer_value){
         let klassenJson = this.getKlassen(),
             obergrenze_max = this.getMax(),
             untergrenze_min = this.getMin();
-        for (let i = 0; i < klassenJson.length; i++) {
-            let obj = klassenJson[i];
-            let max = klassenJson.length-1;
-            let obergrenze = obj.Wert_Obergrenze;
-            let untergrenze = obj.Wert_Untergrenze;
 
-            let value_ind = (Math.round(layer_value * 100) / 100).toFixed(2);
+        for (let i = 0; i < klassenJson.length; i++) {
+            let obj = klassenJson[i],
+                max = klassenJson.length-1,
+                obergrenze = obj.max,
+                untergrenze = obj.min,
+                value_ind = (Math.round(layer_value * 100) / 100).toFixed(2);
 
             if (value_ind <= obergrenze && value_ind >= untergrenze) {
-                return obj.Farbwert;
+                return obj.color;
             }
             else if (value_ind < untergrenze_min > 0) {
-                return obj.Farbwert;
+                return obj.color;
             }
             else if (value_ind === 0) {
-                return obj.Farbwert;
+                return obj.color;
             }
             else if (value_ind > obergrenze_max) {
-                return klassenJson[max].Farbwert;
+                return klassenJson[max].color;
             }
             else if (value_ind === obergrenze_max) {
-                return obj.Farbwert;
+                return obj.color;
             }
         }
     },

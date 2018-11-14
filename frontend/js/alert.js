@@ -87,19 +87,12 @@ function alertNotAsRaster(){
     $.when(setTimeout(function(){
                 swal({
                     title: "Der Indikator ist nicht in der Räumlichen Gliederung verfügbar",
-                    text: "Möchten Sie sich den Indikator trotzdem visualisieren ? ",
                     type: "warning",
                     cancelButtonText: "Abbrechen",
-                    showCancelButton: true,
+                    showCancelButton: false,
                 },
-                function(isConfirm){
-                    if (isConfirm) {
-                        if(raeumliche_visualisierung.getRaeumlicheGliederung()==='raster'){
-                            $('#spatial_choice_checkbox_container').checkbox('uncheck');
-                        }else{
-                            $('#spatial_choice_checkbox_container').checkbox('check');
-                        }
-                    }
+                function(){
+                    raeumliche_visualisierung.getDOMObject().checkbox('uncheck');
                 }
                 );
             },500));

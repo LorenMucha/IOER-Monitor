@@ -323,6 +323,30 @@ Legende
     font-weight: bold;
     position: fixed;
 }
+.legende #legende_i .legende_line{
+    line-height: 15px;
+    width: 100%;
+    display: inline-block;
+}
+.legende #legende_i .legende_line i{
+    width: 15px;
+    height: 10px;
+    float: left;
+    margin-right: 8px;
+}
+.legende #legende_i .zusatzlayer{
+    line-height: 15px;
+    width: 100%;
+    display: inline-block;
+}
+.legende #legende_i .zusatzlayer div{
+    width: 15px;
+    height: 5px;
+    float: left;
+    margin-right: 8px;
+    margin-top: 5px;
+}
+/*Legende Histogramm*/
 #dropdown_datenalter{
     display: none;
 }
@@ -673,16 +697,28 @@ color schema
     width: 100%;
 }
 /*Histogramm*/
-#svgId{
+.legende #histogramm_pic{
+    width: 100%;
+    margin-top: 5px;
+}
+.legende #histogramm_pic #svgId{
     width: 100%;
     height: 60px !important;
 }
-#iconhistogramm {
+.legende #iconhistogramm {
     width: 100%;
 }
-#histogramm_pic{
-    width: 100%;
+.legende #histogramm_pic svg g .value-rect{
+    fill:#000000;
 }
+.legende #histogramm_pic svg g .value-rect:hover{
+    fill:red;
+    font-size: 1600px;
+}
+.legende .hist_info{
+    display: none;
+}
+/*left content*/
 .left_content{
     position: absolute;
     top: 50px;
@@ -722,32 +758,6 @@ color schema
 .text {
     fill: white;
     font-family: sans-serif
-}
-#legende{
-    display: none;
-}
-#legende_i .legende_line{
-    line-height: 15px;
-    width: 100%;
-    display: inline-block;
-}
-#legende_i .legende_line i{
-    width: 15px;
-    height: 10px;
-    float: left;
-    margin-right: 8px;
-}
-#legende_i .zusatzlayer{
-    line-height: 15px;
-    width: 100%;
-    display: inline-block;
-}
-#legende_i .zusatzlayer div{
-    width: 15px;
-    height: 5px;
-    float: left;
-    margin-right: 8px;
-    margin-top: 5px;
 }
 #map {
     width:100%;

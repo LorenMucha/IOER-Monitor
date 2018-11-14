@@ -2,7 +2,7 @@
 
 require_once("MYSQL_MANAGER.php");
 
-class MYSQL_QUERIES extends MYSQL_MANAGER {
+class MY_SQL_TASKREPOSITORY extends MYSQL_MANAGER {
     protected static $instance = NULL;
     private $berechtigung = 3;
     public static function get_instance()
@@ -49,19 +49,30 @@ class MYSQL_QUERIES extends MYSQL_MANAGER {
 
         return $this->query($sql);
     }
-    function getIndicatorInSpatialExtend($year,$indikator_id,$ags){
-        if($indikator_id !=='Z00AG') {
-            $sql = "SELECT i.INDIKATORWERT AS value, i.ID_INDIKATOR as ind, z.EINHEIT as einheit,i.FEHLERCODE as fc, i.HINWEISCODE as hc, i.AGS as ags, z.RUNDUNG_NACHKOMMASTELLEN as rundung
-                                    FROM m_indikatorwerte_" . $year . " i, m_indikator_freigabe f, m_indikatoren z
-                                    Where f.ID_INDIKATOR = i.ID_INDIKATOR AND f.ID_INDIKATOR =  '" . $indikator_id . "'
-                                    AND f.STATUS_INDIKATOR_FREIGABE = " . $this->berechtigung . "
-                                    And z.ID_INDIKATOR = f.ID_INDIKATOR
-                                    And LENGTH(i.AGS) = " . (strlen($ags)) . "
-                                    and not i.AGS='99'
-                                    Group by i.AGS";
-        }else{
+    function getIndicatorValueInSpatialExtend($year, $indikator_id,$length_ags ,$ags_user_array){
+        $ags_extend = "";
+        if(count($ags_user_array)>0) {
+            $ags_extend .= " AND i.AGS REGEXP '";
+            foreach ($ags_user_array as $value) {
+                $ags_extend .= $value."|";
+            }
+            $ags_extend = substr($ags_extend,0,-1);
+            $ags_extend = $ags_extend."'";
+        }
+        //build the sql query
+        $sql = "SELECT i.INDIKATORWERT AS value, i.ID_INDIKATOR as ind, z.EINHEIT as einheit,i.FEHLERCODE as fc, i.HINWEISCODE as hc, i.AGS as ags, z.RUNDUNG_NACHKOMMASTELLEN as rundung
+                                FROM m_indikatorwerte_" . $year . " i, m_indikator_freigabe f, m_indikatoren z
+                                Where f.ID_INDIKATOR = i.ID_INDIKATOR AND f.ID_INDIKATOR =  '" . $indikator_id . "'
+                                AND f.STATUS_INDIKATOR_FREIGABE = " . $this->berechtigung . "
+                                And z.ID_INDIKATOR = f.ID_INDIKATOR
+                                And LENGTH(i.AGS) = " .(strlen($length_ags))
+                                .$ags_extend."
+                                and not i.AGS='99'
+                                Group by i.AGS";
+
+        if($indikator_id ==='Z00AG'){
             $sql = "SELECT i.INDIKATORWERT AS value, i.ID_INDIKATOR as ind, i.ID_INDIKATORWERT as einheit,i.FEHLERCODE as fc, i.HINWEISCODE as hc, i.AGS as ags FROM m_indikatorwerte_".$year." i 
-            Where i.ID_INDIKATOR = 'Z00AG' And LENGTH(i.AGS) = " . (strlen($ags));
+            Where i.ID_INDIKATOR = 'Z00AG' And LENGTH(i.AGS) = " .(strlen($length_ags)).$ags_extend;
         }
        return $this->query($sql);
     }

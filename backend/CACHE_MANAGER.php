@@ -1,5 +1,5 @@
 <?php
-require_once ('database/POSTGRESQL_QUERIES.php');
+require_once('database/POSTGRESQL_TASKRESPOSITORY.php');
 
 class CACHE_MANAGER{
 

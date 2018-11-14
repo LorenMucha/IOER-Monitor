@@ -1,6 +1,6 @@
 <?php
 header('Content-type: application/json; charset=utf-8');
-require("database/MYSQL_QUERIES.php");
+require("database/MY_SQL_TASKREPOSITORY.php");
 require("HELPER.php");
 require('INDICATOR_JSON.php');
 require('CLASSIFY.php');

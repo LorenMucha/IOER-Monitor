@@ -73,6 +73,8 @@ const legende = {
     },
     init:function(open){
         const legende = this;
+        let click_dd = 0,
+            legende_width = legende.getDOMObject().width();
         this.resize();
         legende.getShowButtonObject().show();
         if(legende.getDOMObject().is(':visible')){
@@ -103,37 +105,25 @@ const legende = {
             .unbind()
             .click(function () {
                 let datenalter_dd = legende.getDatenalterContainerObject().find('#dropdown_datenalter'),
-                    legende_width = legende.getDOMObject().width(),
-                    width_dd_datenalter = 50;
-                    if(mainView.getWidth()<=1024){
-                        width_dd_datenalter = 100;
-                    }
-                    if (rightView.isVisible()) {
-                        if (datenalter_dd.is(':hidden')) {
-                            legende.getDOMObject().css("width", legende_width+width_dd_datenalter);
-                            legende.getShowButtonObject().css("right", legende_width+width_dd_datenalter);
-                            datenalter_dd.show();
-                            legende.getHistogrammObject().css("margin-left", "10px");
+                    margin = function(){
+                        let x = 50,
+                            margin;
+                        if(click_dd===0){
+                            margin = (legende_width+x);
+                        }else{
+                            margin = legende_width;
                         }
-                        else {
-                            legende.getDOMObject().css("width", legende_width-width_dd_datenalter);
-                            legende.getShowButtonObject().css("right", legende_width-width_dd_datenalter);
-                            datenalter_dd.hide();
-                            legende.getHistogrammObject().css("margin-left", "0px");
-                        }
-                    } else {
-                        if (datenalter_dd.is(':hidden')) {
-                            legende.getDOMObject().css("width", legende_width+width_dd_datenalter);
-                            legende.getShowButtonObject().css("right", (rightView.getWidth()) + (legende_width+width_dd_datenalter));
-                            datenalter_dd.show();
-                            legende.getDOMObject().css("margin-left", "10px");
-                        } else {
-                            legende.getDOMObject().css("width", legende_width-width_dd_datenalter);
-                            legende.getShowButtonObject().css("right", $('#rightPane').width() + legende_width-width_dd_datenalter);
-                            datenalter_dd.hide();
-                            legende.getDOMObject().css("margin-left", "0px");
-                        }
-                    }
+                        return margin;
+                    };
+                legende.getDOMObject().css("width", margin());
+                legende.getShowButtonObject().css("right", margin());
+                if(click_dd===0){
+                    datenalter_dd.show();
+                    ++click_dd;
+                }else{
+                    datenalter_dd.hide();
+                    click_dd=0;
+                }
                 //scroll down to view full viewport
                 setTimeout(function() {
                     legende.getDOMObject().scrollTop(legende.getDOMObject()[0].scrollHeight);
@@ -261,246 +251,171 @@ const legende = {
         }
     },
     histogramm:{
+        value_array:[],
+        x_set:[],
+        getWidth:function(){
+          return legende.getHistogrammObject().width();
+        },
         setHistogrammGebiete:function(){
             //get the classes and color
+            const object = legende.histogramm;
             let grenzen = klassengrenzen.getKlassen(),
+                info_div = $('.hist_info'),
                 ioer_json = indikatorJSON.getJSONFile(),
-                obergrenze_max = klassengrenzen.getMax(),
-                untergrenze_min = klassengrenzen.getMin();
-                value_array = [];
-            //extract the values out of the JSON
-            $.each(ioer_json.features,function(key,value){value_array.push(value.properties.value)});
-            //append histogramm with the gradient object
-            let gradient =  '<defs>' +
+                max_value = grenzen[(grenzen.length-1)]['max'],
+                min_value = grenzen[0]['min'],
+                diagramm_width = object.getWidth()+100,
+                //norm max to zero
+                max_neu = max_value-min_value,
+                //extract the values out of the JSON
+                //append histogramm with the gradient object
+                gradient =  '<defs>' +
                                 '<linearGradient x1="100%" x2="0%" y1="0" y2="0">' +
                                     '<stop offset="0%" stop-color="'+grenzen[(Object.keys(grenzen).length-1)]['color']+'"></stop>'+
                                     '<stop offset="100%" stop-color="'+grenzen[0]['color']+'"></stop>'+
                                 '</linearGradient>'+
                             '</defs>',
-                //the colored classes isnide the diagramm
-                classes = function(){
-                                let html = '<text x="" style="font-size:9px;"></text>',
-                                    width = 4,
-                                    height = 62,
-                                    counter = 0;
-
-                                //TODO-> klassengenerierung
-
+                //count the classes
+                extract_values = function(){
+                                const object = legende.histogramm;
+                                let value_array = [];
+                                $.each(ioer_json.features,
+                                    function(key,value){
+                                        value_array.push(parseFloat((value.properties.value_comma).replace(",",".")));
+                                });
+                                object.value_array= value_array.sort();
+                                return object.value_array;
                             },
+                /*element_count = function() {
+                            let result = [],
+                                value_array=extract_values();
+                            for (let g = 0; g <= grenzen.length-1; g++) {
+                                    let min = grenzen[g]["min"],
+                                        max = grenzen[g]["max"],
+                                        elements = [];
+                                    for (let i = 0; i < value_array.length; i++) {
+                                        let value_ind = value_array[i];
+                                        if (value_ind < max && value_ind > min) {
+                                            elements.push(value_ind);
+                                        }
+                                    }
+                                let object = $.extend({},grenzen[g],{"value":elements.length});
+                                result.push(object);
+                                }
+                                return result;
+                            },*/
+                //the colored classes inside the diagramm
+                classes_svg = function(){
+                                let html = '',
+                                    element_height = 62,
+                                    _x_set = [],
+                                    i = 0,
+                                    klassifizierung = klassifzierung.getSelectionId();
+                                //create the svg classes
+                                $.each(grenzen,function(key,value){
+                                    if(klassifizierung==="gleich"){
+                                        let width = diagramm_width*((1/klassenanzahl.getSelection()));
+                                        html +='<rect x="'+i+'" width="'+width+'" height="'+element_height+'" style="fill:'+value.color+'" stroke="none"></rect>';
+                                        _x_set.push(width);
+                                        i +=width;
+                                    }else {
+                                        let percent = ((value.max-min_value) * 100) / max_neu,
+                                            pixel_width = (diagramm_width / 100) * percent,
+                                            x=function(){
+                                                try {
+                                                    return _x_set[(i - 1)]['width'];
+                                                }catch(err){
+                                                    return 0;
+                                                }
+                                            },
+                                            width = function(){
+                                                let width = pixel_width-x();
+                                                if(!width){
+                                                    width=pixel_width;
+                                                }
+                                                return width;
+                                            };
+                                        _x_set.push({'width':pixel_width,'min':value.min-min_value,'max':value.max-min_value});
+                                        html += '<rect x="' + x()  + '" width="' +width() + '" height="' + element_height + '" style="fill:' + value.color + '" stroke="none"></rect>';
+                                        i += 1;
+                                    }
+                                });
+                                this.x_set = _x_set;
+                                return html;
+                            },
+                values_svg = function(){
+                     const object = legende.histogramm;
+                    let html = '',
+                        diagramm_hoehe = 60,
+                        diagramm_width = object.getWidth(),
+                        color = '#000000',
+                        verteilung = function(){
+                            let a = [],
+                                b = [],
+                                prev,
+                                arr = extract_values();
+
+                            for ( let i = 0; i < arr.length; i++ ) {
+                                if ( arr[i] !== prev ) {
+                                    a.push(arr[i]);
+                                    b.push(1);
+                                } else {
+                                    b[b.length-1]++;
+                                }
+                                prev = arr[i];
+                            }
+                            return [a, b];
+                        },
+                        percent = function(_value){
+                            let value = (_value*100)/max_neu;
+                            return (diagramm_width / 100) * value;
+                        },
+                        verteilung_arr = verteilung(),
+                        height=function(_value){
+                            let max = function(){
+                                    let max =Math.max.apply(Math,verteilung_arr[1]);
+                                    if(max===1){max=2;}
+                                    return max;
+                                },
+                                percent = _value/max();
+                            return diagramm_hoehe*percent;
+
+                        };
+                    height();
+                    //set the stupid pillars`s
+                    for(let g=0;g<=this.x_set.length-1;g++) {
+                        for (let x = 0; x <=verteilung_arr[0].length-1; x++) {
+                            let value = verteilung_arr[0][x]-min_value,
+                                min = this.x_set[g]['min'],
+                                max = this.x_set[g]['max'],
+                                verteilung = verteilung_arr[1][x];
+                            if(value>=min&&value<=max){
+                                html +=' <rect class="value-rect" data-value="'+(value+min_value)+'" data-verteilung="'+verteilung+'" x="'+percent(value)+'" y="'+(diagramm_hoehe-height(verteilung))+'" width="1px" height="'+height(verteilung)+'" stroke="none"></rect>';
+                            }
+                        }
+                    }
+                    return html;
+                },
                 diagramm = '<svg id="svgId">' +
                                 '<g>' +
                                     gradient+
-                                    classes()+
-                /*
-                '<rect x="0" width="4px" height="62" style="fill:#ffff99" stroke="none"></rect>'+
-                '<rect x="2.5" width="4px" height="62" style="fill:#ffff99" stroke="none"></rect>'+
-                '<rect x="5" width="4px" height="62" style="fill:#ffff99" stroke="none"></rect>'+
-                '<rect x="7.5" width="4px" height="62" style="fill:#ffff99" stroke="none"></rect>'+
-                '<rect x="10" width="4px" height="62" style="fill:#f8db83" stroke="none"></rect>'+
-                '<rect x="12.5" width="4px" height="62" style="fill:#f8db83" stroke="none"></rect>'+
-                '<rect x="15" width="4px" height="62" style="fill:#f8db83" stroke="none"></rect>'+
-                '<rect x="17.5" width="4px" height="62" style="fill:#f0b66d" stroke="none"></rect>'+
-                '<rect x="20" width="4px" height="62" style="fill:#f0b66d" stroke="none"></rect>'+
-                '<rect x="22.5" width="4px" height="62" style="fill:#e99257" stroke="none"></rect>'+
-                '<rect x="25" width="4px" height="62" style="fill:#e99257" stroke="none"></rect>'+
-                '<rect x="27.5" width="4px" height="62" style="fill:#e26d42" stroke="none"></rect>'+
-                '<rect x="30" width="4px" height="62" style="fill:#e26d42" stroke="none"></rect>'+
-                '<rect x="32.5" width="4px" height="62" style="fill:#db492c" stroke="none"></rect>'+
-                '<rect x="35" width="4px" height="62" style="fill:#db492c" stroke="none"></rect>'+
-                '<rect x="37.5" width="4px" height="62" style="fill:#db492c" stroke="none"></rect>'+
-                '<rect x="40" width="4px" height="62" style="fill:#db492c" stroke="none"></rect>'+
-                '<rect x="42.5" width="4px" height="62" style="fill:#db492c" stroke="none"></rect>'+
-                '<rect x="45" width="4px" height="62" style="fill:#db492c" stroke="none"></rect>'+
-                '<rect x="47.5" width="4px" height="62" style="fill:#db492c" stroke="none"></rect>'+
-                '<rect x="50" width="4px" height="62" style="fill:#db492c" stroke="none"></rect>'+
-                '<rect x="52.5" width="4px" height="62" style="fill:#db492c" stroke="none"></rect>'+
-                '<rect x="55" width="4px" height="62" style="fill:#db492c" stroke="none"></rect>'+
-                '<rect x="57.5" width="4px" height="62" style="fill:#db492c" stroke="none"></rect>'+
-                '<rect x="60" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="62.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="65" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="67.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="70" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="72.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="75" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="77.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="80" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="82.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="85" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="87.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="90" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="92.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="95" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="97.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="100" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="102.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="105" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="107.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="110" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="112.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="115" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="117.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="120" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="122.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="125" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="127.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="130" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="132.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="135" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="137.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="140" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="142.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="145" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="147.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="150" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="152.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="155" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="157.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="160" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="162.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="165" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="167.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="170" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="172.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="175" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="177.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="180" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="182.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="185" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="187.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="190" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="192.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="195" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="197.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="200" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="202.5" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="205" width="4px" height="62" style="fill:#d32416" stroke="none"></rect>'+
-                '<rect x="207.5" width="4px" height="62" style="fill:#cc0000" stroke="none"></rect>'+
-                '<rect x="210" width="4px" height="62" style="fill:#cc0000" stroke="none"></rect>'+
-                '<rect x="212.5" width="4px" height="62" style="fill:#cc0000" stroke="none"></rect>'+
-                '<rect x="215" width="4px" height="62" style="fill:#cc0000" stroke="none"></rect>'+
-                '<rect x="217.5" width="4px" height="62" style="fill:#cc0000" stroke="none"></rect>'+
-                '<rect x="220" width="4px" height="62" style="fill:#cc0000" stroke="none"></rect>'+
-                '<rect x="222.5" width="4px" height="62" style="fill:#cc0000" stroke="none"></rect>'+
-                '<rect x="225" width="4px" height="62" style="fill:#cc0000" stroke="none"></rect>'+
-                '<rect x="227.5" width="4px" height="62" style="fill:#cc0000" stroke="none"></rect>'+
-                '<rect x="230" width="4px" height="62" style="fill:#cc0000" stroke="none"></rect>'+
-                '<rect x="232.5" width="4px" height="62" style="fill:#cc0000" stroke="none"></rect>'+
-                '<rect x="235" width="4px" height="62" style="fill:#cc0000" stroke="none"></rect>'+
-                '<rect x="237.5" width="4px" height="62" style="fill:#cc0000" stroke="none"></rect>'+
-                '<rect x="240" width="4px" height="62" style="fill:#cc0000" stroke="none"></rect>'+
-                '<rect x="242.5" width="4px" height="62" style="fill:#cc0000" stroke="none"></rect>'+
-                '<rect x="245" width="4px" height="62" style="fill:#cc0000" stroke="none"></rect>'+
-                '<rect x="247.5" width="4px" height="62" style="fill:#cc0000" stroke="none"></rect>'+
-                '<rect x="250" width="4px" height="62" style="fill:#cc0000" stroke="none"></rect>'+*/
-                    //generate the lines
-                /*'<rect x="0" y="30" width="1px" height="30" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="2.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="7.5" y="0" width="1px" height="60" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="10" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="12.5" y="30" width="1px" height="30" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="15" y="30" width="1px" height="30" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="17.5" y="30" width="1px" height="30" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="20" y="30" width="1px" height="30" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="22.5" y="30" width="1px" height="30" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="25" y="30" width="1px" height="30" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="27.5" y="30" width="1px" height="30" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="30" y="30" width="1px" height="30" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="32.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="35" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="37.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="40" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="42.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="45" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="47.5" y="30" width="1px" height="30" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="50" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="52.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="55" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="57.5" y="30" width="1px" height="30" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="60" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="62.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="65" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="67.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="70" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="72.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="75" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="77.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="80" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="82.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="85" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="87.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="90" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="92.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="95" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="97.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="100" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="102.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="105" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="107.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="110" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="112.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="115" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="117.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="120" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="122.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="125" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="127.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="130" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="132.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="135" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="137.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="140" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="142.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="145" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="147.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="150" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="152.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="155" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="157.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="160" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="162.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="165" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="167.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="170" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="172.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="175" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="177.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="180" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="182.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="185" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="187.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="190" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="192.5" y="30" width="1px" height="30" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="195" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="197.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="200" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="202.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="205" y="30" width="1px" height="30" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="207.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="210" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="212.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="215" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="217.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="220" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="222.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="225" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="227.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="230" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="232.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="235" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="237.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="240" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="242.5" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="245" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="247.5" y="30" width="1px" height="30" style="fill:#000000" stroke="none"></rect>'+
-                '<rect x="250" y="60" width="1px" height="0" style="fill:#000000" stroke="none"></rect>'+*/
+                                    classes_svg()+
+                                    values_svg()+
                                 '</g>' +
                             '</svg>';
 
-
             legende.getHistogrammObject().empty().append(diagramm);
-            //console.log(classes());
+            $(document).on({
+                mouseenter: function () {
+                    let value = $(this).data("value"),
+                        verteilung = $(this).data("verteilung");
+                    info_div.show().html('<b>Wert: </b>'+(Math.round(value * 100) / 100).toFixed(2)+indikatorauswahl.getIndikatorEinheit()+'<br/>'+
+                                         '<b>Verteilung: </b>'+verteilung+" x");
+                },
+                mouseleave: function () {
+                    info_div.empty().hide();
+                }
+            },".value-rect");
         },
         setHistogrammRaster:function(){
             $.ajax({

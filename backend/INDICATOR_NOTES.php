@@ -1,5 +1,5 @@
 <?php
-require_once ('database/MYSQL_QUERIES.php');
+require_once('database/MY_SQL_TASKREPOSITORY.php');
 
 class INDICATOR_NOTES extends MYSQL_MANAGER{
     private $notes;

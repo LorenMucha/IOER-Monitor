@@ -1,7 +1,7 @@
 <?php
 header('Access-Control-Allow-Origin: *');
 header('Content-type: application/json; charset=utf-8');
-require("database/MYSQL_QUERIES.php");
+require("database/MY_SQL_TASKREPOSITORY.php");
 require("HELPER.php");
 require('INDICATOR_JSON.php');
 require('CLASSIFY.php');
@@ -19,8 +19,11 @@ $query = $json_obj['query'];
 try{
     //get the JSON
     if($query==='getJSON'){
-        $ags_array = $json_obj['ind']['ags_array'];
-        $ags_array = explode(",",$ags_array);
+        $ags_user = trim($json_obj['ind']['ags_array']);
+        $ags_array = array();
+        if(strlen($ags_user)>0){
+            $ags_array = explode(",",$ags_user);
+        }
         //check if the json exist in the database
         $cache_manager = new CACHE_MANAGER($indicator,$year,$raumgliederung,$ags_array,$klassifizierung);
         try{
@@ -39,18 +42,19 @@ try{
             $trace = $e->getTrace();
             echo $e->getMessage().' in '.$e->getFile().' on line '.$e->getLine().' called from '.$trace[0]['file'].' on line '.$trace[0]['line'];
         }
+
     }
     //get all possible Indicators
     else if($query==='getAllIndicators'){
         $json = '{';
-        $kategories = MYSQL_QUERIES::get_instance()->getAllIndicatorsGebiete();
+        $kategories = MY_SQL_TASKREPOSITORY::get_instance()->getAllIndicatorsGebiete();
         if($modus=='raster') {
-            $kategories = MYSQL_QUERIES::get_instance()->getAllIndicatorsRaster();
+            $kategories = MY_SQL_TASKREPOSITORY::get_instance()->getAllIndicatorsRaster();
         }
 
         foreach($kategories as $row){
 
-            $erg_indikator = MYSQL_QUERIES::get_instance()->getAllIndicatorsByCategoryGebiete($row->ID_THEMA_KAT,$modus);
+            $erg_indikator = MY_SQL_TASKREPOSITORY::get_instance()->getAllIndicatorsByCategoryGebiete($row->ID_THEMA_KAT,$modus);
 
             //only if indicators are avaliabke
             if (count($erg_indikator) != 0) {
@@ -59,7 +63,7 @@ try{
 
                 foreach($erg_indikator as $row_ind){
                     $grundakt_state = "verfügbar";
-                    if (MYSQL_QUERIES::get_instance()->getGrundaktState($row_ind->ID_INDIKATOR) == 1) {
+                    if (MY_SQL_TASKREPOSITORY::get_instance()->getGrundaktState($row_ind->ID_INDIKATOR) == 1) {
                         $grundakt_state = "nicht verfügbar";
                     }
                     $significant = 'false';
@@ -69,7 +73,7 @@ try{
 
                     //get all possible times
                     $time_string = '';
-                    $times = MYSQL_QUERIES::get_instance()->getIndicatorPossibleTimeArray($row_ind->ID_INDIKATOR,$modus,false);
+                    $times = MY_SQL_TASKREPOSITORY::get_instance()->getIndicatorPossibleTimeArray($row_ind->ID_INDIKATOR,$modus,false);
                     foreach($times as $value){$time_string .= $value["time"].",";};
                     $time_string = substr($time_string,0,-1);
                     //extend the json
@@ -103,7 +107,7 @@ try{
     //get all possible years
     else if($query=='years'){
         $jahre = array();
-        $years = MYSQL_QUERIES::get_instance()->getIndicatorPossibleTimeArray($indicator,$modus);
+        $years = MY_SQL_TASKREPOSITORY::get_instance()->getIndicatorPossibleTimeArray($indicator,$modus);
         foreach ($years as $x){
                 array_push($jahre,intval($x["time"]));
         }
@@ -114,7 +118,7 @@ try{
         $array = array();
             array_push($array, array(
                 "ind" => $indicator,
-                "avability" => MYSQL_QUERIES::get_instance()->checkIndicatorAvability($indicator,$modus))
+                "avability" => MY_SQL_TASKREPOSITORY::get_instance()->checkIndicatorAvability($indicator,$modus))
             );
         echo json_encode($array);
     }

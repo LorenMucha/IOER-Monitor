@@ -1,7 +1,7 @@
 <?php
 require_once ('POSTGRESQL_MANAGER.php');
 
-class POSTGRESQL_QUERIES extends POSTGRESQL_MANAGER
+class POSTGRESQL_TASKRESPOSITORY extends POSTGRESQL_MANAGER
 {
     protected static $instance = NULL;
     private $berechtigung = 3;

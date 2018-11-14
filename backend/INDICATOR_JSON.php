@@ -1,6 +1,6 @@
 <?php
-require_once ('database/POSTGRESQL_QUERIES.php');
-require_once ('database/MYSQL_QUERIES.php');
+require_once('database/POSTGRESQL_TASKRESPOSITORY.php');
+require_once('database/MY_SQL_TASKREPOSITORY.php');
 require_once('INDICATOR_ERRORS.php');
 require_once('INDICATOR_NOTES.php');
 require_once('HELPER.php');
@@ -16,36 +16,20 @@ class INDICATOR_JSON
 
         $this->indicator_id = $indicator_id;
         $this->year = $year;
-        $this->year_pg =MYSQL_QUERIES::get_instance()->getPostGreYear($year);
+        $this->year_pg =MY_SQL_TASKREPOSITORY::get_instance()->getPostGreYear($year);
         $this->spatial_extend = $spatial_extend;
         $this->ags_array_user = $ags_array_user;
-    }
-    function getJSON(){
-        $cache_manager = new CACHE_MANAGER($this->indicator_id,$this->year,$this->spatial_extend,$this->ags_array_user);
-        try{
-            if (!$cache_manager->check_cached()) {
-                $json = $this->createJSON();
-                //save the cache
-                $cache_manager->insert($json);
-                return $json;
-            }else{
-                return $cache_manager->get_cached();
-            }
-        }catch(Error $e){
-            $trace = $e->getTrace();
-            echo $e->getMessage().' in '.$e->getFile().' on line '.$e->getLine().' called from '.$trace[0]['file'].' on line '.$trace[0]['line'];
-        }
     }
     function createJSON(){
             # Build GeoJSON
             $output = '';
             $rowOutput = '';
             //get the PostgreObject
-            $geometry_object = POSTGRESQL_QUERIES::get_instance()->getGeometry($this->year_pg, $this->spatial_extend, $this->ags_array_user);
+            $geometry_object = POSTGRESQL_TASKRESPOSITORY::get_instance()->getGeometry($this->year_pg, $this->spatial_extend, $this->ags_array_user);
             //get the Indicator Object
-            $indicator_object = MYSQL_QUERIES::get_instance()->getIndicatorInSpatialExtend($this->year, $this->indicator_id, $geometry_object[0]->ags);
+            $indicator_object = MY_SQL_TASKREPOSITORY::get_instance()->getIndicatorValueInSpatialExtend($this->year, $this->indicator_id, $geometry_object[0]->ags,$this->ags_array_user);
             //get the Grundaktualität
-            $indikator_grundaktualitaet = MYSQL_QUERIES::get_instance()->getGrundaktState($this->indicator_id);
+            $indikator_grundaktualitaet = MY_SQL_TASKREPOSITORY::get_instance()->getGrundaktState($this->indicator_id);
             //get the ags array's to calculate the differences
             $indicator_rundung = '';
             $ags_mysql = array();
@@ -79,13 +63,13 @@ class INDICATOR_JSON
                             $fc_id = $row_mysql->fc;
                             $note_id = $row_mysql->hc;
                             $ags = $row_postgre->ags;
-                            $des = POSTGRESQL_QUERIES::get_instance()->getDescription($row_postgre->des, $ags, $this->spatial_extend);
+                            $des = POSTGRESQL_TASKRESPOSITORY::get_instance()->getDescription($row_postgre->des, $ags, $this->spatial_extend);
 
                             //get the grundakt
                             if ($indikator_grundaktualitaet == 1) {
                                 $grundakt = 0;
                             } else {
-                                $grundakt = MYSQL_QUERIES::get_instance()->getIndicatorGrundaktualitaet($ags, $this->year);
+                                $grundakt = MY_SQL_TASKREPOSITORY::get_instance()->getIndicatorGrundaktualitaet($ags, $this->year);
                             }
 
                             //get the hc text
@@ -100,7 +84,7 @@ class INDICATOR_JSON
                                 $fc = $fc_id . "||" . $fc[0]["color"] . "||" . $fc[0]["name"] . "||" . $fc[0]["description"];
                             }
                         } else {
-                            $indicator_value = MYSQL_QUERIES::get_instance()->getIndicatorValueByAGS('Z00AG', $row_postgre->ags, $this->year);
+                            $indicator_value = MY_SQL_TASKREPOSITORY::get_instance()->getIndicatorValueByAGS('Z00AG', $row_postgre->ags, $this->year);
                         }
                     }
                 }
@@ -138,10 +122,10 @@ class INDICATOR_JSON
                 $stat_string_ags = '';
                 foreach ($this->ags_array_user as $value) {
                     $ags_set = substr($value, 0, 2);
-                    $stat_string_ags .= '"' . $ags_set . '":{"gen":"' . POSTGRESQL_QUERIES::get_instance()->getAGSName('bld', $ags_set, $this->year) . '","value_ags":"' . number_format(round(MYSQL_QUERIES::get_instance()->getIndicatorValueByAGS($this->indicator_id, $value, $this->year), $indicator_rundung), $indicator_rundung, ',', '') . '","ags_grundakt":"' . MYSQL_QUERIES::get_instance()->getIndicatorGrundaktualitaet($value, $this->year) . '"},';
+                    $stat_string_ags .= '"' . $ags_set . '":{"gen":"' . POSTGRESQL_TASKRESPOSITORY::get_instance()->getAGSName('bld', $ags_set, $this->year) . '","value_ags":"' . number_format(round(MY_SQL_TASKREPOSITORY::get_instance()->getIndicatorValueByAGS($this->indicator_id, $value, $this->year), $indicator_rundung), $indicator_rundung, ',', '') . '","ags_grundakt":"' . MY_SQL_TASKREPOSITORY::get_instance()->getIndicatorGrundaktualitaet($value, $this->year) . '"},';
                 }
             }
-            trim($JSON = '{ "type": "FeatureCollection", "stat":{' . $stat_string_ags . '"wert_brd":"' . number_format(round(MYSQL_QUERIES::get_instance()->getIndicatorValueForBRD($this->indicator_id, $this->year), $indicator_rundung), $indicator_rundung, ',', '') . '","grundakt_brd":"' . MYSQL_QUERIES::get_instance()->getIndicatorGrundaktualitaet('99', $this->year) . '"},"features": [ ' . $output . ' ]}');
+            trim($JSON = '{ "type": "FeatureCollection", "stat":{' . $stat_string_ags . '"wert_brd":"' . number_format(round(MY_SQL_TASKREPOSITORY::get_instance()->getIndicatorValueForBRD($this->indicator_id, $this->year), $indicator_rundung), $indicator_rundung, ',', '') . '","grundakt_brd":"' . MY_SQL_TASKREPOSITORY::get_instance()->getIndicatorGrundaktualitaet('99', $this->year) . '"},"features": [ ' . $output . ' ]}');
             $this->json = json_decode($JSON,true);
             return json_decode($JSON,true);
         }

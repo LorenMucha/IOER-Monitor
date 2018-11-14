@@ -10,7 +10,7 @@ class CLASSIFY
         $this->json = $json;
         $this->classes = $classes;
         if(!$colors) {
-            $this->colors = MYSQL_QUERIES::get_instance()->getIndicatorColors($indicator_id);
+            $this->colors = MY_SQL_TASKREPOSITORY::get_instance()->getIndicatorColors($indicator_id);
         }else{
             $this->colors=$colors;
         }

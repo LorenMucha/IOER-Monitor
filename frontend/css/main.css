@@ -176,6 +176,10 @@ Slider
 .search .input{
     width: 100%;
 }
+.search .input #search_input_field::placeholder{
+    font-weight: bold;
+    color:black !important;
+}
 .ui.search .prompt {
     border-radius: 0 !important;
     border:1px solid black;

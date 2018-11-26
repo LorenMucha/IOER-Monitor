@@ -60,7 +60,11 @@ const urlparamter={
 
     },
     getURL_SVG:function(){
-        return window.location.origin+"/";
+        if(viewState.getProductionState()){
+            return "https://monitor.ioer.de/monitor_test/";
+        }else{
+            return "https://monitor.ioer.de/";
+        }
     },
     getURL_RASTER:function(){
         return "https://maps.ioer.de/monitor_raster/";

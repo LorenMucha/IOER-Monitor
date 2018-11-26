@@ -73,6 +73,8 @@ const legende = {
     },
     init:function(open){
         const legende = this;
+        let click_dd = 0,
+            legende_width = legende.getDOMObject().width();
         this.resize();
         legende.getShowButtonObject().show();
         if(legende.getDOMObject().is(':visible')){
@@ -103,37 +105,25 @@ const legende = {
             .unbind()
             .click(function () {
                 let datenalter_dd = legende.getDatenalterContainerObject().find('#dropdown_datenalter'),
-                    legende_width = legende.getDOMObject().width(),
-                    width_dd_datenalter = 50;
-                    if(mainView.getWidth()<=1024){
-                        width_dd_datenalter = 100;
-                    }
-                    if (rightView.isVisible()) {
-                        if (datenalter_dd.is(':hidden')) {
-                            legende.getDOMObject().css("width", legende_width+width_dd_datenalter);
-                            legende.getShowButtonObject().css("right", legende_width+width_dd_datenalter);
-                            datenalter_dd.show();
-                            legende.getHistogrammObject().css("margin-left", "10px");
+                    margin = function(){
+                        let x = 50,
+                            margin;
+                        if(click_dd===0){
+                            margin = (legende_width+x);
+                        }else{
+                            margin = legende_width;
                         }
-                        else {
-                            legende.getDOMObject().css("width", legende_width-width_dd_datenalter);
-                            legende.getShowButtonObject().css("right", legende_width-width_dd_datenalter);
-                            datenalter_dd.hide();
-                            legende.getHistogrammObject().css("margin-left", "0px");
-                        }
-                    } else {
-                        if (datenalter_dd.is(':hidden')) {
-                            legende.getDOMObject().css("width", legende_width+width_dd_datenalter);
-                            legende.getShowButtonObject().css("right", (rightView.getWidth()) + (legende_width+width_dd_datenalter));
-                            datenalter_dd.show();
-                            legende.getDOMObject().css("margin-left", "10px");
-                        } else {
-                            legende.getDOMObject().css("width", legende_width-width_dd_datenalter);
-                            legende.getShowButtonObject().css("right", $('#rightPane').width() + legende_width-width_dd_datenalter);
-                            datenalter_dd.hide();
-                            legende.getDOMObject().css("margin-left", "0px");
-                        }
-                    }
+                        return margin;
+                    };
+                legende.getDOMObject().css("width", margin());
+                legende.getShowButtonObject().css("right", margin());
+                if(click_dd===0){
+                    datenalter_dd.show();
+                    ++click_dd;
+                }else{
+                    datenalter_dd.hide();
+                    click_dd=0;
+                }
                 //scroll down to view full viewport
                 setTimeout(function() {
                     legende.getDOMObject().scrollTop(legende.getDOMObject()[0].scrollHeight);
@@ -148,7 +138,6 @@ const legende = {
             datengrundlage_container = this.getDatengrundlageObject(),
             indikator_info_container = this.getIndikatorInfoObject(),
             einheit_container = this.getEinheitObject(),
-            histogramm_container = this.getHistogrammObject(),
             klasseneinteilung_contaiener = this.getKlasseneinteilungObject();
 
         //close datenalter
@@ -179,15 +168,15 @@ const legende = {
                 let grades = [];
 
                 $.each(klassengrenzen.getKlassen(), function (key, value) {
-                    let minus_max = value.Wert_Obergrenze - 1000000000,
-                        minus_min = value.Wert_Untergrenze - 1000000000,
+                    let minus_max = value.max,
+                        minus_min = value.min,
                         round_max = (Math.round(minus_max * 100) / 100).toFixed(2),
                         round_min = (Math.round(minus_min * 100) / 100).toFixed(2);
 
                     grades.push({
                         "max": round_max,
                         "min": round_min,
-                        "farbe": '#' + value.Farbwert
+                        "farbe": value.color
                     });
                 });
 
@@ -208,25 +197,12 @@ const legende = {
 
                 if (errorcode != false) {
                     legende_colors.append('<div class="legende_line error"><i style="background: repeating-linear-gradient(45deg,rgb(255, 0, 0),rgb(255,255,255) 5px, rgb(255,255,255) 1px, rgb(255,255,255) 1px);"></i>' + errorcode + '</div>');
-                }else{
-                    $('.error').remove();
                 }
                 legende_colors.append(zusatzlayer);
             }
-            /*------Histogramm------------------------------------------------------------------------*/
-            $.when(getHistogramm()).done(function (data) {
-                $('#iconhistogramm').attr("src", "");
-                histogramm_container.empty().append(data);
-            });
+            object.histogramm.setHistogrammGebiete();
         }
         else {
-            $.ajax({
-                type:"GET",
-                url :urlparamter.getURL_RASTER() + "php/histogramm.php?Jahr=" + zeit_slider.getTimeSet() + "&Kategorie=" + indikatorauswahl.getSelectedIndikatorKategorie() + "&Indikator=" + indikatorauswahl.getSelectedIndikator() + "&Raumgliederung=" + raeumliche_analyseebene.getSelectionId() + "&Klassifizierung=" + klassifzierung.getSelectionId() + "&AnzKlassen=" + klassenanzahl.getSelectionId(),
-                success:function(data){
-                    histogramm_container.empty().append('<img style="width:100%;" src="'+data+'"/>');
-                }
-            });
             let options = indikator_raster.getInfos(),
                 pfad_mapfile = options[0]["pfadmapfile"],
                 layername = options[0]["layername"],
@@ -245,6 +221,8 @@ const legende = {
                     $(this).attr('src', url);
                 });
             });
+            //set the histogramm
+            object.histogramm.setHistogrammRaster();
         }
         this.resize();
     },
@@ -270,6 +248,153 @@ const legende = {
             }else{
                 show_button.css("right","0px").show();
             }
+        }
+    },
+    histogramm:{
+        value_array:[],
+        x_set:[],
+        getWidth:function(){
+          return legende.getHistogrammObject().width();
+        },
+        setHistogrammGebiete:function(){
+            //get the classes and color
+            const object = legende.histogramm;
+            let grenzen = klassengrenzen.getKlassen(),
+                info_div = $('.hist_info'),
+                ioer_json = indikatorJSON.getJSONFile(),
+                max_value = grenzen[(grenzen.length-1)]['max'],
+                min_value = grenzen[0]['min'],
+                diagramm_width = object.getWidth(),
+                //norm max to zero
+                max_neu = max_value-min_value,
+                //extract the values out of the JSON
+                //append histogramm with the gradient object
+                gradient =  '<defs>' +
+                                '<linearGradient x1="100%" x2="0%" y1="0" y2="0">' +
+                                    '<stop offset="0%" stop-color="'+grenzen[(Object.keys(grenzen).length-1)]['color']+'"></stop>'+
+                                    '<stop offset="100%" stop-color="'+grenzen[0]['color']+'"></stop>'+
+                                '</linearGradient>'+
+                            '</defs>',
+                //count the classes
+                extract_values = function(){
+                                const object = legende.histogramm;
+                                let value_array = [];
+                                $.each(ioer_json.features,
+                                    function(key,value){
+                                        value_array.push(parseFloat((value.properties.value_comma).replace(",",".")));
+                                });
+                                object.value_array= value_array.sort();
+                                return object.value_array;
+                            },
+                //the colored classes inside the diagramm
+                classes_svg = function(){
+                                let html = '',
+                                    element_height = 62,
+                                    _x_set = [],
+                                    i = 0,
+                                    klassifizierung = klassifzierung.getSelectionId();
+                                //create the svg classes
+                                $.each(grenzen,function(key,value){
+                                    if(klassifizierung==="gleich"){
+                                        let width = diagramm_width*((1/klassenanzahl.getSelection()));
+                                        html +='<rect x="'+i+'" width="'+width+'" height="'+element_height+'" style="fill:'+value.color+'" stroke="none"></rect>';
+                                        _x_set.push(width);
+                                        i +=width;
+                                    }else {
+                                        let percent = ((value.max-min_value) * 100) / max_neu,
+                                            pixel_width = (diagramm_width / 100) * percent,
+                                            x=function(){
+                                                try {
+                                                    return _x_set[(i - 1)]['width'];
+                                                }catch(err){
+                                                    return 0;
+                                                }
+                                            },
+                                            width = function(){
+                                                let width = pixel_width-x();
+                                                if(!width){
+                                                    width=pixel_width;
+                                                }
+                                                return width;
+                                            };
+                                        _x_set.push({'width':pixel_width,'min':value.min-min_value,'max':value.max-min_value});
+                                        html += '<rect x="' + x()  + '" width="' +width() + '" height="' + element_height + '" style="fill:' + value.color + '" stroke="none"></rect>';
+                                        i += 1;
+                                    }
+                                });
+                                this.x_set = _x_set;
+                                return html;
+                            },
+                values_svg = function(){
+                     const object = legende.histogramm;
+                    let html = '',
+                        diagramm_hoehe = 60,
+                        diagramm_width = object.getWidth(),
+                        color = '#000000',
+                        verteilung = function(){
+                            let a = [],
+                                b = [],
+                                prev,
+                                arr = extract_values();
+
+                            for ( let i = 0; i < arr.length; i++ ) {
+                                if ( arr[i] !== prev ) {
+                                    a.push(arr[i]);
+                                    b.push(1);
+                                } else {
+                                    b[b.length-1]++;
+                                }
+                                prev = arr[i];
+                            }
+                            return [a, b];
+                        },
+                        percent = function(_value){
+                            let value = (_value*100)/max_neu;
+                            return (diagramm_width / 100) * value;
+                        },
+                        verteilung_arr = verteilung(),
+                        height=function(_value){
+                            let max = function(){
+                                    let max =Math.max.apply(Math,verteilung_arr[1]);
+                                    if(max===1){max=2;}
+                                    return max;
+                                },
+                                percent = _value/max();
+                            return diagramm_hoehe*percent;
+
+                        };
+                    //set the value pillars`s
+                    for(let g=0;g<=this.x_set.length-1;g++) {
+                        for (let x = 0; x <=verteilung_arr[0].length-1; x++) {
+                            let value = verteilung_arr[0][x]-min_value,
+                                min = this.x_set[g]['min'],
+                                max = this.x_set[g]['max'],
+                                verteilung = verteilung_arr[1][x];
+                            if(value>=min&&value<=max){
+                                html +=' <rect class="value-rect" data-value="'+(value+min_value)+'" data-verteilung="'+verteilung+'" x="'+percent(value)+'" y="'+(diagramm_hoehe-height(verteilung))+'" width="1px" height="'+height(verteilung)+'" stroke="none"></rect>';
+                            }
+                        }
+                    }
+                    return html;
+                },
+                diagramm = '<svg id="svgId">' +
+                                '<g>' +
+                                    gradient+
+                                    classes_svg()+
+                                    values_svg()+
+                                '</g>' +
+                            '</svg>';
+
+            legende.getHistogrammObject().empty().append(diagramm);
+        },
+        setHistogrammRaster:function(){
+            $.ajax({
+                type:"GET",
+                url :urlparamter.getURL_RASTER() + "php/histogramm.php?Jahr=" + zeit_slider.getTimeSet() + "&Kategorie=" + indikatorauswahl.getSelectedIndikatorKategorie() + "&Indikator=" + indikatorauswahl.getSelectedIndikator() + "&Raumgliederung=" + raeumliche_analyseebene.getSelectionId() + "&Klassifizierung=" + klassifzierung.getSelectionId() + "&AnzKlassen=" + klassenanzahl.getSelection(),
+                success:function(data){
+                    legende.getHistogrammObject().empty().append('<img style="width:100%;" src="'+data+'"/>');
+                }
+            });
         }
     }
 };

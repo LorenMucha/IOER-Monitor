@@ -1,4 +1,5 @@
-var url_backend = urlparamter.getURL_SVG()+"backend";
+let url_backend = urlparamter.getURL_SVG()+"backend",
+    ajax_call;
 
 /*
 AJAX GETTER Functions------------------------------------------------------------
@@ -15,16 +16,6 @@ function getSUMGeometriesInfo(raumgl,time,ags_array){
         },
         success:function(){}
     })
-}
-function getHistogramm(){
-    request_histogramm = $.ajax({
-        url:url_backend+"/html/histogramm.php",
-        type:"GET",
-        data:{
-            indikator:indikatorauswahl.getSelectedIndikator()
-        }
-    });
-    return request_histogramm;
 }
 function getIndZusatzinformationen(ind,time){
     let ind_set = indikatorauswahl.getSelectedIndikator();
@@ -50,12 +41,30 @@ function getIndZusatzinformationen(ind,time){
     });
 }
 function getGeoJSON(ind,time,_raumgliederung,ags_array){
-    let json = JSON.parse('{"ind":{"id":"'+ind+'","time":"'+time+'","raumgliederung":"'+_raumgliederung+'","ags_array":"'+ags_array.toString()+'","klassifizierung":"'+klassifzierung.getSelectionId()+'"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+'"},"query":"getJSON"}');
-    return $request_geojson = $.ajax({
+    let colors = function(){
+            let max = farbschema.getHexMax(),
+                min = farbschema.getHexMin(),
+                string = '';
+            if(max.length >0){
+                string = ',"colors":{"max":"'+max+'","min":"'+min+'"}';
+            }
+            return string;
+        },
+        json_string = '{"ind":{"id":"'+ind+
+                        '","time":"'+time+
+                        '","raumgliederung":"'+_raumgliederung+
+                        '","ags_array":"'+ags_array.toString()+
+                        '","klassifizierung":"'+klassifzierung.getSelectionId()+
+                        '","klassenzahl":"'+klassenanzahl.getSelection()+'"'+
+                        colors()+
+                        '},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+
+                        '"},"query":"getJSON"}';
+        let request = JSON.parse(json_string);
+    ajax_call = $.ajax({
         url: url_backend+"/query.php",
         type: "GET",
         data: {
-            values: JSON.stringify(json)
+            values: JSON.stringify(request)
         },
         error: function (xhr, ajaxOptions, thrownError) {
             if (thrownError !== 'abort' && ind !=='Z00AG') {
@@ -67,33 +76,10 @@ function getGeoJSON(ind,time,_raumgliederung,ags_array){
         },
         success:function(data){
             //console.log(this.url);
+            //console.log(data);
         }
     });
-}
-function getGeneratedClasses(indikator,time,raumgl,klassifizierung,klassenanzahl){
-    return $.ajax({
-        url: url_backend+"/map/klassenbildung.php",
-        type: "GET",
-        dataType: 'json',
-        data: {
-            indikator:indikator,
-            KLASSIFIZIERUNG: klassifizierung,
-            KLASSENANZAHL: klassenanzahl,
-            hex_min:farbschema.getHexMin(),
-            hex_max: farbschema.getHexMax(),
-            raumgl:raumgl,
-            time:time
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            if (thrownError !== 'abort') {
-                progressbar.remove();
-                console.log(thrownError);
-                alertError();
-            }
-        },success:function(data){
-            console.log(this.url);
-        }
-    });
+    return ajax_call;
 }
 function getRasterMap(time,ind,_raumgliederung,klassifizierung,klassenanzahl,darstellung_map,_seite){
     return $.ajax({
@@ -121,16 +107,8 @@ function getColorHTML(array, id) {
         data: {
             colmax_rgb: array[0],
             colmin_rgb: array[1],
-            anz_klassen: klassenanzahl.getSelectionId(),
+            anz_klassen: klassenanzahl.getSelection(),
             id: id
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            console.log(this.url);
-            progressbar.remove();
-            console.log(thrownError);
-        },
-        success:function(data){
-            //callback
         }
     });
 }
@@ -145,6 +123,8 @@ function getIndicatorValueByMapAGS(json,ags_array){
         url: url_backend+"/html/indicator_values.php",
         type: "POST",
         data:{
+            time:zeit_slider.getTimeSet(),
+            indicator:indikatorauswahl.getSelectedIndikator(),
             values:json,
             ags_array_string: JSON.stringify(ags_set),
             grundakt_set: indikatorauswahl.getSelectedIndiktorGrundaktState()
@@ -237,6 +217,10 @@ function getRaumgliederung(ind){
             progressbar.remove();
             console.log("error create Raumgliederung:"+thrownError);
             alertError();
+        },
+        success:function(data){
+            //console.log(data);
+            //console.log(this.url);
         }
     });
     return request_Raumgliederung;

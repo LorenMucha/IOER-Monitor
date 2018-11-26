@@ -2,7 +2,7 @@
 
 require_once("MYSQL_MANAGER.php");
 
-class MYSQL_QUERIES extends MYSQL_MANAGER {
+class MY_SQL_TASKREPOSITORY extends MYSQL_MANAGER {
     protected static $instance = NULL;
     private $berechtigung = 3;
     public static function get_instance()
@@ -49,19 +49,32 @@ class MYSQL_QUERIES extends MYSQL_MANAGER {
 
         return $this->query($sql);
     }
-    function getIndicatorInSpatialExtend($year,$indikator_id,$ags){
-        if($indikator_id !=='Z00AG') {
-            $sql = "SELECT i.INDIKATORWERT AS value, i.ID_INDIKATOR as ind, z.EINHEIT as einheit,i.FEHLERCODE as fc, i.HINWEISCODE as hc, i.AGS as ags, z.RUNDUNG_NACHKOMMASTELLEN as rundung
-                                    FROM m_indikatorwerte_" . $year . " i, m_indikator_freigabe f, m_indikatoren z
-                                    Where f.ID_INDIKATOR = i.ID_INDIKATOR AND f.ID_INDIKATOR =  '" . $indikator_id . "'
-                                    AND f.STATUS_INDIKATOR_FREIGABE = " . $this->berechtigung . "
-                                    And z.ID_INDIKATOR = f.ID_INDIKATOR
-                                    And LENGTH(i.AGS) = " . (strlen($ags)) . "
-                                    and not i.AGS='99'
-                                    Group by i.AGS";
-        }else{
+    function getIndicatorValueInSpatialExtend($year, $indikator_id,$length_ags ,$ags_user_array){
+        $ags_extend = "";
+        if(count($ags_user_array)>0) {
+            $ags_extend .= " AND i.AGS REGEXP '";
+            foreach ($ags_user_array as $value) {
+                $ags_extend .= $value."|";
+            }
+            $ags_extend = substr($ags_extend,0,-1);
+            $ags_extend = $ags_extend."'";
+        }
+        //build the sql query
+        $sql = "SELECT i.INDIKATORWERT AS value, i.ID_INDIKATOR as ind, z.EINHEIT as einheit,i.FEHLERCODE as fc, i.HINWEISCODE as hc, i.AGS as ags, z.RUNDUNG_NACHKOMMASTELLEN as rundung,
+                                COALESCE((SELECT x.INDIKATORWERT FROM m_indikatorwerte_".$year." x WHERE x.ID_INDIKATOR = 'Z00AG' AND x.ags=i.AGS AND x.INDIKATORWERT <=".$year."),0) as grundakt_year,
+                                COALESCE((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS =i.AGS AND y.INDIKATORWERT <= ".$year."),0) as grundakt_month
+                                FROM m_indikatorwerte_" . $year . " i, m_indikator_freigabe f, m_indikatoren z
+                                Where f.ID_INDIKATOR = i.ID_INDIKATOR AND f.ID_INDIKATOR =  '" . $indikator_id . "'
+                                AND f.STATUS_INDIKATOR_FREIGABE = " . $this->berechtigung . "
+                                And z.ID_INDIKATOR = f.ID_INDIKATOR
+                                And LENGTH(i.AGS) = " .(strlen($length_ags))
+                                .$ags_extend."
+                                and not i.AGS='99'
+                                Group by i.AGS";
+
+        if($indikator_id ==='Z00AG'){
             $sql = "SELECT i.INDIKATORWERT AS value, i.ID_INDIKATOR as ind, i.ID_INDIKATORWERT as einheit,i.FEHLERCODE as fc, i.HINWEISCODE as hc, i.AGS as ags FROM m_indikatorwerte_".$year." i 
-            Where i.ID_INDIKATOR = 'Z00AG' And LENGTH(i.AGS) = " . (strlen($ags));
+            Where i.ID_INDIKATOR = 'Z00AG' And LENGTH(i.AGS) = " .(strlen($length_ags)).$ags_extend;
         }
        return $this->query($sql);
     }
@@ -153,10 +166,7 @@ class MYSQL_QUERIES extends MYSQL_MANAGER {
     function getIndicatorColors($ind){
         $sql = "SELECT FARBWERT_MAX as max,FARBWERT_MIN as min FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$ind."'";
         $rs = $this->query($sql);
-        if(!$rs){
-
-        }
-        return $rs;
+        return $rs[0];
     }
     function getGrundaktState($ind){
         $sql = "SELECT MITTLERE_AKTUALITAET_IGNORE as value FROM m_indikatoren where ID_INDIKATOR = '".$ind."'";

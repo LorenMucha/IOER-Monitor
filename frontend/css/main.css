@@ -176,8 +176,13 @@ Slider
 .search .input{
     width: 100%;
 }
+.search .input #search_input_field::placeholder{
+    font-weight: bold;
+    color:black !important;
+}
 .ui.search .prompt {
     border-radius: 0 !important;
+    border:1px solid black;
 }
 
 /*Dialog*/
@@ -243,10 +248,9 @@ Feedack
     padding: 10px;
     border-radius: 15px;
 }
-#progress_div #cancel_btn {
-    margin-top: 20px;
+#progress_div #abort_btn {
     width: 50%;
-    margin-right: 30%;
+    margin-left: 20%;
     background-color: #8CB91B;
     color:white;
 }
@@ -298,7 +302,7 @@ Legende
 }
 .legende #grundakt_legende{
     float:left;
-    width: 100px;
+    width: 80px;
     margin-top: 3px;
     font-size: x-small;
     line-height: 1.4;
@@ -315,7 +319,29 @@ Legende
     float: left;
     margin-right: 8px;
 }
-#legende_close{
+.legende #grundaktmap {
+    float:right;
+    margin-top: 3px;
+    width: 160.8px;
+    height: 150px;
+    background-color: white;
+}
+.legende #hover_info_grundaktmap{
+    position: absolute;
+    z-index: 10000;
+    right: 30px;
+    width: 100px;
+    background-color: rgba(255,255,255,0.5);
+    display: none;
+    margin-top: 20px;
+}
+.legende #grundaktmap_btn{
+    background-color: #8CB91B;
+    width: 100%;
+    margin-bottom: 0;
+    margin-top: 10px;
+}
+.legende #legende_close{
     font-weight: bold;
     position: fixed;
 }
@@ -323,6 +349,30 @@ Legende
     font-weight: bold;
     position: fixed;
 }
+.legende #legende_i .legende_line{
+    line-height: 15px;
+    width: 100%;
+    display: inline-block;
+}
+.legende #legende_i .legende_line i{
+    width: 15px;
+    height: 10px;
+    float: left;
+    margin-right: 8px;
+}
+.legende #legende_i .zusatzlayer{
+    line-height: 15px;
+    width: 100%;
+    display: inline-block;
+}
+.legende #legende_i .zusatzlayer div{
+    width: 15px;
+    height: 5px;
+    float: left;
+    margin-right: 8px;
+    margin-top: 5px;
+}
+/*Legende Histogramm*/
 #dropdown_datenalter{
     display: none;
 }
@@ -673,16 +723,28 @@ color schema
     width: 100%;
 }
 /*Histogramm*/
-#svgId{
+.legende #histogramm_pic{
+    width: 100%;
+    margin-top: 5px;
+}
+.legende #histogramm_pic #svgId{
     width: 100%;
     height: 60px !important;
 }
-#iconhistogramm {
+.legende #iconhistogramm {
     width: 100%;
 }
-#histogramm_pic{
-    width: 100%;
+.legende #histogramm_pic svg g .value-rect{
+    fill:#000000;
 }
+.legende #histogramm_pic svg g .value-rect:hover{
+    fill:red;
+    font-size: 1600px;
+}
+.legende .hist_info{
+    display: none;
+}
+/*left content*/
 .left_content{
     position: absolute;
     top: 50px;
@@ -723,32 +785,6 @@ color schema
     fill: white;
     font-family: sans-serif
 }
-#legende{
-    display: none;
-}
-#legende_i .legende_line{
-    line-height: 15px;
-    width: 100%;
-    display: inline-block;
-}
-#legende_i .legende_line i{
-    width: 15px;
-    height: 10px;
-    float: left;
-    margin-right: 8px;
-}
-#legende_i .zusatzlayer{
-    line-height: 15px;
-    width: 100%;
-    display: inline-block;
-}
-#legende_i .zusatzlayer div{
-    width: 15px;
-    height: 5px;
-    float: left;
-    margin-right: 8px;
-    margin-top: 5px;
-}
 #map {
     width:100%;
     height: 100%;
@@ -760,28 +796,6 @@ color schema
     width: 160.8px;
     height: 150px;
     background-color: white;
-}
-#grundaktmap {
-    float:right;
-    margin-top: 3px;
-    width: 160.8px;
-    height: 150px;
-    background-color: white;
-}
-#hover_info_grundaktmap{
-    position: absolute;
-    z-index: 10000;
-    right: 30px;
-    width: 120px;
-    background-color: rgba(255,255,255,0.5);
-    display: none;
-    margin-top: 20px;
-}
-#grundaktmap_btn{
-    background-color: #8CB91B;
-    width: 100%;
-    margin-bottom: 0;
-    margin-top: 10px;
 }
 .backButton{
     font-size: 3.5em;

@@ -85,6 +85,7 @@ try {
         $verteilung_werte[$i_Prozentwert]++;
 
     }
+    //echo json_encode($verteilung_werte);
 
     // Max-der Verteilung ermitteln
     for($i=0 ; $i<=100 ; $i++)

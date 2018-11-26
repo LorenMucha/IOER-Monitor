@@ -83,6 +83,20 @@ if($modus === 'gebiete') {
         array_push($array,array("id"=>"kfs","name"=>"kreisfreie Städte","state"=>"enabled"));
     }
 
+    $query_gmd = "SELECT i.ID_INDIKATOR, i.RAUMEBENE_VWG FROM m_indikatoren i, m_indikator_freigabe f 
+              WHERE f.JAHR =  " . $year . " 
+              AND i.ID_INDIKATOR= '" . $indikator . "'
+              AND f.STATUS_INDIKATOR_FREIGABE = " . $berechtigung . " Group BY i.ID_INDIKATOR";
+
+    $mysql_query_gmd = mysqli_query(getMySQLConnection(), $query_gmd);
+    $rs_gmd = mysqli_fetch_row($mysql_query_gmd);
+
+    if ($rs_gmd[1] == 0) {
+        array_push($array,array("id"=>"vwg","name"=>"Gemeindeverbände","state"=>"disabled"));
+    } else {
+        array_push($array,array("id"=>"vwg","name"=>"Gemeindeverbände","state"=>"enabled"));
+    }
+
     $query_gem = "SELECT i.ID_INDIKATOR, i.RAUMEBENE_GEM FROM m_indikatoren i, m_indikator_freigabe f 
               WHERE f.JAHR =  " . $year . " 
               AND i.ID_INDIKATOR= '" . $indikator . "'

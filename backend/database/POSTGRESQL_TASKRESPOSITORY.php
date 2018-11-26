@@ -1,7 +1,7 @@
 <?php
 require_once ('POSTGRESQL_MANAGER.php');
 
-class POSTGRESQL_QUERIES extends POSTGRESQL_MANAGER
+class POSTGRESQL_TASKRESPOSITORY extends POSTGRESQL_MANAGER
 {
     protected static $instance = NULL;
     private $berechtigung = 3;
@@ -15,24 +15,30 @@ class POSTGRESQL_QUERIES extends POSTGRESQL_MANAGER
     function getGeometry($year,$spatial_extend,$ags_array){
         $digit = '';
         $sql = '';
-        $geom = "the_geom ";
+        $geom = "x.the_geom ";
+        $krs_col ="";
+        $sql_join_krs = "";
         //set the gemetry column
         if ($year == 2000) {
-            $geom = "geom";
+            $geom = "x.geom";
+        }
+        if($spatial_extend==="gem"){
+            $krs_col = ",k.gen as kreis";
+            $sql_join_krs =" inner join vg250_krs_2016_grob k on cast(k.ags as text) Like substring(cast(x.ags as text) for 5)";
         }
         if (count($ags_array) == 0) {
             // Build SQL SELECT statement and return the geometry as a GeoJSON element in EPSG: 4326
-            $sql = "select gid, ags, des, replace(gen, '''','') as gen, st_asgeojson(transform(" . pg_escape_string($geom) . ",4326)) AS geojson from  vg250_" . $spatial_extend . "_" . $year . "_grob where ags is not null";
+            $sql = "select x.gid, x.ags, x.des, replace(x.gen, '''','') as gen, st_asgeojson(transform(" . pg_escape_string($geom) . ",4326)) AS geojson ".$krs_col." from  vg250_" . $spatial_extend . "_" . $year . "_grob ".$sql_join_krs." x where x.ags is not null";
         } else {
-            $sql = "select gid, ags, des, replace(gen, '''','') as gen, st_asgeojson(transform(" . pg_escape_string($geom) . ",4326)) AS geojson from  vg250_" . $spatial_extend . "_" . $year . "_grob where CAST(ags AS TEXT) Like'" . $ags_array[0] . "";
+            $sql = "select x.gid, x.ags, x.des, replace(x.gen, '''','') as gen, st_asgeojson(transform(" . pg_escape_string($geom) . ",4326)) AS geojson ".$krs_col." from  vg250_" . $spatial_extend . "_" . $year . "_grob x ".$sql_join_krs." where CAST(x.ags AS TEXT) Like'" . $ags_array[0] . "";
 
             foreach ($ags_array as $value) {
                 if (strlen($value) <= 5) {
                     $digit = "%'";
-                    $sql .= "%' or CAST(ags AS TEXT) Like'" . $value . "";
+                    $sql .= "%' or CAST(x.ags AS TEXT) Like'" . $value . "";
                 } else {
                     $digit = "'";
-                    $sql .= "' or CAST(ags AS TEXT) Like'" . $value . "";
+                    $sql .= "' or CAST(x.ags AS TEXT) Like'" . $value . "";
                 }
             }
         }
@@ -64,6 +70,7 @@ class POSTGRESQL_QUERIES extends POSTGRESQL_MANAGER
             $year= 2016;
         }
         $sql ="select gen from vg250_".$raumgliederung."_".$year."_grob where ags ='".$ags."'";
+
         $rs = $this->query($sql);
         return $rs[0]->gen;
     }

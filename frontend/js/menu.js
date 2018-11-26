@@ -1,4 +1,4 @@
-var page_init = true,
+let page_init = true,
     splitter_width = null,
     changed = false,
     step;
@@ -15,13 +15,14 @@ $(function menu_interaction() {
     $( ".kennblatt" ).click(function() {
         openKennblatt();
     });
+
 });
 //Models--------------------------------------------------------------------
 //Toolbar
 const toolbar = {
     getDOMObject:function(){
-      $elem = $('#toolbar');
-      return $elem;
+        $elem = $('#toolbar');
+        return $elem;
     },
     state:false,
     open:function(){
@@ -70,6 +71,9 @@ const toolbar = {
 
                 if(ddm_container.hasClass('pinned')===false && !ddm_container.is(':visible')){
                     ddm_container.slideDown();
+                    if($(this).attr("id")==="hh_sf_drop_kat"){
+                        indikatorauswahl.openMenu();
+                    }
                 }else if(ddm_container.is(':visible')===true &&ddm_container.hasClass('pinned')===false){
                     ddm_container.slideUp();
                 }
@@ -195,6 +199,9 @@ const indikatorauswahl ={
                     resetHighlightElementByID('indicator_ddm');
                 }
             });
+    },
+    isVisible:function(){
+      return this.getDOMObject().is(':visible');
     },
     fill:function(){
         const menu = this;
@@ -423,6 +430,9 @@ const indikatorauswahl ={
                     $('.' + newClassId + "[value=" + exclude_kat + "]").remove();
                 }
             }
+    },
+    openMenu:function(){
+        this.getDOMObject().dropdown('show');
     }
 };
 //checkbox Gebiete <-> Raster
@@ -677,7 +687,7 @@ const gebietsauswahl = {
         urlparamter.updateURLParameter(this.paramter,_value);
     },
     removeParamter:function(){
-      urlparamter.removeUrlParameter(this.paramter);
+        urlparamter.removeUrlParameter(this.paramter);
     },
     getMapLayer:function(){return this.mapLayer;},
     setMapLayer:function(array){this.mapLayer=array;},
@@ -776,7 +786,6 @@ const gebietsauswahl = {
         }
     },
     addSelectedLayersToMap:function(){
-        indikatorJSONGroup.clean();
         $.each(this.getMapLayer(), function (key, value) {
             indikatorJSON.addToMap(value, klassengrenzen.getKlassen());
         });
@@ -786,6 +795,7 @@ const gebietsauswahl = {
         indikatorJSONGroup.fitBounds();
     },
     removeSelectedLayersFromMap:function(value){
+        indikatorJSONGroup.clean();
         let mapLayer = this.getMapLayer(),
             mapLayer_grund = this.getMapLayerGrund(),
             ags_array= this.getSelection();
@@ -1054,15 +1064,15 @@ const farbschema = {
         object.getFarbwahlButtonDomObject()
             .unbind()
             .click(function () {
-            if(click_farb==0) {
-                object.getDOMObject().find('#color_schema').show();
-                click_farb++;
-            }else{
-                object.getDOMObject().find('#color_schema').hide();
-                click_farb = 0;
-            }
+                if(click_farb==0) {
+                    object.getDOMObject().find('#color_schema').show();
+                    click_farb++;
+                }else{
+                    object.getDOMObject().find('#color_schema').hide();
+                    click_farb = 0;
+                }
 
-        });
+            });
     },
     reset:function(){
         this.removeParamter();
@@ -1182,7 +1192,7 @@ const klassenanzahl = {
     removeParameter:function(){
         urlparamter.removeUrlParameter(this.paramter);
     },
-    getSelectionId:function(){
+    getSelection:function(){
         const object = this;
         let parameter = object.getParamter();
         if(!parameter){
@@ -1191,6 +1201,7 @@ const klassenanzahl = {
             $('#klassi_'+parameter).prop("selected",true);
         }
         return parseInt(object.getParamter());
+
     },
     init:function(){
         const object = this;
@@ -1198,8 +1209,13 @@ const klassenanzahl = {
             .unbind()
             .change(function(){
                 farbliche_darstellungsart.resetSelection();
-                let value =$(this).val();
-                object.updateParamter(value);
+                let value =$(this).val(),
+                    param = object.getParamter();
+                if(!param){
+                    object.setParamter(value);
+                }else{
+                    object.updateParamter(value);
+                }
                 if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete'){
                     if(typeof raumgliederung.getSelectedId() !=='undefined'){
                         indikatorJSON.init(raumgliederung.getSelectedId());

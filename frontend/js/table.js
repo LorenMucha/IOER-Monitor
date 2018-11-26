@@ -76,6 +76,7 @@ const table = {
                 let ind = indikatorauswahl.getSelectedIndikator();
                 openEntwicklungsdiagramm(ags,name,ind,false);
             });
+
         //development chart single indicator
         $('.indsingle_entwicklungsdiagr')
             .unbind()
@@ -180,15 +181,15 @@ const table = {
                 colspan=5;
             }
 
-           let html = '<thead id="thead" class="full-width">'+
-                    '<tr id="first_row_head">' +
-                    '<th colspan="'+colspan+'" data-sorter="false" class="sorter-false expand" id="header_ind_set">'+indikatorauswahl.getSelectedIndikatorText_Lang()+' ('+zeit_slider.getTimeSet()+')</th>'+
-                    '</tr>'+
-                    '<tr class="header" id="second_row_head">' +
-                    '<th class="th_head" id="tr_rang">lfd. Nr.</th>'+
-                    '<th class="th_head ags">AGS</th>'+
-                    '<th class="th_head gebietsname">Gebietsname</th>'+
-                    '<th id="tabel_header_raumgl" class="th_head">'+value_text+'</th>';
+            let html = '<thead id="thead" class="full-width">'+
+                '<tr id="first_row_head">' +
+                '<th colspan="'+colspan+'" data-sorter="false" class="sorter-false expand" id="header_ind_set">'+indikatorauswahl.getSelectedIndikatorText_Lang()+' ('+zeit_slider.getTimeSet()+')</th>'+
+                '</tr>'+
+                '<tr class="header" id="second_row_head">' +
+                '<th class="th_head" id="tr_rang">lfd. Nr.</th>'+
+                '<th class="th_head ags">AGS</th>'+
+                '<th class="th_head gebietsname">Gebietsname</th>'+
+                '<th id="tabel_header_raumgl" class="th_head">'+value_text+'</th>';
 
             if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
                 html += '<th class="th_head grundakt_head" id="grundakt_head">Mittlere Grund- aktualität</th>';
@@ -226,7 +227,11 @@ const table = {
                 }
 
                 if(name === layer_array[i].gen){
-                    name = name+" ("+des+")";
+                    if(value.krs){
+                        name = name+" ("+value.krs+")";
+                    }else {
+                        name = name + " (" + des + ")";
+                    }
                 }
 
                 if(mainView.getMobileState()) {
@@ -686,7 +691,7 @@ const table = {
         function getDiff_Grundakt(values_ind,values_set){
             let date_set = new Date(parseFloat(values_set[1]),parseFloat(values_set[0])),
                 date_ind = new Date(parseFloat(values_ind[1]),parseFloat(values_ind[0])),
-            //solution to calc the difference from http://www.splessons.com/how-do-i-find-the-difference-between-two-dates-using-jquery/
+                //solution to calc the difference from http://www.splessons.com/how-do-i-find-the-difference-between-two-dates-using-jquery/
                 diff_date = date_ind - date_set,
                 years = Math.floor(diff_date/31536000000),
                 months = Math.floor((diff_date % 31536000000)/2628000000);
@@ -694,7 +699,7 @@ const table = {
         }
     },
     setExpandState:function(_state){
-      this.expandState = _state;
+        this.expandState = _state;
     },
     setRang:function(){
         let i=0;
@@ -831,8 +836,8 @@ const table_expand_panel = {
         return $ddm;
     },
     getZeitschnittAuswahlContainer:function(){
-      $elem = $('#time_expand_conatier');
-      return $elem;
+        $elem = $('#time_expand_conatier');
+        return $elem;
     },
     getZeitschnittauswahlDDMObject:function(){
         $ddm = $('#zeitschnitt_ddm_table');
@@ -1085,47 +1090,47 @@ const table_expand_panel = {
                         panel.getTrendAuswahlContainer().show();
                     }
                 }
-        });
+            });
         //kenngrößen-------------------------------------------------------
         this.getKenngroessenauswahlDDMObject()
             .unbind()
             .dropdown({
-            onAdd: function (addedValue, addedText, $addedChoice) {
-                if(addedValue === 'brd'){
-                    panel.expandArray.push({id:addedValue,text:'Gesamte Bundesrepublik ('+zeit_slider.getTimeSet()+')',time:zeit_slider.getTimeSet(),einheit:false, count: 15});
+                onAdd: function (addedValue, addedText, $addedChoice) {
+                    if(addedValue === 'brd'){
+                        panel.expandArray.push({id:addedValue,text:'Gesamte Bundesrepublik ('+zeit_slider.getTimeSet()+')',time:zeit_slider.getTimeSet(),einheit:false, count: 15});
+                    }
+                    else if(addedValue === 'bld'){
+                        panel.expandArray.push({id:addedValue,text:'Übergeordnetes Bundesland ('+zeit_slider.getTimeSet()+')',time:zeit_slider.getTimeSet(),einheit:false,count: 15});
+                    }
+                    else{
+                        panel.expandArray.push({id:addedValue,text:addedText,time:zeit_slider.getTimeSet(),einheit:false,count: 10});
+                    }
+                    $(this).blur();
+                },
+                onLabelRemove: function (value) {
+                    panel.expandArray = removefromarray(panel.expandArray,value);
                 }
-                else if(addedValue === 'bld'){
-                    panel.expandArray.push({id:addedValue,text:'Übergeordnetes Bundesland ('+zeit_slider.getTimeSet()+')',time:zeit_slider.getTimeSet(),einheit:false,count: 15});
-                }
-                else{
-                    panel.expandArray.push({id:addedValue,text:addedText,time:zeit_slider.getTimeSet(),einheit:false,count: 10});
-                }
-                $(this).blur();
-            },
-            onLabelRemove: function (value) {
-                panel.expandArray = removefromarray(panel.expandArray,value);
-            }
-        });
+            });
         //trendfortschreitung
         this.getTrendfortschreibungauswahlDDMObject()
             .unbind()
             .dropdown({
-            onAdd: function (addedValue, addedText, $addedChoice) {
-                table_expand_panel.clear();
-                panel.expandArray.push({id:indikatorauswahl.getSelectedIndikator()+'|'+addedValue,text:'Trendfortschreibung ('+addedValue+')',time:addedValue,einheit:indikatorauswahl.getIndikatorEinheit(),count:30});
-                panel.getZeitschnittAuswahlContainer().hide();
-                $('#hinweis_time_expand_linear').show();
-                $(this).blur();
-            },
-            onLabelRemove: function (value) {
-                panel.expandArray = removefromarray(panel.expandArray,indikatorauswahl.getSelectedIndikator()+'|'+value);
-                let selection = panel.getTrendfortschreibungauswahlDDMObject().dropdown('get value').split(',');
-                if(selection.length<= 1){
-                    panel.getZeitschnittAuswahlContainer().show();
-                    $('#hinweis_time_expand_linear').hide();
+                onAdd: function (addedValue, addedText, $addedChoice) {
+                    table_expand_panel.clear();
+                    panel.expandArray.push({id:indikatorauswahl.getSelectedIndikator()+'|'+addedValue,text:'Trendfortschreibung ('+addedValue+')',time:addedValue,einheit:indikatorauswahl.getIndikatorEinheit(),count:30});
+                    panel.getZeitschnittAuswahlContainer().hide();
+                    $('#hinweis_time_expand_linear').show();
+                    $(this).blur();
+                },
+                onLabelRemove: function (value) {
+                    panel.expandArray = removefromarray(panel.expandArray,indikatorauswahl.getSelectedIndikator()+'|'+value);
+                    let selection = panel.getTrendfortschreibungauswahlDDMObject().dropdown('get value').split(',');
+                    if(selection.length<= 1){
+                        panel.getZeitschnittAuswahlContainer().show();
+                        $('#hinweis_time_expand_linear').hide();
+                    }
                 }
-            }
-        })
+            })
     },
     disable:function(){
         this.getOpenButtonObject().hide();
@@ -1242,8 +1247,8 @@ const table_filter_panel = {
 };
 const csv_table_export = {
     getButtonDomObject:function(){
-      $elem = $('#csv_export');
-      return $elem;
+        $elem = $('#csv_export');
+        return $elem;
     },
     init:function(){
         //export as csv

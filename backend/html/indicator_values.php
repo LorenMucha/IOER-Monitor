@@ -4,8 +4,8 @@ header('Content-type: application/json; charset=utf-8');
 include("../database/db_manager.php");
 
 $ags_map_string=$_POST["ags_array_string"];
-$time = $_SESSION["jahr"];
-$ind_map = $_SESSION["indikator"];
+$time = $_POST["time"];
+$ind_map = $_POST["indicator"];
 
 $einheit = getIndEinheit($ind);
 //the input JSON z.B. {id:addedValue,time:getTime()}

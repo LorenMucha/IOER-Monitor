@@ -7,52 +7,6 @@ $(function(){
         }
     });
 });
-
-$(document).ready(function() {
-    //set the Unit test
-    //Touch support
-    if(!viewState.getUnitTestState()) {
-        raeumliche_visualisierung.init();
-        farbschema.init();
-        webTour.init();
-        toolbar.init();
-        opacity_slider.init();
-        klassifzierung.init();
-        klassenanzahl.init();
-        farbliche_darstellungsart.init();
-        $.when(mainView.restoreView())
-            .then(leftView.setMapView())
-            .then(function () {
-                if (urlparamter.getUrlParameter('rid')) {
-                    loadRID(urlparamter.getUrlParameter('rid'));
-                    return false;
-                }
-                else if (indikatorauswahl.getSelectedIndikator()) {
-                    indikatorauswahl.setIndicator(indikatorauswahl.getSelectedIndikator());
-                    layer_control.init();
-                }
-                else {
-                    mainView.initializeFirstView();
-                }
-            });
-
-    }else {
-        $.when($('body')
-            .append('<div id="qunit"></div>')
-            .find("#Modal")
-            .css("display", "none"))
-            .then($('head').append('<script src="frontend/lib/qunit/qunit-2.6.2.js"></script><link rel="stylesheet" href="frontend/lib/qunit/qunit-2.6.2.css">'))
-            .then(
-                QUnit.test("init map", function (assert) {
-                    assert.equal(raeumliche_visualisierung.init());
-                    assert.equal(farbschema.init());
-                    assert.equal(webTour.init());
-                    assert.equal(opacity_slider.init());
-                    assert.equal(mainView.restoreView());
-                    assert.equal(leftView.setMapView());
-                }));
-        }
-});
 const mainView = {
     splitter:'',
     splitter_width:null,
@@ -340,6 +294,10 @@ const viewState = {
       this.test_system = _state;
     },
     getProductionState:function(){
+       let path = window.location.pathname;
+        if(path.includes("monitor_test")){
+            this.test_system = true;
+        }
       return this.test_system;
     },
     setViewState:function(_state){
@@ -397,12 +355,17 @@ const progressbar ={
     getContainer:function(){return $('#progress_div');},
     getTextContainer:function(){return $('#progress_header');},
     init:function(){
+        const object = this;
         if(this.active===false) {
-            $('body').append('<div id="progress_div"><h2 id="progress_header"></h2><div class="progress"></div></div>');
+            $('body').append('<div id="progress_div"><h2 id="progress_header"></h2><div class="progress"></div><hr/><button type="button" class="btn btn-primary" id="abort_btn">Abbrechen</button></div>');
             this.getContainer().show();
             modal_layout.init();
             this.active = true;
         }
+        $(document).on("click","#abort_btn",function(){
+            ajax_call.abort();
+            object.remove();
+        });
     },
     remove:function(callback){
         modal_layout.remove();

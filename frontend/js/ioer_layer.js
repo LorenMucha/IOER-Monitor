@@ -11,8 +11,8 @@ const indikator_raster = {
             _ind = indikatorauswahl.getSelectedIndikator(),
             _time = zeit_slider.getTimeSet(),
             _klassifizierung = klassifzierung.getSelectionId(),
-            _klassenanzahl = klassenanzahl.getSelectionId(),
-            _raumgliederung = raeumliche_analyseebene.getSelectionId();
+            _klassenanzahl = klassenanzahl.getSelection(),
+            _raumgliederung_set = raeumliche_analyseebene.getSelectionId();
 
         map.off('click', object.onClick);
 
@@ -20,12 +20,12 @@ const indikator_raster = {
         if (_seite === 'rechts') {
             _ind = _settings[0].ind;
             _time = _settings[0].time;
-            _raumgliederung = _settings[0].raumgl;
+            _raumgliederung_set = _settings[0].raumgl;
             _klassifizierung = _settings[0].klassifizierung;
             _klassenanzahl = _settings[0].klassenanzahl;
         }
 
-        $.when(getRasterMap(_time, _ind, _raumgliederung, _klassifizierung, _klassenanzahl, _darstellung_map, _seite))
+        $.when(getRasterMap(_time, _ind, _raumgliederung_set, _klassifizierung, _klassenanzahl, _darstellung_map, _seite))
             .then(function (data) {
                 let txt = data,
                     x = txt.split('##'),
@@ -245,7 +245,7 @@ const indikatorJSON = {
         let ind = indikatorauswahl.getSelectedIndikator(),
             klassifizierung_set = klassifzierung.getSelectionId(),
             raumgliederung_set = raeumliche_analyseebene.getSelectionId(),
-            klassenanzahl_set = klassenanzahl.getSelectionId(),
+            klassenanzahl_set = klassenanzahl.getSelection(),
             time = zeit_slider.getTimeSet(),
             ags_set = gebietsauswahl.getSelection();
 
@@ -267,45 +267,34 @@ const indikatorJSON = {
             }, 100)
         });
 
-        let def = $.Deferred();
+        $.when(getGeoJSON(ind, time, raumgliederung_set, ags_set))
+            .done(function(arr){
+                //now we have access to array of data
+                try{
+                    object.json_file = JSON.parse(arr);
+                }catch(err){
+                    object.json_file = arr
+                }
 
-        function defCalls() {
-            let requests = [
-                getGeoJSON(ind, time, raumgliederung_set, ags_set),
-                getGeneratedClasses(ind, time, raumgliederung_set, klassifizierung_set, klassenanzahl_set)
-            ];
-            $.when.apply($, requests).done(function () {
-                def.resolve(arguments);
+                if (farbliche_darstellungsart.getSelectionId() === "auto") {
+                    klassengrenzen.setKlassen(object.json_file.classes);
+                }
+
+                object.addToMap();
+                grundakt_layer.init();
+                table.create();
+                gebietsauswahl.init();
+                legende.fillContent();
+                farbschema.fill();
+
+                if (callback) callback();
             });
-            return def.promise();
-        }
 
-        defCalls().done(function (arr) {
-            //now we have access to array of data
-            try{
-                object.json_file = JSON.parse(arr[0][0]);
-            }catch(err){
-                object.json_file = arr[0][0]
-            }
-            if (farbliche_darstellungsart.getSelectionId() === "auto") {
-                klassengrenzen.setKlassen(arr[1][0]);
-            }
-
-            indikatorJSON.addToMap();
-            grundakt_layer.init();
-            table.create();
-            gebietsauswahl.init();
-            legende.fillContent();
-            farbschema.fill();
-
-            if (callback) callback();
-        });
         page_init = false;
     },
     addToMap:function(geoJson_set, klassenJson_set){
         const object = this;
         let geoJson = this.json_file;
-        indikatorJSONGroup.clean();
         //optional parameter for undependant creation
         if(geoJson_set){
             geoJson = geoJson_set;
@@ -316,7 +305,7 @@ const indikatorJSON = {
 
         //let einheit = geoJson.feature[0].properties.einheit;
         $.each(geoJson.features, function(key, value) {
-            if(key== 0) {
+            if(key == 0) {
                 einheit = String(value.properties.einheit);
             }
         });
@@ -346,6 +335,7 @@ const indikatorJSON = {
         if(layer_control.zusatzlayer.getState()){layer_control.zusatzlayer.setForward()};
     },
     setPopUp:function(e){
+        console.log(e.target);
         let layer = e.target,
             gen = layer.feature.properties.gen.toString(),
             value_ags = layer.feature.properties.value_comma,
@@ -504,32 +494,27 @@ const grundakt_layer = {
         disableElement('#datenalter','Nicht verfügbar');
         //hole JSON
         const object = this;
+        let grundaktmap = $("#grundaktmap");
         if(indikatorauswahl.getSelectedIndiktorGrundaktState()) {
-            if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'gebiete' && raumgliederung.getSelectedId() !== 'gem' && raeumliche_analyseebene.getSelectionId()!=='gem' && zeit_slider.getTimeSet() > 2000) {
+            if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'gebiete'
+                && raumgliederung.getSelectedId() !== 'vwg'
+                && raeumliche_analyseebene.getSelectionId()!=='vwg'
+                && raumgliederung.getSelectedId() !== 'gem'
+                && raeumliche_analyseebene.getSelectionId()!=='gem'
+                && zeit_slider.getTimeSet() > 2000) {
                 enableElement('#datenalter', 'Zeige die Karte des Datenalters an.');
                 let def = $.Deferred();
 
-                function defCalls() {
-                    let requests = [
-                        getGeoJSON('Z00AG', zeit_slider.getTimeSet(), raeumliche_analyseebene.getSelectionId(), gebietsauswahl.getSelection()),
-                        getGeneratedClasses('Z00AG', zeit_slider.getTimeSet(),raeumliche_analyseebene.getSelectionId(),klassifzierung.getSelectionId(), klassenanzahl.getSelectionId())
-                    ];
-                    $.when.apply($, requests).done(function () {
-                        def.resolve(arguments);
-                    });
-                    return def.promise();
-                }
-
-                defCalls().done(function (arr) {
+                $.when(getGeoJSON('Z00AG', zeit_slider.getTimeSet(), raeumliche_analyseebene.getSelectionId(), gebietsauswahl.getSelection())).done(function(arr){
                     //now we have access to array of data
                     try{
-                        object.json_file = JSON.parse(arr[0][0]);
+                        object.json_file = JSON.parse(arr);
                     }catch(err){
-                        object.json_file = arr[0][0]
+                        object.json_file = arr
                     }
 
                     if (farbliche_darstellungsart.getSelectionId() === "auto") {
-                        object.klassen = arr[1][0];
+                        object.klassen = object.json_file.classes;
                     }
 
                     //no grunakt avaliable
@@ -554,15 +539,14 @@ const grundakt_layer = {
                         Raumgliederung: raeumliche_analyseebene.getSelectionId()
                     },
                     success: function (data) {
-                        let txt_datenakt = data,
-                            x_datenakt = txt_datenakt.split('##'),
-                            datenalter_mapfile = x_datenakt[0].replace(/^( +)/g, ''),
-                            datenalter_legende = x_datenakt[1],
-                            datenalter_layer = x_datenakt[2],
-                            grundaktmap = $("#grundaktmap");
+                        let txt_datenakt = data;
+                        let x_datenakt = txt_datenakt.split('##');
+                        let datenalter_mapfile = x_datenakt[0].replace(/^( +)/g, '');
+                        let datenalter_legende = x_datenakt[1];
+                        let datenalter_layer = x_datenakt[2];
 
                         $('#datenalter_container').show();
-                        grundaktmap.empty();
+                       grundaktmap.empty();
 
                         grundaktlayer = new L.tileLayer.wms('https://maps.ioer.de/cgi-bin/mapserv_dv?Map=' + datenalter_mapfile,
                             {
@@ -652,10 +636,10 @@ const grundakt_layer = {
         function getColor(d) {
             for (let i = 0; i < klassen_set.length; i++) {
                 let obj = klassen_set[i],
-                    obergrenze = obj.Wert_Obergrenze - 1000000000,
-                    untergrenze = obj.Wert_Untergrenze - 1000000000;
+                    obergrenze = obj.max,
+                    untergrenze = obj.min;
                 if (d.value <= obergrenze && d.value >= untergrenze) {
-                    return '#' + obj.Farbwert;
+                    return obj.color;
                 }
             }
         }
@@ -678,14 +662,14 @@ const grundakt_layer = {
         jsongroup_grund.addLayer(object.json_layer);
 
         $.each(klassen_set, function (key, value) {
-            let minus_max = value.Wert_Obergrenze - 1000000000,
-                minus_min = value.Wert_Untergrenze - 1000000000,
+            let minus_max = value.max,
+                minus_min = value.min,
                 round_max = (Math.round(minus_max * 100) / 100).toFixed(2),
                 round_min = (Math.round(minus_min * 100) / 100).toFixed(2);
             grades.push({
                 "max": round_max,
                 "min": round_min,
-                "farbe": '#' + value.Farbwert
+                "farbe": value.color
             });
         });
 
@@ -834,39 +818,39 @@ const klassengrenzen = {
     getKlassen: function(){return this.klassen},
     getMax:function(){
         return Math.max.apply(Math, this.klassen.map(function (o) {
-            return o.Wert_Obergrenze - 1000000000;
+            return o.max;
         }));
     },
     getMin:function(){
         return Math.min.apply(Math, this.klassen.map(function (o) {
-            return o.Wert_Untergrenze - 1000000000;}));
+            return o.min;}));
     },
     getColor:function(layer_value){
         let klassenJson = this.getKlassen(),
             obergrenze_max = this.getMax(),
             untergrenze_min = this.getMin();
+
         for (let i = 0; i < klassenJson.length; i++) {
             let obj = klassenJson[i],
                 max = klassenJson.length-1,
-                obergrenze = obj.Wert_Obergrenze - 1000000000,
-                untergrenze = obj.Wert_Untergrenze - 1000000000;
-
-            let value_ind = (Math.round(layer_value * 100) / 100).toFixed(2);
+                obergrenze = obj.max,
+                untergrenze = obj.min,
+                value_ind = (Math.round(layer_value * 100) / 100).toFixed(2);
 
             if (value_ind <= obergrenze && value_ind >= untergrenze) {
-                return '#' + obj.Farbwert;
+                return obj.color;
             }
             else if (value_ind < untergrenze_min > 0) {
-                return '#' + obj.Farbwert;
+                return obj.color;
             }
             else if (value_ind === 0) {
-                return '#' + obj.Farbwert;
+                return obj.color;
             }
             else if (value_ind > obergrenze_max) {
-                return '#' + klassenJson[max].Farbwert;
+                return klassenJson[max].color;
             }
             else if (value_ind === obergrenze_max) {
-                return '#' + obj.Farbwert;
+                return obj.color;
             }
         }
     },
@@ -933,8 +917,12 @@ const indikatorJSONGroup = {
                     grundakt = layer.feature.properties.grundakt,
                     value = layer.feature.properties.value,
                     hc = layer.feature.properties.hc,
-                    value_comma = layer.feature.properties.value_comma;
-
+                    value_comma = layer.feature.properties.value_comma,
+                    krs = function(){
+                        if(layer.feature.properties.kreis){
+                            return layer.feature.properties.kreis;
+                        }
+                    };
                 if($.inArray(des,exluded_areas)===-1){
                     ags_array.push({
                         ags: ags_feature,
@@ -944,7 +932,8 @@ const indikatorJSONGroup = {
                         value: value,
                         hc: hc,
                         value_comma: value_comma,
-                        des: des
+                        des: des,
+                        krs:krs()
                     });
                 }
             });

@@ -180,7 +180,7 @@ if(!$IND)
     die;
 }
 ?>
-<button class="btn btn-primary" id="print_btn_kennblatt"><i class="glyphicon glyphicon-print"></i>Drucken</button>
+<button class="btn btn-primary" id="print_btn_kennblatt"><i class="glyphicon glyphicon-print"></i>Exportieren</button>
 <form class="kennblatt_form" id="kennblatt_form">
 
         <!--Titelbereich: Bearbeitungsstand nur für Prüfer ausgeben-->

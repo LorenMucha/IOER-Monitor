@@ -50,13 +50,16 @@ $(function(){
             });
         }
         else if(e.name === "Hauptfließgewässer"){
-            $.when(getZusatzlayer('hauptgewaesser')).done(function(_data){
-                    let json = JSON.parse((_data));
-                    layer_control.zusatzlayer.gew_haupt.addData(json);
+            $.ajax({
+                url:"https://sg.geodatenzentrum.de/wfs_dlm250?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&typeNames=dlm250:objart_44001_f&SRSNAME=EPSG:4326&OUTPUTFORMAT=JSON",
+                type:"GET",
+                success:function(data){
+                    layer_control.zusatzlayer.gew_haupt.addData(data);
                     layer_control.zusatzlayer.gew_haupt.setStyle(style.gewaesser);
                     layer_control.zusatzlayer.setStyleSet(style.gewaesser);
                     layer_control.zusatzlayer.setParam();
                     legende.getLegendeColorsObject().append('<div class="zusatzlayer"><div style="border-bottom: 3px solid '+style.gewaesser.color+';"></div>'+e.name+'</div>');
+                }
             });
         }
         else if(e.name === "Ländergrenzen") {
@@ -127,7 +130,7 @@ $(function(){
         }else{
             layer_control.baselayer.updateParamter(layer);
         }
-        if (map.hasLayer(raster)) {
+        if (raeumliche_visualisierung.getParameter()==="raster") {
             raster_group.eachLayer(function (layer) {
                 layer.bringToFront();
             });

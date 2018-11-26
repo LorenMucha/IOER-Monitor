@@ -1,46 +1,71 @@
 <?php
 header('Access-Control-Allow-Origin: *');
 header('Content-type: application/json; charset=utf-8');
-require("database/MYSQL_QUERIES.php");
+require("database/MY_SQL_TASKREPOSITORY.php");
 require("HELPER.php");
-require('INDIKATOR_JSON.php');
+require('INDICATOR_JSON.php');
+require('CLASSIFY.php');
+require_once('CACHE_MANAGER.php');
 $q =  $_GET["values"];
 $json_obj = json_decode($q, true);
 $modus = $json_obj['format']['id'];
 $indicator = $json_obj['ind']['id'];
 $year =$json_obj['ind']['time'];
 $raumgliederung =$json_obj['ind']['raumgliederung'];
+$klassifizierung = $json_obj['ind']['klassifizierung'];
+$klassenanzahl = $json_obj['ind']['klassenzahl'];
+$colors =$json_obj['ind']['colors'];
 $query = $json_obj['query'];
 
 try{
     //get the JSON
     if($query==='getJSON'){
-        $ags_array = $json_obj['ind']['ags_array'];
-        $ags_array = explode(",",$ags_array);
-        //echo json_encode($ags_array);
-        $test = new INDIKATOR_JSON($indicator,$year,$raumgliederung,$ags_array);
-        echo $test->getJSON();
+        $ags_user = trim($json_obj['ind']['ags_array']);
+        $ags_array = array();
+        if(strlen($ags_user)>0){
+            $ags_array = explode(",",$ags_user);
+        }
+        //check if the json exist in the database
+        $cache_manager = new CACHE_MANAGER($indicator,$year,$raumgliederung,$ags_array,$klassifizierung);
+        try{
+            if (!$cache_manager->check_cached() or $colors) {
+                $indicator_json = new INDICATOR_JSON($indicator,$year,$raumgliederung,$ags_array);
+                $geometry_values = $indicator_json->createJSON();
+                $class_json = new CLASSIFY($geometry_values,$klassenanzahl,$colors,$indicator,$klassifizierung);
+                $json = json_encode(array_merge($geometry_values,array("classes"=>$class_json->classify())));
+                //save the cache but not avaliable user colors
+                if(!$colors) {
+                    $cache_manager->insert($json);
+                }
+                echo $json;
+            }else{
+                echo $cache_manager->get_cached();
+            }
+        }catch(Error $e){
+            $trace = $e->getTrace();
+            echo $e->getMessage().' in '.$e->getFile().' on line '.$e->getLine().' called from '.$trace[0]['file'].' on line '.$trace[0]['line'];
+        }
     }
     //get all possible Indicators
     else if($query==='getAllIndicators'){
         $json = '{';
-        $kategories = MYSQL_QUERIES::get_instance()->getAllIndicatorsGebiete();
+        $kategories = MY_SQL_TASKREPOSITORY::get_instance()->getAllIndicatorsGebiete();
         if($modus=='raster') {
-            $kategories = MYSQL_QUERIES::get_instance()->getAllIndicatorsRaster();
+            $kategories = MY_SQL_TASKREPOSITORY::get_instance()->getAllIndicatorsRaster();
         }
 
         foreach($kategories as $row){
 
-            $erg_indikator = MYSQL_QUERIES::get_instance()->getAllIndicatorsByCategoryGebiete($row->ID_THEMA_KAT,$modus);
+            $erg_indikator = MY_SQL_TASKREPOSITORY::get_instance()->getAllIndicatorsByCategoryGebiete($row->ID_THEMA_KAT,$modus);
 
             //only if indicators are avaliabke
             if (count($erg_indikator) != 0) {
 
-                $json .= '"' . $row->ID_THEMA_KAT . '":{"cat_name":"' . $row->THEMA_KAT_NAME . '","indicators":{';
+                $json .= '"' . $row->ID_THEMA_KAT . '":{"cat_name":"' . $row->THEMA_KAT_NAME . '","cat_name_en":"'.$row->THEMA_KAT_NAME_EN.'","indicators":{';
 
                 foreach($erg_indikator as $row_ind){
                     $grundakt_state = "verfügbar";
-                    if (MYSQL_QUERIES::get_instance()->getGrundaktState($row_ind->ID_INDIKATOR) == 1) {
+                    if (MY_SQL_TASKREPOSITORY::get_instance()->getGrundaktState($row_ind->ID_INDIKATOR) == 1) {
                         $grundakt_state = "nicht verfügbar";
                     }
                     $significant = 'false';
@@ -50,11 +75,27 @@ try{
 
                     //get all possible times
                     $time_string = '';
-                    $times = MYSQL_QUERIES::get_instance()->getIndicatorPossibleTimeArray($row_ind->ID_INDIKATOR,$modus,false);
+                    $times = MY_SQL_TASKREPOSITORY::get_instance()->getIndicatorPossibleTimeArray($row_ind->ID_INDIKATOR,$modus,false);
                     foreach($times as $value){$time_string .= $value["time"].",";};
                     $time_string = substr($time_string,0,-1);
                     //extend the json
-                    $json .= '"' . $row_ind->ID_INDIKATOR . '":{"ind_name":"' . str_replace('"', "'", $row_ind->INDIKATOR_NAME) . '","ind_name_short":"' . str_replace('"', "'", $row_ind->INDIKATOR_NAME_KURZ) . '","basic_actuality_state":"' . $grundakt_state . '","significant":"' . $significant . '","unit":"' . $row_ind->EINHEIT . '","interpretation":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->BEDEUTUNG_INTERPRETATION))) . '","methodik":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->METHODIK))) . '","times":"' . $time_string . '"},';
+                    $json .= '"' . $row_ind->ID_INDIKATOR . '":{"ind_name":"' . str_replace('"', "'", $row_ind->INDIKATOR_NAME) .
+                        '","ind_name_en":"' . str_replace('"', "'", $row_ind->INDIKATOR_NAME_EN) .
+                        '","ind_name_short":"' . str_replace('"', "'", $row_ind->INDIKATOR_NAME_KURZ) .
+                        '","basic_actuality_state":"' . $grundakt_state .
+                        '","significant":"' . $significant .
+                        '","unit":"' . $row_ind->EINHEIT .
+                        '","interpretation":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->BEDEUTUNG_INTERPRETATION))) .
+                        '","interpretation_en":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->BEDEUTUNG_INTERPRETATION_EN))) .
+                        '","methodik":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->METHODIK))) .
+                        '","methodology":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->METHODIK_EN))) .
+                        '","datengrundlage":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->DATENGRUNDLAGE_ZEILE_1))) .
+                        " ".
+                        trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->DATENGRUNDLAGE_ZEILE_2))).
+                        '","data_foundation":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->DATENGRUNDLAGE_ZEILE_1_EN))) .
+                        " ".
+                        trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->DATENGRUNDLAGE_ZEILE_2_EN))).
+                        '","times":"' . $time_string . '"},';
                 }
                 $json = substr($json, 0, -1);
                 $json .= '}},';
@@ -68,7 +109,7 @@ try{
     //get all possible years
     else if($query=='years'){
         $jahre = array();
-        $years = MYSQL_QUERIES::get_instance()->getIndicatorPossibleTimeArray($indicator,$modus);
+        $years = MY_SQL_TASKREPOSITORY::get_instance()->getIndicatorPossibleTimeArray($indicator,$modus);
         foreach ($years as $x){
                 array_push($jahre,intval($x["time"]));
         }
@@ -79,7 +120,7 @@ try{
         $array = array();
             array_push($array, array(
                 "ind" => $indicator,
-                "avability" => MYSQL_QUERIES::get_instance()->checkIndicatorAvability($indicator,$modus))
+                "avability" => MY_SQL_TASKREPOSITORY::get_instance()->checkIndicatorAvability($indicator,$modus))
             );
         echo json_encode($array);
     }

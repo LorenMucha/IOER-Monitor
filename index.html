@@ -38,7 +38,7 @@
     <link href="frontend/lib/d3/animate.min.css" rel="stylesheet"/>
 
     <!-- Sweet Alert -->
-    <link rel="stylesheet" href="frontend/lib/sweetalert/sweetalert.css">
+    <link rel="stylesheet" href="frontend/lib/sweetalert/sweetalert.css"/>
 
     <!-- Page CSS -->
     <link href="frontend/css/main.css" rel="stylesheet"/>
@@ -178,7 +178,7 @@
                             </div>
                             <div class="dropdown_menu" id="dropdown_layer">
                                 <div id="layer_conainer">
-                                    <span>Sichtbarkeit Indikator</span>
+                                    <span class="span">Sichtbarkeit Indikator</span>
                                     <hr class="hr"/>
                                     <div id="opacity_container">
                                         <div id="opacity_slider"></div>
@@ -193,10 +193,10 @@
                                     <div id="color_schema">
                                     </div>
                                 </div>
-                                <div class="klassifizierung">
-                                    <span>Klassifizierung</span>
+                                <div class="klassenbesetzung">
+                                    <span class="span">Klassenanzahl</span>
                                     <hr class="hr"/>
-                                    <form id="menu_klassifizierung2" name="menu_klassifizierung">
+                                    <form id="menu_klassenbesetzung" name="menu_klassifizierung">
                                         <select class="form-control Klassifikationsmethode" name="Klassenanzahl" id="Klassenanzahl" title="Anzahl der Klassen w&auml;hlen">
                                             <option id="klassi_3" value="3">3</option>
                                             <option id="klassi_4" value="4">4</option>
@@ -206,7 +206,7 @@
                                         </select>
                                     </form>
                                 </div>
-                                <span>Klassenbesetzung</span>
+                                <span class="span">Klassifizierung</span>
                                 <hr class="hr"/>
                                 <div class="klassifizierung">
                                     <form id="menu_klassifizierung" name="menu_klassifizierung2">
@@ -225,7 +225,7 @@
                                     </form>
                                 </div>
                                 <div class="klassifizierung">
-                                    <span>Art der Darstellung</span>
+                                    <span class="span">Art der Darstellung</span>
                                     <hr class="hr"/>
                                     <form id="menu_darstellung" name="menu_klassifizierung2">
                                         <div class="radio_left">
@@ -340,7 +340,9 @@
                         <input id="search_input_table" placeholder="Suche nach Orten.." type="text" class="form-control search_input" />
                     </div>
                     <!--Tabelle-->
-                    <div id="scrollable-area" class="scrollable-area"></div>
+                    <div id="scrollable-area" class="scrollable-area">
+
+                    </div>
                 </div>
                 <!-- Tabelle erweitern Panel------------------------------------------------------------->
                 <div id="tabelle_erweitern" class="choice_panel">
@@ -460,6 +462,7 @@
             <hr class="hr"/>
             <div><b>Histogramm</b></div>
             <div id="histogramm_pic"></div>
+            <div class="hist_info"></div>
             <div id="datenalter_container">
                 <button class="btn btn-primary btn_dropdown" id="datenalter">
                     <i class="glyphicon glyphicon-chevron-down drop_arrow"></i>Datenalter
@@ -694,7 +697,7 @@
                     </div>
                 </div>
                 <div id="klassifizierung_vergleich">
-                    <span class="span">Klassifizierung</span>
+                    <span class="span">Klassenanzahl</span>
                     <hr class="hr"/>
                     <form id="menu_klassenanzahl_vergleich" name="menu_klassifizierung">
                         <select class="form-control Klassifikationsmethode" name="Klassenanzahl" id="Klassenanzahl_vergleich" title="Anzahl der Klassen wählen">
@@ -707,7 +710,7 @@
                     </form>
                 </div>
                 <div id="klassenbestzung_vergleich">
-                    <span class="span">Klassenbesetzung</span>
+                    <span class="span">Klassifizierung</span>
                     <hr class="hr"/>
                     <div class="klassifizierung">
                         <form id="menu_klassifizierung_vergleich" name="menu_klassifizierung2">
@@ -846,8 +849,8 @@
 <script src="frontend/lib/sweetalert/sweetalert-dev.js"></script>
 
 <!-- Export2PDF-->
-<script src="frontend/lib/export/jspdf.min.js" defer></script>
-<script src="frontend/lib/export/html2canvas.js" defer></script>
+<script src="frontend/lib/export/jspdf.min.js"></script>
+<script src="frontend/lib/export/html2canvas.js"></script>
 <script src="frontend/lib/export/html2pdf.bundle.min.js"></script>
 
 <!-- Page js-->
@@ -868,5 +871,6 @@
 <script src="frontend/js/ioer_layer.js"></script>
 <script src="frontend/js/ajax.js"></script>
 <script src="frontend/js/helper.js"></script>
+<script src="frontend/js/main.js"></script>
 </body>
 </html>

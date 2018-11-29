@@ -1,22 +1,21 @@
 <?php
 require_once('database/POSTGRESQL_TASKRESPOSITORY.php');
-require_once('database/MY_SQL_TASKREPOSITORY.php');
-require_once('INDICATOR_ERRORS.php');
-require_once('INDICATOR_NOTES.php');
+require_once('database/MYSQL_TASKREPOSITORY.php');
+require_once('ERRORS.php');
+require_once('NOTES.php');
 require_once('HELPER.php');
 require_once('CACHE_MANAGER.php');
 require_once ('COLORS.php');
 
-class INDICATOR_JSON
+class JSON
 {
     protected static $instance = NULL;
     private $json;
-
     public function __construct($indicator_id,$year,$spatial_extend,$ags_array_user) {
 
         $this->indicator_id = $indicator_id;
         $this->year = $year;
-        $this->year_pg =MY_SQL_TASKREPOSITORY::get_instance()->getPostGreYear($year);
+        $this->year_pg =MYSQL_TASKREPOSITORY::get_instance()->getPostGreYear($year);
         $this->spatial_extend = $spatial_extend;
         $this->ags_array_user = $ags_array_user;
     }
@@ -27,9 +26,9 @@ class INDICATOR_JSON
             //get the PostgreObject
             $geometry_object = POSTGRESQL_TASKRESPOSITORY::get_instance()->getGeometry($this->year_pg, $this->spatial_extend, $this->ags_array_user);
             //get the Indicator Object
-            $indicator_object = MY_SQL_TASKREPOSITORY::get_instance()->getIndicatorValueInSpatialExtend($this->year, $this->indicator_id, $geometry_object[0]->ags,$this->ags_array_user);
+            $indicator_object = MYSQL_TASKREPOSITORY::get_instance()->getIndicatorValueInSpatialExtend($this->year, $this->indicator_id, $geometry_object[0]->ags,$this->ags_array_user);
             //get the Grundaktualität
-            $indikator_grundaktualitaet = MY_SQL_TASKREPOSITORY::get_instance()->getGrundaktState($this->indicator_id);
+            $indikator_grundaktualitaet = MYSQL_TASKREPOSITORY::get_instance()->getGrundaktState($this->indicator_id);
             //get the ags array's to calculate the differences
             $indicator_rundung = '';
             $ags_mysql = array();
@@ -74,12 +73,12 @@ class INDICATOR_JSON
 
                             //get the hc text
                             if (!empty($note_id)) {
-                                $text_hc = INDICATOR_NOTES::get_instance()->getNoteText($note_id) . "||" . $note_id;
+                                $text_hc = NOTES::get_instance()->getNoteText($note_id) . "||" . $note_id;
                             } else {
                                 $text_hc = "0";
                             }
 
-                            $fc = INDICATOR_ERRORS::get_instance()->getCodeValues(intval($fc_id));
+                            $fc = ERRORS::get_instance()->getCodeValues(intval($fc_id));
                             if ($fc != 0) {
                                 $fc = $fc_id . "||" . $fc[0]["color"] . "||" . $fc[0]["name"] . "||" . $fc[0]["description"];
                             }
@@ -122,10 +121,10 @@ class INDICATOR_JSON
                 $stat_string_ags = '';
                 foreach ($this->ags_array_user as $value) {
                     $ags_set = substr($value, 0, 2);
-                    $stat_string_ags .= '"' . $ags_set . '":{"gen":"' . POSTGRESQL_TASKRESPOSITORY::get_instance()->getAGSName('bld', $ags_set, $this->year) . '","value_ags":"' . number_format(round(MY_SQL_TASKREPOSITORY::get_instance()->getIndicatorValueByAGS($this->indicator_id, $value, $this->year), $indicator_rundung), $indicator_rundung, ',', '') . '","ags_grundakt":"' . MY_SQL_TASKREPOSITORY::get_instance()->getIndicatorGrundaktualitaet($value, $this->year) . '"},';
+                    $stat_string_ags .= '"' . $ags_set . '":{"gen":"' . POSTGRESQL_TASKRESPOSITORY::get_instance()->getAGSName('bld', $ags_set, $this->year) . '","value_ags":"' . number_format(round(MYSQL_TASKREPOSITORY::get_instance()->getIndicatorValueByAGS($this->indicator_id, $value, $this->year), $indicator_rundung), $indicator_rundung, ',', '') . '","ags_grundakt":"' . MYSQL_TASKREPOSITORY::get_instance()->getIndicatorGrundaktualitaet($value, $this->year) . '"},';
                 }
             }
-            trim($JSON = '{ "type": "FeatureCollection", "stat":{' . $stat_string_ags . '"wert_brd":"' . number_format(round(MY_SQL_TASKREPOSITORY::get_instance()->getIndicatorValueForBRD($this->indicator_id, $this->year), $indicator_rundung), $indicator_rundung, ',', '') . '","grundakt_brd":"' . MY_SQL_TASKREPOSITORY::get_instance()->getIndicatorGrundaktualitaet('99', $this->year) . '"},"features": [ ' . $output . ' ]}');
+            trim($JSON = '{ "type": "FeatureCollection", "stat":{' . $stat_string_ags . '"wert_brd":"' . number_format(round(MYSQL_TASKREPOSITORY::get_instance()->getIndicatorValueForBRD($this->indicator_id, $this->year), $indicator_rundung), $indicator_rundung, ',', '') . '","grundakt_brd":"' . MYSQL_TASKREPOSITORY::get_instance()->getIndicatorGrundaktualitaet('99', $this->year) . '"},"features": [ ' . $output . ' ]}');
             $this->json = json_decode($JSON,true);
             return json_decode($JSON,true);
         }

@@ -22,7 +22,7 @@ class POSTGRESQL_TASKRESPOSITORY extends POSTGRESQL_MANAGER
         if ($year == 2000) {
             $geom = "x.geom";
         }
-        if($spatial_extend==="gem"){
+        if($spatial_extend==="gem" and count($ags_array) > 0){
             $krs_col = ",k.gen as kreis";
             $sql_join_krs =" inner join vg250_krs_2016_grob k on cast(k.ags as text) Like substring(cast(x.ags as text) for 5)";
         }
@@ -43,6 +43,25 @@ class POSTGRESQL_TASKRESPOSITORY extends POSTGRESQL_MANAGER
             }
         }
         return $this->query($sql . $digit);
+    }
+    function countGeometries($year,$raumgl,$ags_array){
+        $year_pg = MYSQL_TASKREPOSITORY::get_instance()->getPostGreYear($year);
+        $query= "select COUNT(AGS) from vg250_".$raumgl."_".$year_pg."_grob";
+        if (count($ags_array) > 0) {
+            $sql_pg = "select COUNT(AGS) from  vg250_" . $raumgl . "_" . $year_pg . "_grob where AGS Like'" . $ags_array[0] . "";
+
+            foreach ($ags_array as $key=>$value) {
+                if (strlen($value) <= 5) {
+                    $digit = "%'";
+                    $sql_pg .= "%' or AGS Like '" . $value . "";
+                } else {
+                    $digit = "'";
+                    $sql_pg .= "' or AGS Like '" . $value . "";
+                }
+            }
+            $query= $sql_pg.$digit;
+        }
+        return $this->query($query);
     }
     function getDescription($des,$ags,$spatial_extend){
         $value_return = $des;

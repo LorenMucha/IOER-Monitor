@@ -73,8 +73,6 @@ const legende = {
     },
     init:function(open){
         const legende = this;
-        let click_dd = 0,
-            legende_width = legende.getDOMObject().width();
         this.resize();
         legende.getShowButtonObject().show();
         if(legende.getDOMObject().is(':visible')){
@@ -87,48 +85,8 @@ const legende = {
                 legende.open();
             }
         }
-        //the onClick funcionality
-        //open Button
-        legende.getCloseIconObject()
-                .unbind()
-                .click(function(){
-                        legende.close();
-                    });
-        //close Icon
-        legende.getShowButtonObject()
-            .unbind()
-            .click(function(){
-                    legende.open();
-                });
-        //Datenalter
-        legende.getDatenalterContainerObject().find('#datenalter')
-            .unbind()
-            .click(function () {
-                let datenalter_dd = legende.getDatenalterContainerObject().find('#dropdown_datenalter'),
-                    margin = function(){
-                        let x = 50,
-                            margin;
-                        if(click_dd===0){
-                            margin = (legende_width+x);
-                        }else{
-                            margin = legende_width;
-                        }
-                        return margin;
-                    };
-                legende.getDOMObject().css("width", margin());
-                legende.getShowButtonObject().css("right", margin());
-                if(click_dd===0){
-                    datenalter_dd.show();
-                    ++click_dd;
-                }else{
-                    datenalter_dd.hide();
-                    click_dd=0;
-                }
-                //scroll down to view full viewport
-                setTimeout(function() {
-                    legende.getDOMObject().scrollTop(legende.getDOMObject()[0].scrollHeight);
-                },100);
-            });
+        //set the controller
+        legende.controller.set();
     },
     fillContent:function() {
         const object = this;
@@ -141,10 +99,14 @@ const legende = {
             klasseneinteilung_contaiener = this.getKlasseneinteilungObject();
 
         //close datenalter
-        object.getDatenalterContainerObject().find('#dropdown_datenalter').hide();
+        if(indikatorauswahl.getSelectedIndiktorGrundaktState() && object.getDatenalterContainerObject().find('#dropdown_datenalter').is(":visible")){
+            object.getDatenalterContainerObject().find('#dropdown_datenalter').show();
+        }else{
+            object.getDatenalterContainerObject().find('#dropdown_datenalter').hide();
+        }
 
         /*------hole Zusatzinfos------------------------------------------------------------------------*/
-        $.when(getIndZusatzinformationen()).done(function(data){
+        $.when(request_manager.getIndZusatzinformationen()).done(function(data){
             let datengrundlage = data[0]["datengrundlage"];
             if (datengrundlage.length >= 3) {
                 datengrundlage = datengrundlage + "</br>";
@@ -249,6 +211,54 @@ const legende = {
                 show_button.css("right","0px").show();
             }
         }
+    },
+    controller:{
+      set:function(){
+          let click_dd = 0,
+              legende_width = legende.getDOMObject().width();
+          //the onClick funcionality
+          //open Button
+          legende.getCloseIconObject()
+              .unbind()
+              .click(function(){
+                  legende.close();
+              });
+          //close Icon
+          legende.getShowButtonObject()
+              .unbind()
+              .click(function(){
+                  legende.open();
+              });
+          //Datenalter
+          legende.getDatenalterContainerObject().find('#datenalter')
+              .unbind()
+              .click(function () {
+                  let datenalter_dd = legende.getDatenalterContainerObject().find('#dropdown_datenalter'),
+                      margin = function(){
+                          let x = 50,
+                              margin;
+                          if(click_dd===0){
+                              margin = (legende_width+x);
+                          }else{
+                              margin = legende_width;
+                          }
+                          return margin;
+                      };
+                  legende.getDOMObject().css("width", margin());
+                  legende.getShowButtonObject().css("right", margin());
+                  if(click_dd===0){
+                      datenalter_dd.show();
+                      ++click_dd;
+                  }else{
+                      datenalter_dd.hide();
+                      click_dd=0;
+                  }
+                  //scroll down to view full viewport
+                  setTimeout(function() {
+                      legende.getDOMObject().scrollTop(legende.getDOMObject()[0].scrollHeight);
+                  },100);
+              });
+      }
     },
     histogramm:{
         value_array:[],
@@ -395,6 +405,18 @@ const legende = {
                     legende.getHistogrammObject().empty().append('<img style="width:100%;" src="'+data+'"/>');
                 }
             });
+        }
+    },
+    datenalter:{
+        getDOMObject:function(){
+            $elem = legende.getDatenalterContainerObject().find('#dropdown_datenalter') ;
+            return $elem;
+        },
+        show:function(){
+
+        },
+        hide:function(){
+
         }
     }
 };

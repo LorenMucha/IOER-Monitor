@@ -30,8 +30,7 @@ $(function(){
         }
 
         if(e.name === "Autobahnnetz (Stand 2015)") {
-            $.when(getZusatzlayer('bab_grossmasstaeblich')).done(function(_data){
-                let json = JSON.parse((_data));
+            $.when(request_manager.getZusatzlayer('bab_grossmasstaeblich')).done(function(json){
                 layer_control.zusatzlayer.autobahn.addData(json);
                 layer_control.zusatzlayer.autobahn.setStyle(style.autobahn);
                 layer_control.zusatzlayer.setStyleSet(style.autobahn);
@@ -40,8 +39,7 @@ $(function(){
             });
         }
         else if(e.name === "Fernbahnnetz (Stand 2016)"){
-            $.when(getZusatzlayer('db_fernverkehr_kleinmassstaeblich')).done(function(_data){
-                let json = JSON.parse((_data));
+            $.when(request_manager.getZusatzlayer('db_fernverkehr_kleinmassstaeblich')).done(function(json){
                 layer_control.zusatzlayer.fernbahnnetz.addData(json);
                 layer_control.zusatzlayer.fernbahnnetz.setStyle(style.fernbahnnetz);
                 layer_control.zusatzlayer.setStyleSet(style.fernbahnnetz);
@@ -63,8 +61,7 @@ $(function(){
             });
         }
         else if(e.name === "Ländergrenzen") {
-            $.when(getZusatzlayer('vg250_bld_'+time+'_grob')).done(function(_data){
-                let json = JSON.parse(_data);
+            $.when(request_manager.getZusatzlayer('vg250_bld_'+time+'_grob')).done(function(json){
                 layer_control.zusatzlayer.grenze_laender.addData(json);
                 layer_control.zusatzlayer.grenze_laender.setStyle(style.laendergrenzen);
                 layer_control.zusatzlayer.setStyleSet(style.laendergrenzen);
@@ -75,8 +72,7 @@ $(function(){
         else if(e.name === "Kreisgrenzen") {
             progressbar.init();
             progressbar.setHeaderText("Erstelle Layer");
-            $.when(getZusatzlayer('vg250_krs_'+time+'_grob')).done(function(_data){
-                let json = JSON.parse(_data);
+            $.when(request_manager.getZusatzlayer('vg250_krs_'+time+'_grob')).done(function(json){
                 layer_control.zusatzlayer.grenze_kreise.addData(json);
                 layer_control.zusatzlayer.grenze_kreise.setStyle(style.kreisgrenzen);
                 layer_control.zusatzlayer.setStyleSet(style.kreisgrenzen);
@@ -89,8 +85,7 @@ $(function(){
         else if(e.name === "Gemeindegrenzen") {
             progressbar.init();
             progressbar.setHeaderText("Erstelle Layer");
-            $.when(getZusatzlayer('vg250_gem_'+time+'_grob')).done(function(_data){
-                let json = JSON.parse(_data);
+            $.when(request_manager.getZusatzlayer('vg250_gem_'+time+'_grob')).done(function(json){
                 layer_control.zusatzlayer.grenze_gemeinden.addData(json);
                 layer_control.zusatzlayer.grenze_gemeinden.setStyle(style.gemeindegrenzen);
                 layer_control.zusatzlayer.setStyleSet(style.gemeindegrenzen);

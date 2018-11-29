@@ -363,7 +363,7 @@ const progressbar ={
             this.active = true;
         }
         $(document).on("click","#abort_btn",function(){
-            ajax_call.abort();
+            request_manager.cancel();
             object.remove();
         });
     },

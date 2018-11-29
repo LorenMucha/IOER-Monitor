@@ -402,11 +402,6 @@ Toolbar
     margin-bottom: 10px;
     margin-top: 10px;
 }
-.dropdown_menu {
-    display: none;
-    margin-bottom: 5px;
-    margin-top: 5px;
-}
 #btn_reset {
     background-color: grey !important;
 }
@@ -442,7 +437,7 @@ Toolbar
     padding-left: 2px;
 }
 
-.menu_m span {
+.toolbar .menu_m span {
     color: #fff;
     font-size: 1.5em;
     font-weight: bold;
@@ -452,13 +447,13 @@ Toolbar
     top: 39px;
     left: -18px;
 }
-.tools {
+.toolbar .tools {
     list-style-type: none;
     margin: 0;
     padding: 0;
     overflow: hidden;
 }
-#content .dropdown_choice{
+.toolbar #content .dropdown_choice{
     width: 100%;
     border-radius: 5px;
     background: #4E60AA;
@@ -468,7 +463,7 @@ Toolbar
     color:white;
     margin-bottom: 10px;
 }
-#content .dropdown_choice .hh_sf{
+.toolbar #content .dropdown_choice .hh_sf{
     float: left;
     width: 90%;
     cursor: pointer;
@@ -498,6 +493,12 @@ Toolbar
     width:100%;
     margin-bottom: 5px;
 }
+.toolbar .dropdown_menu {
+    display: none;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+/*Indicator choices also for the cloned ones*/
 .indicator_ddm{
     width: 100% !important;
     background-color: white !important;
@@ -526,53 +527,67 @@ Toolbar
     overflow-y: auto !important;
     padding-bottom: 10px !important;
 }
-#content #dropdown_raumgl{
+.toolbar #content #dropdown_raumgl{
     margin-top: 0;
 }
-#content #dropdown_raumgl .spatial_choice{
+.toolbar #content #dropdown_raumgl .spatial_choice{
     display: inline-block;
     width: 90%;
     margin: 10px;
 }
-#content #dropdown_raumgl .spatial_choice .label_spatial_choice{
+.toolbar #content #dropdown_raumgl .spatial_choice .label_spatial_choice{
     font-family: 'Roboto', sans-serif !important;
     font-weight: normal;
     font-size: 1.8rem !important;
     margin-top: 0.5rem;
 }
-#content #dropdown_raumgl .spatial_choice #gebiete_label{
+.toolbar #content #dropdown_raumgl .spatial_choice #gebiete_label{
     float: left;
 }
-#content #dropdown_raumgl .spatial_choice #spatial_choice_checkbox_container label:before{
+.toolbar #content #dropdown_raumgl .spatial_choice #spatial_choice_checkbox_container label:before{
     width: 4.5rem !important;
     height: 2.5rem !important;
     background: #8CB91B !important;
 }
-#content #dropdown_raumgl .spatial_choice #spatial_choice_checkbox_container label:after{
+.toolbar #content #dropdown_raumgl .spatial_choice #spatial_choice_checkbox_container label:after{
     width: 2.5rem !important;
     height: 2.5rem !important;
 }
-#content #dropdown_raumgl .spatial_choice #raster_label{
+.toolbar #content #dropdown_raumgl .spatial_choice #raster_label{
     float: right;
 }
-#content #dropdown_raumgl .spatial_choice .checkbox{
+.toolbar #content #dropdown_raumgl .spatial_choice .checkbox{
     margin-top: 0 !important;
 }
-#content #dropdown_raumgl #spatial_range_raster #slider_raum_container {
+.toolbar #content #dropdown_raumgl #spatial_range_gebiete .dropdown_gebietsauswahl{
+    width:100%;
+}
+.toolbar #content #dropdown_raumgl #spatial_range_gebiete .dropdown_gebietsauswahl #dropdown_grenzen_container{
+    float:left;
+    width:90%;
+}
+.toolbar #content #dropdown_raumgl #spatial_range_gebiete .dropdown_gebietsauswahl #clear_gebietsauswahl{
+    font-size: 1.5rem;
+    padding-top: 0.5rem;
+    padding-left: 0.1rem;
+    cursor: pointer;
+}
+/*spatial slider inside the raster choices */
+.toolbar #content #dropdown_raumgl #spatial_range_raster #slider_raum_container {
     display: block;
     margin-bottom: 0;
 }
-#content #dropdown_raumgl #spatial_range_raster{
+.toolbar #content #dropdown_raumgl #spatial_range_raster{
     display: none;
 }
-#content #dropdown_raumgl #spatial_range_raster #slider_raum_container #raum_slider {
+.toolbar #content #dropdown_raumgl #spatial_range_raster #slider_raum_container #raum_slider {
     margin-left: 10px;
     margin-right: 20px;
     display: block;
     margin-bottom: 50px !important;
     margin-top: 20px;
 }
-#content #dropdown_raumgl #spatial_range_raster #slider_raum_container #raum_slider .ui-slider-range {
+.toolbar #content #dropdown_raumgl #spatial_range_raster #slider_raum_container #raum_slider .ui-slider-range {
     background-color: #4E60AA;
 }
 /*Slider*/

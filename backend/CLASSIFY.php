@@ -9,11 +9,12 @@ class CLASSIFY
     public function __construct($json,$classes,$colors, $indicator_id,$klassifizierung) {
         $this->json = $json;
         $this->classes = $classes;
-        if(!$colors) {
-            $this->colors = MY_SQL_TASKREPOSITORY::get_instance()->getIndicatorColors($indicator_id);
+        //if no color is set, get the predefined colors
+        if(!(array)$colors or $indicator_id==="Z00AG") {
+            $this->colors = MYSQL_TASKREPOSITORY::get_instance()->getIndicatorColors($indicator_id);
         }else{
             //cast because it needs to be an object
-            $this->colors=(object)$colors;
+            $this->colors=$colors;
         }
         $this->klassifizierung=$klassifizierung;
     }

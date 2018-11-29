@@ -1,86 +1,146 @@
-let url_backend = urlparamter.getURL_SVG()+"backend",
-    ajax_call;
-
-/*
-AJAX GETTER Functions------------------------------------------------------------
- */
-function getSUMGeometriesInfo(raumgl,time,ags_array){
-    return $.ajax({
-        url: url_backend+"/map/count_ags.php",
-        type:"GET",
-        dataType:"json",
-        data:{
-            raumgl:raumgl,
-            time:time,
-            ags:ags_array + ""
-        },
-        success:function(){}
-    })
-}
-function getIndZusatzinformationen(ind,time){
-    let ind_set = indikatorauswahl.getSelectedIndikator();
-    let time_set = zeit_slider.getTimeSet();
-    if(ind){
-        ind_set = ind;
-    }
-    if(time){
-        time_set= time;
-    }
-    let json = JSON.parse('{"ind":{"id":"'+ind_set+'","time":"'+time_set+'"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+'"},"query":"additional_info"}');
-    return $.ajax({
-        type: "GET",
-        url: url_backend+"/query.php",
-        data: {
-            values: JSON.stringify(json)
-        },
-        error:function(xhr, ajaxOptions, thrownError){
-            console.log(this.url);
-            console.log(thrownError);
-        },
-        success:function(){}
-    });
-}
-function getGeoJSON(ind,time,_raumgliederung,ags_array){
-    let colors = function(){
-            let max = farbschema.getHexMax(),
-                min = farbschema.getHexMin(),
-                string = '';
-            if(max.length >0){
-                string = ',"colors":{"max":"'+max+'","min":"'+min+'"}';
-            }
-            return string;
-        },
-        json_string = '{"ind":{"id":"'+ind+
-                        '","time":"'+time+
-                        '","raumgliederung":"'+_raumgliederung+
-                        '","ags_array":"'+ags_array.toString()+
-                        '","klassifizierung":"'+klassifzierung.getSelectionId()+
-                        '","klassenzahl":"'+klassenanzahl.getSelection()+'"'+
-                        colors()+
-                        '},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+
-                        '"},"query":"getJSON"}';
-        let request = JSON.parse(json_string);
-    ajax_call = $.ajax({
-        url: url_backend+"/query.php",
-        type: "GET",
-        data: {
-            values: JSON.stringify(request)
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            if (thrownError !== 'abort' && ind !=='Z00AG') {
-                progressbar.remove();
-                console.log(thrownError);
-                console.log(this.url);
-                alertError();
-            }
-        },
-        success:function(data){
-            //console.log(this.url);
-            //console.log(data);
+let url_backend = urlparamter.getURL_SVG()+"backend";
+const request_manager={
+    call:false,
+    url_backend:urlparamter.getURL_SVG()+"backend/query.php",
+    //get the indicator-JSON
+    getGeoJSON:function(ind,time,_raumgliederung,ags_array,_klassenanzahl,_klassifizierung){
+        let colors = function(){
+                let max = farbschema.getHexMax(),
+                    min = farbschema.getHexMin(),
+                    string = '';
+                if(max.length >0){
+                    string = ',"colors":{"max":"'+max+'","min":"'+min+'"}';
+                }
+                return string;
+            },
+            json = JSON.parse('{"ind":{"id":"'+ind+
+                '","time":"'+time+
+                '","raumgliederung":"'+_raumgliederung+
+                '","ags_array":"'+ags_array.toString()+
+                '","klassifizierung":"'+_klassifizierung+
+                '","klassenzahl":"'+_klassenanzahl+'"'+
+                colors()+
+                '},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+
+                '"},"query":"getJSON"}');
+        return this.makeRequest({"file":json,"query":"getGeoJSON","type":"POST","debug":false});
+    },
+    //check if a indicator is possible to view in the the given kind of visualization (gebiete/raster)
+    getAvabilityIndicator:function(_ind){
+        let ind = indikatorauswahl.getSelectedIndikator();
+        if(_ind){ind=_ind;}
+        let json = JSON.parse('{"ind":{"id":"'+ind+'"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+'"},"query":"getAvability"}');
+        return this.makeRequest({"file":json,"query":"getAvabilityIndicator","type":"POST","debug":false});
+    },
+    //get all avaliable indicators
+    getAllAvaliableIndicators:function(){
+        const manager = this;
+        let json = JSON.parse('{"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+'"},"query":"getAllIndicators"}');
+        return manager.makeRequest({"file":json,"query":"getAllAvaliableIndicators","type":"POST","debug":false});
+    },
+    //get the possible time`s
+    getJahre:function(ind){
+        let ind_set = indikatorauswahl.getSelectedIndikator();
+        if(ind){
+            ind_set = ind;
         }
-    });
-    return ajax_call;
-}
+        let json = JSON.parse('{"ind":{"id": "'+ind_set+'"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+'"},"query":"getYears"}');
+        return this.makeRequest({"file":json,"query":"getJahre","type":"POST","debug":false});
+
+    },
+    //get the possible spatial extends for a indicator
+    getRaumgliederung:function(ind){
+        let ind_set = indikatorauswahl.getSelectedIndikator();
+        if(ind){
+            ind_set = ind;
+        }
+        let json = JSON.parse('{"ind":{"id":"'+ind_set+
+            '","time":"'+zeit_slider.getTimeSet()+'"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+
+            '"},"query":"getSpatialExtend"}');
+        return this.makeRequest({"file":json,"query":"getAllAvaliableIndicators","type":"POST","debug":false});
+
+    },
+    // get extra info`s for the legend f. eg. info, datengrundlage....
+    getIndZusatzinformationen:function(ind,time){
+        let ind_set = indikatorauswahl.getSelectedIndikator(),
+            time_set = zeit_slider.getTimeSet();
+        if(ind){
+            ind_set = ind;
+        }
+        if(time){
+            time_set= time;
+        }
+        let json = JSON.parse('{"ind":{"id":"'+ind_set+'","time":"'+time_set+
+                                '"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+
+                                '"},"query":"getAdditionalInfo"}');
+        return this.makeRequest({"file":json,"query":"getIndZusatzinformationen","type":"POST","debug":false});
+    },
+    //get colors to give the user the possibility to manipulate the color of the indicator map
+     getColorSchema:function(color_array){
+        const manager = this;
+        let json = JSON.parse('{"ind":{"klassenzahl":"'+klassenanzahl.getSelection()+
+                                    '","colors":{"max":"'+color_array[0]+
+                                        '","min":"'+color_array[1]+
+                                        '"}},"query":"getColorSchema"}');
+         return manager.makeRequest({"file":json,"query":"getColorSchema","type":"POST","debug":false});
+    },
+    //get the sum of geometries to show them inside the loading bar
+    getCountGeometries:function(raumgliederung){
+        let json = JSON.parse('{"ind":{"klassenzahl":"'+klassenanzahl.getSelection()+'","time":"'+zeit_slider.getTimeSet()+
+                                    '","ags_array":"'+gebietsauswahl.getSelection()+
+                                    '","raumgliederung":"'+raumgliederung+'"},"query":"countgeometries"}');
+        return this.makeRequest({"file":json,"query":"getCountGeometries","type":"POST","debug":false});
+    },
+    //get overlays like autobahn, train, communal borders, rivers
+    getZusatzlayer:function(layer){
+        let json = JSON.parse('{"ind":{"zusatzlayer":"'+layer+'"},"query":"getzusatzlayer"}');
+        return this.makeRequest({"file":json,"query":"getZusatzlayer","type":"POST","debug":false});
+    },
+    //get the needed values to expand the table, has it´s own parameters, because the logic is slightly different
+    getTableExpandValues:function(expand_values,ags_array){
+        let ags_set = indikatorJSONGroup.getLayerArray(table.excludedAreas);
+        let raumgliederung_set = raeumliche_analyseebene.getSelectionId();
+        if(raumgliederung.getSelectedId()){raumgliederung_set=raumgliederung.getSelectedId();}
+        //optional ags array must include ags object {ags:01}
+        if(ags_array){
+            ags_set = ags_array;
+        }
+        let json = JSON.parse('{"ind":{"id":"'+indikatorauswahl.getSelectedIndikator()+'","time":"'+zeit_slider.getTimeSet()+
+            '","raumgliederung":"'+raumgliederung_set+'"},"expand_values":'+JSON.stringify(expand_values)+',"ags_array":'+JSON.stringify(ags_set)+',"query":"getTableExpandValues"}');
+        console.log('{"ind":{"id":"'+indikatorauswahl.getSelectedIndikator()+'","time":"'+zeit_slider.getTimeSet()+
+            '","raumgliederung":"'+raumgliederung_set+'"},"expand_values":'+JSON.stringify(expand_values)+',"ags_array":'+JSON.stringify(ags_set)+',"query":"getTableExpandValues"}');
+        return this.makeRequest({"file":json,"query":"getTableExpandValues","type":"POST","debug":false});
+    },
+    makeRequest:function(json){
+        const manager = this;
+        this.call= $.ajax({
+            type: json.type,
+            url: manager.url_backend,
+            data: {
+                values: JSON.stringify(json.file)
+            },
+            error:function(xhr, ajaxOptions, thrownError){
+                manager.onError( thrownError,json.query,this.url);
+            },
+            success:function(data){
+                if(json.debug){
+                    console.log(this.url);
+                    console.log(data);
+                }
+            }
+        });
+        return this.call;
+    },
+    cancel:function(){
+        this.call.abort();
+    },
+    onError:function( thrownError,function_name,url){
+        console.log("Error in: "+function_name);
+        progressbar.remove();
+        console.log(url);
+        console.log(thrownError);
+        alertError();
+    }
+};
 function getRasterMap(time,ind,_raumgliederung,klassifizierung,klassenanzahl,darstellung_map,_seite){
     return $.ajax({
         type: "GET",
@@ -96,148 +156,6 @@ function getRasterMap(time,ind,_raumgliederung,klassifizierung,klassenanzahl,dar
             hex_min: farbschema.getHexMin(),
             hex_max: farbschema.getHexMax(),
             seite: _seite
-        }
-    });
-}
-function getColorHTML(array, id) {
-    return $.ajax({
-        type: "GET",
-        url: url_backend+'/colors/create_color_schema.php',
-        dataType: "html",
-        data: {
-            colmax_rgb: array[0],
-            colmin_rgb: array[1],
-            anz_klassen: klassenanzahl.getSelection(),
-            id: id
-        }
-    });
-}
-function getIndicatorValueByMapAGS(json,ags_array){
-    //json must look like //the input JSON z.B. {id:addedValue,time:time}
-    let ags_set = indikatorJSONGroup.getLayerArray(table.excludedAreas);
-    //optional ags array must include ags object {ags:01}
-    if(ags_array){
-        ags_set = ags_array;
-    }
-    return $.ajax({
-        url: url_backend+"/html/indicator_values.php",
-        type: "POST",
-        data:{
-            time:zeit_slider.getTimeSet(),
-            indicator:indikatorauswahl.getSelectedIndikator(),
-            values:json,
-            ags_array_string: JSON.stringify(ags_set),
-            grundakt_set: indikatorauswahl.getSelectedIndiktorGrundaktState()
-        },
-        error:function(data){
-            alertError();
-
-        }
-    });
-}
-function getAvabilityIndicator(_ind){
-    let ind = indikatorauswahl.getSelectedIndikator();
-    if(_ind){ind=_ind;}
-    let json = JSON.parse('{"ind":{"id":"'+ind+'"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+'"},"query":"avability"}');
-    return $.ajax({
-        type: "GET",
-        url: url_backend+"/query.php",
-        data: {
-            values: JSON.stringify(json)
-        },
-        success:function(data){
-            //console.log(this.url);
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            console.log(this.url);
-            progressbar.remove();
-            console.log(thrownError);
-            alertError();
-        }
-    });
-}
-/*
-Getter Menu
- */
-function getAllAvaliableIndicators(){
-    let json = JSON.parse('{"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+'"},"query":"getAllIndicators"}');
-    return  $.ajax({
-        type: "GET",
-        url: url_backend+"/query.php",
-        data: {
-            values:JSON.stringify(json)
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            console.log(this.url);
-            progressbar.remove();
-            console.log(thrownError);
-            alertError();
-        }
-    });
-}
-/*Get the time shifts for a single indicator with callback to retrieve the spatial possebilities with
-final map creation*/
-function getJahre(ind){
-    let ind_set = indikatorauswahl.getSelectedIndikator();
-    if(ind){
-        ind_set = ind;
-    }
-    let json = JSON.parse('{"ind":{"id": "'+ind_set+'"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+'"},"query":"years"}');
-    return  $.ajax({
-        type: "GET",
-        url: url_backend+"/query.php",
-        data: {
-            values:JSON.stringify(json)
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            console.log(this.url);
-            progressbar.remove();
-            console.log(thrownError);
-            alertError();
-        }
-    });
-}
-function getRaumgliederung(ind){
-    let ind_set = indikatorauswahl.getSelectedIndikator();
-    if(ind){
-        ind_set = ind;
-    }
-
-    let request_Raumgliederung = $.ajax({
-        url: url_backend+"/html/raumgliederung.php",
-        type: "GET",
-        data: {
-            indikator: ind_set,
-            //Year must be set, fot final initializing
-            jahr:zeit_slider.getTimeSet(),
-            modus:raeumliche_visualisierung.getRaeumlicheGliederung()
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            console.log(this.url);
-            progressbar.remove();
-            console.log("error create Raumgliederung:"+thrownError);
-            alertError();
-        },
-        success:function(data){
-            //console.log(data);
-            //console.log(this.url);
-        }
-    });
-    return request_Raumgliederung;
-}
-function getZusatzlayer(layer){
-    return $.ajax({
-        url: url_backend+"/holeZusatzLayer.php",
-        type: "GET",
-        dataType: 'json',
-        data: {
-            LAYER: layer
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            console.log(xhr.status);
-            console.log(thrownError);
-            alertError();
-            progressbar.remove();
         }
     });
 }

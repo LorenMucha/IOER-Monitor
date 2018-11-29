@@ -243,9 +243,7 @@ const indikatorJSON = {
     init:function(raumgl, callback) {
         const object = this;
         let ind = indikatorauswahl.getSelectedIndikator(),
-            klassifizierung_set = klassifzierung.getSelectionId(),
             raumgliederung_set = raeumliche_analyseebene.getSelectionId(),
-            klassenanzahl_set = klassenanzahl.getSelection(),
             time = zeit_slider.getTimeSet(),
             ags_set = gebietsauswahl.getSelection();
 
@@ -261,13 +259,13 @@ const indikatorJSON = {
         }
 
         //info how much geomtries will be created and afterwards stat the creation
-        $.when(getSUMGeometriesInfo(raumgliederung_set, time, ags_set)).done(function (x) {
+        $.when(request_manager.getCountGeometries(raumgliederung_set)).done(function (x) {
             setTimeout(function () {
-                progressbar.setHeaderText("Lade " + x + " Gebiete");
+                progressbar.setHeaderText("Lade " + x[0].count + " Gebiete");
             }, 100)
         });
 
-        $.when(getGeoJSON(ind, time, raumgliederung_set, ags_set))
+        $.when(request_manager.getGeoJSON(ind, time, raumgliederung_set, ags_set,klassenanzahl.getSelection(),klassifzierung.getSelectionId()))
             .done(function(arr){
                 //now we have access to array of data
                 try{
@@ -281,12 +279,10 @@ const indikatorJSON = {
                 }
 
                 object.addToMap();
-                grundakt_layer.init();
+                grundakt_layer.init(raumgliederung_set);
                 table.create();
                 gebietsauswahl.init();
                 legende.fillContent();
-                farbschema.fill();
-
                 if (callback) callback();
             });
 
@@ -335,7 +331,6 @@ const indikatorJSON = {
         if(layer_control.zusatzlayer.getState()){layer_control.zusatzlayer.setForward()};
     },
     setPopUp:function(e){
-        console.log(e.target);
         let layer = e.target,
             gen = layer.feature.properties.gen.toString(),
             value_ags = layer.feature.properties.value_comma,
@@ -490,7 +485,7 @@ const grundakt_layer = {
     getJSONFile:function(){
       return this.json_file;
     },
-    init:function(){
+    init:function(raumgl){
         disableElement('#datenalter','Nicht verfügbar');
         //hole JSON
         const object = this;
@@ -503,9 +498,14 @@ const grundakt_layer = {
                 && raeumliche_analyseebene.getSelectionId()!=='gem'
                 && zeit_slider.getTimeSet() > 2000) {
                 enableElement('#datenalter', 'Zeige die Karte des Datenalters an.');
-                let def = $.Deferred();
+                let def = $.Deferred(),
+                    raumgliederung_set = raeumliche_analyseebene.getSelectionId();
 
-                $.when(getGeoJSON('Z00AG', zeit_slider.getTimeSet(), raeumliche_analyseebene.getSelectionId(), gebietsauswahl.getSelection())).done(function(arr){
+                if (raumgl) {
+                    raumgliederung_set = raumgl;
+                }
+
+                $.when(request_manager.getGeoJSON('Z00AG', zeit_slider.getTimeSet(), raumgliederung_set, gebietsauswahl.getSelection(),5,"gleich")).done(function(arr){
                     //now we have access to array of data
                     try{
                         object.json_file = JSON.parse(arr);
@@ -892,13 +892,14 @@ const indikatorJSONGroup = {
         }catch(err){}
     },
     fitBounds:function(){
-        let bounds = jsongroup.getBounds();
         if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'raster') {
             map.setView(new L.LatLng(50.9307, 9.7558), 6.8);
         } else {
             try{
-                map.fitBounds(bounds);
-            }catch(e){console.log(e)}
+                map.fitBounds(jsongroup.getBounds());
+            }catch(e){
+                map.fitBounds(indikatorJSON.getJSONLayer().getBounds());
+            }
         }
     },
     clean:function(){

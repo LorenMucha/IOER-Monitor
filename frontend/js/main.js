@@ -1,6 +1,13 @@
+//init all essential functions
 $(document).ready(function() {
     //set the Unit test
     if(!viewState.getUnitTestState()) {
+        //load the config data
+        $.getJSON( "frontend/config.json", function( data ) {
+           config.setData(data);
+           config.checkVersion();
+        });
+        search.init();
         raeumliche_visualisierung.init();
         farbschema.init();
         webTour.init();

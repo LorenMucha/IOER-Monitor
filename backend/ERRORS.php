@@ -1,7 +1,7 @@
 <?php
-require_once ('database/MYSQL_MANAGER.php');
+require_once('database/MYSQL_MANAGER.php');
 
-class INDICATOR_ERRORS extends MYSQL_MANAGER
+class ERRORS
 {
     private $errors;
     protected static $instance = NULL;
@@ -17,7 +17,7 @@ class INDICATOR_ERRORS extends MYSQL_MANAGER
        if (count($this->errors) == 0) {
            $fc_array = array();
            $sql = "SELECT FEHLERCODE,FEHLER_NAME,FEHLER_FARBCODE,FEHLER_BESCHREIBUNG FROM m_fehlercodes";
-           $rs_fc = $this->query($sql);
+           $rs_fc = MYSQL_MANAGER::get_instance()->query($sql);
            foreach ($rs_fc as $row) {
                array_push($fc_array, array(
                    'FC' => $row->FEHLERCODE,

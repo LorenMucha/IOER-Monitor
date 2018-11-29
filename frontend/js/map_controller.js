@@ -604,8 +604,8 @@ const raster_split={
                 let def = $.Deferred();
                 function defCalls(){
                     let requests = [
-                        getJahre(indikator_id),
-                        getRaumgliederung(indikator_id)
+                        request_manager.getJahre(indikator_id),
+                        request_manager.getRaumgliederung(indikator_id)
                     ];
                     $.when.apply($,requests).done(function(){
                         def.resolve(arguments);
@@ -708,7 +708,7 @@ const raster_split={
                             }
                         });
 
-                        $.when(getIndZusatzinformationen(ind,time)).done(function(data){
+                        $.when(request_manager.getIndZusatzinformationen(ind,time)).done(function(data){
                             let datengrundlage = data[0]["datengrundlage"];
                             if (datengrundlage.length >= 3) {
                                 datengrundlage = datengrundlage + "</br>";

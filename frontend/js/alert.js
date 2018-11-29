@@ -1,10 +1,19 @@
 //no indicator chosen
-function alertOldBrowser(){
-    $('#Modal').hide();
-    swal(
-        "Alte Version des Internet Explorers",
-        "Sie verwenden eine veraltete Version des Internet Explorers, diese wird nicht unterstützt.",
-        "error"
+function alertUpdate(version){
+    swal({
+        title: "Ein Update ist Verfügbar",
+        text: '',
+        type: "info",
+        html: true,
+        cancelButtonText: "Abbrechen",
+        showCancelButton: "Neu laden",
+    },
+        function(isConfirm){
+            if (isConfirm) {
+                localStorage.setItem("v",version);
+                location.reload(true);
+            }
+        }
     );
 
 }

@@ -1,4 +1,4 @@
-let page_init = true,
+var page_init = true,
     splitter_width = null,
     changed = false,
     step;
@@ -44,72 +44,76 @@ const toolbar = {
         }
     },
     init:function(){
-        const object = this;
         // the mapnavbar
-        object.state=true;
-        object.getDOMObject()
-            .find('.menu_m')
-            .unbind()
-            .click(function() {
-                if(object.state){
-                    object.close();
-                }else{
-                    object.open();
-                }
-            });
-        setTimeout(function(){
-            map_indikator_infos.resize();
-        },1000);
-
-        //open and close the dropdown's
-        object.getDOMObject()
-            .find(".hh_sf")
-            .unbind()
-            .click(function(event) {
-                let ddm = $(this).find('i').data('ddm'),
-                    ddm_container = $('#'+ddm);
-
-                if(ddm_container.hasClass('pinned')===false && !ddm_container.is(':visible')){
-                    ddm_container.slideDown();
-                    if($(this).attr("id")==="hh_sf_drop_kat"){
-                        indikatorauswahl.openMenu();
-                    }
-                }else if(ddm_container.is(':visible')===true &&ddm_container.hasClass('pinned')===false){
-                    ddm_container.slideUp();
-                }
-                $('.dropdown_menu').each(function(){
-                    if($(this).is('#'+ddm)===false && $(this).hasClass('pinned')===false){
-                        $(this).slideUp();
-                    }
-                });
-                //set the height og the overflow content inside the menu bar
-                if(mainView.getHeight() <= 1000 && viewState.getViewState() ==='mw') {
-                    let height = toolbar.getHeight() - $('#no_overflow').height() - 60;
-                    $('#overflow_content').css("height",height+50);
-                }
-            });
-
-        //pin the element in the menu and unpin
-        object.getDOMObject()
-            .find('.pin')
-            .unbind()
-            .click(function(event){
-                let drop_menu = $(this).find('i').data('ddm'),
-                    icon =  $(this).find('i');
-                if(icon.hasClass('arrow_pinned')){
-                    icon.removeClass('arrow_pinned');
-                    $('#'+drop_menu).removeClass('pinned');
-                }else {
-                    icon.addClass('arrow_pinned');
-                    $('#' + drop_menu).addClass('pinned');
-                }
-            });
+        this.state=true;
+        this.controller.set();
     },
     getHeight:function(){
         return this.getDOMObject().height();
     },
     isOpen:function(){
         return this.state;
+    },
+    controller:{
+        set:function(){
+            toolbar.getDOMObject()
+                .find('.menu_m')
+                .unbind()
+                .click(function() {
+                    if(toolbar.state){
+                        toolbar.close();
+                    }else{
+                        toolbar.open();
+                    }
+                });
+            setTimeout(function(){
+                map_indikator_infos.resize();
+            },1000);
+
+            //open and close the dropdown's
+            toolbar.getDOMObject()
+                .find(".hh_sf")
+                .unbind()
+                .click(function(event) {
+                    let ddm = $(this).find('i').data('ddm'),
+                        ddm_container = $('#'+ddm);
+
+                    if(ddm_container.hasClass('pinned')===false && !ddm_container.is(':visible')){
+                        ddm_container.slideDown();
+                        if($(this).attr("id")==="hh_sf_drop_kat"){
+                            indikatorauswahl.openMenu();
+                        }
+                    }else if(ddm_container.is(':visible')===true &&ddm_container.hasClass('pinned')===false){
+                        ddm_container.slideUp();
+                    }
+                    $('.dropdown_menu').each(function(){
+                        if($(this).is('#'+ddm)===false && $(this).hasClass('pinned')===false){
+                            $(this).slideUp();
+                        }
+                    });
+                    //set the height og the overflow content inside the menu bar
+                    if(mainView.getHeight() <= 1000 && viewState.getViewState() ==='mw') {
+                        let height = toolbar.getHeight() - $('#no_overflow').height() - 60;
+                        $('#overflow_content').css("height",height+50);
+                    }
+                });
+
+            //pin the element in the menu and unpin
+            toolbar.getDOMObject()
+                .find('.pin')
+                .unbind()
+                .click(function(event){
+                    let drop_menu = $(this).find('i').data('ddm'),
+                        icon =  $(this).find('i');
+                    if(icon.hasClass('arrow_pinned')){
+                        icon.removeClass('arrow_pinned');
+                        $('#'+drop_menu).removeClass('pinned');
+                    }else {
+                        icon.addClass('arrow_pinned');
+                        $('#' + drop_menu).addClass('pinned');
+                    }
+                });
+        }
     }
 };
 //Indikatorauswahl
@@ -178,27 +182,8 @@ const indikatorauswahl ={
         return $elem;
     },
     init:function(){
-        const menu = this;
-        menu.fill();
-        menu.getDOMObject()
-            .dropdown('refresh')
-            .dropdown({
-                onChange: function (value, text, $choice) {
-                    //clean the search field
-                    $('#search_input_indikatoren').val('');
-                    //save the prev selected indicator as paramter
-                    menu.previous_indikator=value;
-                    menu.setIndicator(value);
-                    if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'gebiete') {
-                        farbliche_darstellungsart.resetSelection();
-                        clearChartArray();
-                        table_expand_panel.close();
-                    }
-                },
-                onHide: function () {
-                    resetHighlightElementByID('indicator_ddm');
-                }
-            });
+        this.fill();
+        this.controller.set();
     },
     isVisible:function(){
       return this.getDOMObject().is(':visible');
@@ -206,7 +191,7 @@ const indikatorauswahl ={
     fill:function(){
         const menu = this;
         //get all possebilities via ajax
-        $.when(getAllAvaliableIndicators()).done(function(data){
+        $.when(request_manager.getAllAvaliableIndicators()).done(function(data){
             menu.possebilities = data;
             let container = $('#kat_auswahl');
             let html = "";
@@ -266,7 +251,7 @@ const indikatorauswahl ={
         let ind = this.getSelectedIndikator();
         const menu = this;
         if(_ind){ind = _ind;}
-        $.when(getAvabilityIndicator(ind)).done(function(data){
+        $.when(request_manager.getAvabilityIndicator(ind)).done(function(data){
             $.each(data,function(key,value) {
                 if(value.ind === ind) {
                     if(value.avability==false){
@@ -308,7 +293,7 @@ const indikatorauswahl ={
         //reset error code
         error_code.setErrorCode(false);
         legende.init(true);
-        $.when(getJahre(indicator_id)).done(function(data_time){
+        $.when(request_manager.getJahre(indicator_id)).done(function(data_time){
             menu.all_possible_years = data_time;
             let years_selected = [];
             $.each(data_time,function(key,value){
@@ -318,7 +303,7 @@ const indikatorauswahl ={
             });
             menu.filtered_years = years_selected;
             zeit_slider.init(years_selected);
-            $.when(getRaumgliederung(indicator_id)).done(function(data_raum){
+            $.when(request_manager.getRaumgliederung(indicator_id)).done(function(data_raum){
                 raeumliche_analyseebene.init(data_raum);
             });
         });
@@ -433,6 +418,29 @@ const indikatorauswahl ={
     },
     openMenu:function(){
         this.getDOMObject().dropdown('show');
+    },
+    controller:{
+        set:function(){
+            indikatorauswahl.getDOMObject()
+                .dropdown('refresh')
+                .dropdown({
+                    onChange: function (value, text, $choice) {
+                        //clean the search field
+                        $('#search_input_indikatoren').val('');
+                        //save the prev selected indicator as paramter
+                        indikatorauswahl.previous_indikator=value;
+                        indikatorauswahl.setIndicator(value);
+                        if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'gebiete') {
+                            farbliche_darstellungsart.resetSelection();
+                            clearChartArray();
+                            table_expand_panel.close();
+                        }
+                    },
+                    onHide: function () {
+                        resetHighlightElementByID('indicator_ddm');
+                    }
+                });
+        }
     }
 };
 //checkbox Gebiete <-> Raster
@@ -453,19 +461,9 @@ const raeumliche_visualisierung = {
     },
     init:function(){
         indikatorauswahl.init();
-        const checkbox = this;
-        checkbox.getDOMObject()
-            .checkbox('enable')
-            .checkbox({
-                onChecked: function () {
-                    checkbox.setRaster();
-                },
-                onUnchecked: function() {
-                    checkbox.setGebiete();
-                }
-            });
+        this.controller.set();
         if(raeumliche_visualisierung.getRaeumlicheGliederung()==='raster'){
-            checkbox.setChecked();
+            this.setChecked();
         }
     },
     setRaster:function(){
@@ -513,6 +511,20 @@ const raeumliche_visualisierung = {
             this.setParameter('gebiete');
         }
         return this.getParameter();
+    },
+    controller:{
+        set:function(){
+            raeumliche_visualisierung.getDOMObject()
+                .checkbox('enable')
+                .checkbox({
+                    onChecked: function () {
+                        raeumliche_visualisierung.setRaster();
+                    },
+                    onUnchecked: function() {
+                        raeumliche_visualisierung.setGebiete();
+                    }
+                });
+        }
     }
 };
 //Räumliche Analyseebene
@@ -556,20 +568,19 @@ const raeumliche_analyseebene = {
     },
     init:function(json_raumgl) {
         const menu = this;
-
         menu.values = json_raumgl;
         //create the spatial choice menu
         if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete') {
-            let raumgl_selection = $('#Raumgliederung');
-            let spatialRange = [];
-            let raumgl_parameter = menu.getParamter();
+            let raumgl_selection = $('#Raumgliederung'),
+                spatialRange = [],
+                raumgl_parameter = menu.getParamter();
 
             if (!raumgl_parameter) {
                 menu.updateParamter('bld');
             }
             raumgl_selection.empty();
             $.each(json_raumgl,function(key,value){
-                if(value.state==="enabled"){
+                if(json_raumgl[key].state==="enabled"){
                     spatialRange.push(value.id);
                 }
                 let html = '<option data-state="'+value.state+'" id="'+value.id+'_raumgl" name="'+value.name+'" value="'+value.id+'" '+value.state+'>'+value.name+'</option>';
@@ -643,32 +654,38 @@ const raeumliche_analyseebene = {
             rasterweite_slider.init(steps_set);
             indikator_raster.init();
         }
-        //bind the on click events
-        menu.getDOMObject()
-            .find('#Raumgliederung')
-            .unbind()
-            .change(function() {
-                changed = true;
-                let choice = $(this).val();
-                //start the pipeline
-                gebietsauswahl.clear();
-                raumgliederung.removeParameter();
-                gebietsauswahl.removeParamter();
-                //save the user setted spatial extent
-                if (choice === "gem") {
-                    alertServerlast(choice);
-                } else {
-                    menu.updateParamter(choice);
-                    indikatorJSON.init();
-                }
-                table_expand_panel.close();
-                gebietsauswahl.clearAddedAGS();
-                raumgliederung.init();
-                gebietsauswahl.clear();
-                //remove the fine choice for spatial extent
-                raumgliederung.hide();
-                changed = false;
-            });
+        menu.constroller.set();
+
+    },
+    constroller:{
+        set:function() {
+            //bind the on click events
+            raeumliche_analyseebene.getDOMObject()
+                .find('#Raumgliederung')
+                .unbind()
+                .change(function () {
+                    changed = true;
+                    let choice = $(this).val();
+                    //start the pipeline
+                    gebietsauswahl.clear();
+                    raumgliederung.removeParameter();
+                    gebietsauswahl.removeParamter();
+                    //save the user setted spatial extent
+                    if (choice === "gem") {
+                        alertServerlast(choice);
+                    } else {
+                        raeumliche_analyseebene.updateParamter(choice);
+                        indikatorJSON.init();
+                    }
+                    table_expand_panel.close();
+                    gebietsauswahl.clearAddedAGS();
+                    raumgliederung.init();
+                    gebietsauswahl.clear();
+                    //remove the fine choice for spatial extent
+                    raumgliederung.hide();
+                    changed = false;
+                });
+        }
     }
 };
 //Multi Choice Gebietsauswahl
@@ -703,17 +720,16 @@ const gebietsauswahl = {
         $menu = $('#dropdown_grenzen_container');
         return $menu;
     },
+    getClearIconObject:function(){
+        $elem = $("#clear_gebietsauswahl");
+        return $elem;
+    },
     init:function(){
         /*
         Extend the existing semntic ui Object with the needed callbacks
          */
         const object = this;
-        let parameter_ags_set = this.getParamter(),
-            mapLayer = [],
-            mapLayer_grund = [],
-            ags_array = [],
-            menu =  this.getDOMObject(),
-            geoJson = indikatorJSON.getJSONFile();
+        let parameter_ags_set = this.getParamter();
 
         if (this.countTags()=== 0) {
             this.fill();
@@ -722,65 +738,7 @@ const gebietsauswahl = {
             }
             //create parameter AGS_ARRAY if not set
             $('#grenzen_choice').text('Gebietsauswahl: ' + raeumliche_analyseebene.getSelectionText().replace("- nur", ""));
-            menu
-                .unbind()
-                .dropdown({
-                    onAdd: function (addedValue, addedText, $addedChoice) {
-                        //close after each choice
-                        menu.dropdown('hide');
-                        indikatorJSONGroup.clean();
-                        //update the paramter
-                        ags_array.push(addedValue);
-                        if(indikatorJSONGroup.getLayerArray().length!==ags_array.length) {
-                            object.updateParamter(ags_array.toString());
-                        }
-                        $.each(geoJson.features, function (key, value) {
-                            $.each(value, function (_key, _value) {
-                                if (_value.ags === addedValue) {
-                                    mapLayer.push(value);
-                                }
-                            });
-                        });
-                        //only if possible
-                        try {
-                            $.each(grundakt_layer.getJSONFile().features, function (key, value) {
-                                $.each(value, function (_key, _value) {
-                                    if (_value.ags === addedValue) {
-                                        mapLayer_grund.push(value);
-                                    }
-                                });
-                            });
-                        } catch (err) {
-
-                        }
-                        object.setMapLayer(mapLayer);
-                        object.setMapLayerGrund(mapLayer_grund);
-                        object.setSelection(ags_array);
-                        if(raumgliederung.getSelectedId() && !page_init){
-                            indikatorJSON.init(raumgliederung.getSelectedId());
-                        }else {
-                            object.addSelectedLayersToMap();
-                            table.create();
-                            raumgliederung.init();
-                        }
-                    },
-                    onRemove: function (removedValue, removedText, $removedChoice) {
-                        //changed: prevend Trigger
-                        let value = removedValue;
-                        if (object.countTags() > 1 && changed == false) {
-                            object.removeSelectedLayersFromMap(value);
-                        }else{
-                            if(changed === false) {
-                                $.when(raumgliederung.removeParameter())
-                                    .then(object.removeParamter())
-                                    .then(object.clearAddedAGS())
-                                    .then(indikatorJSON.init())
-                                    .then(raumgliederung.init());
-                            }
-                        }
-                        $("tr[id^='"+value+"']").remove();
-                    }
-                });
+            this.controller.set();
         }else{
             raumgliederung.init();
         }
@@ -863,6 +821,84 @@ const gebietsauswahl = {
             string +=$(this).text()+",";
         });
         return string.slice(0, -1);
+    },
+    controller:{
+        set:function(){
+            let mapLayer = [],
+                mapLayer_grund = [],
+                ags_array = [],
+                menu =  gebietsauswahl.getDOMObject(),
+                geoJson = indikatorJSON.getJSONFile();
+
+            menu
+                .unbind()
+                .dropdown({
+                    onAdd: function (addedValue, addedText, $addedChoice) {
+                        //close after each choice
+                        menu.dropdown('hide');
+                        indikatorJSONGroup.clean();
+                        //update the paramter
+                        ags_array.push(addedValue);
+                        if(indikatorJSONGroup.getLayerArray().length!==ags_array.length) {
+                            gebietsauswahl.updateParamter(ags_array.toString());
+                        }
+                        $.each(geoJson.features, function (key, value) {
+                            $.each(value, function (_key, _value) {
+                                if (_value.ags === addedValue) {
+                                    mapLayer.push(value);
+                                }
+                            });
+                        });
+                        //only if possible
+                        try {
+                            $.each(grundakt_layer.getJSONFile().features, function (key, value) {
+                                $.each(value, function (_key, _value) {
+                                    if (_value.ags === addedValue) {
+                                        mapLayer_grund.push(value);
+                                    }
+                                });
+                            });
+                        } catch (err) {
+
+                        }
+                        gebietsauswahl.setMapLayer(mapLayer);
+                        gebietsauswahl.setMapLayerGrund(mapLayer_grund);
+                        gebietsauswahl.setSelection(ags_array);
+                        if(raumgliederung.getSelectedId() && !page_init){
+                            indikatorJSON.init(raumgliederung.getSelectedId());
+                        }else {
+                            gebietsauswahl.addSelectedLayersToMap();
+                            table.create();
+                            raumgliederung.init();
+                        }
+                    },
+                    onRemove: function (removedValue, removedText, $removedChoice) {
+                        //changed: prevend Trigger
+                        let value = removedValue;
+                        if (gebietsauswahl.countTags() > 1 && changed == false) {
+                            gebietsauswahl.removeSelectedLayersFromMap(value);
+                        }else{
+                            if(changed === false) {
+                                $.when(raumgliederung.removeParameter())
+                                    .then(gebietsauswahl.removeParamter())
+                                    .then(gebietsauswahl.clearAddedAGS())
+                                    .then(indikatorJSON.init())
+                                    .then(raumgliederung.init());
+                            }
+                        }
+                        $("tr[id^='"+value+"']").remove();
+                    }
+                });
+
+            gebietsauswahl.getClearIconObject()
+                .unbind()
+                .click(function(){
+                    raumgliederung.removeParameter();
+                    gebietsauswahl.clear();
+                    indikatorJSONGroup.fitBounds();
+                    raumgliederung.hide();
+                });
+        }
     }
 };
 const raumgliederung = {
@@ -901,32 +937,7 @@ const raumgliederung = {
         return $elem;
     },
     init:function(){
-        const object = this;
-        if(raeumliche_analyseebene.getSelectionId()!=='ror' && raeumliche_analyseebene.getSelectionId() !=='gem') {
-            object.getDOMObject()
-                .find('#Raumgliederung_Fein')
-                .unbind()
-                .change(function () {
-                    let valueSelected = this.value,
-                        url_parameter = object.getParamter();
-
-                    if (valueSelected === 'null') {
-                        object.removeParameter();
-                        indikatorJSON.init();
-                    } else {
-                        if (!url_parameter) {
-                            object.setParameter(valueSelected);
-                        } else {
-                            object.updateParamter(valueSelected);
-                        }
-                        indikatorJSON.init(valueSelected);
-                    }
-                });
-            object.fill();
-            object.getContainerObject().show();
-        }else{
-            object.hide();
-        }
+        this.constroller.set();
     },
     fill:function(){
         const object = this,
@@ -972,6 +983,35 @@ const raumgliederung = {
     },
     hide:function(){
         this.getContainerObject().hide();
+    },
+    constroller:{
+        set:function(){
+            if(raeumliche_analyseebene.getSelectionId()!=='ror' && raeumliche_analyseebene.getSelectionId() !=='gem') {
+                raumgliederung.getDOMObject()
+                    .find('#Raumgliederung_Fein')
+                    .unbind()
+                    .change(function () {
+                        let valueSelected = this.value,
+                            url_parameter = raumgliederung.getParamter();
+
+                        if (valueSelected === 'null') {
+                            raumgliederung.removeParameter();
+                            indikatorJSON.init();
+                        } else {
+                            if (!url_parameter) {
+                                raumgliederung.setParameter(valueSelected);
+                            } else {
+                                raumgliederung.updateParamter(valueSelected);
+                            }
+                            indikatorJSON.init(valueSelected);
+                        }
+                    });
+                raumgliederung.fill();
+                raumgliederung.getContainerObject().show();
+            }else{
+                raumgliederung.hide();
+            }
+        }
     }
 };
 const farbschema = {
@@ -1005,11 +1045,13 @@ const farbschema = {
     fill: function () {
         const object = this;
         let color_container =  object.getDOMObject().find('#color_schema'),
+            keys_array = [],
             def = $.Deferred();
         function defCalls() {
             let requests = [];
             $.each(object.farben, function (key, value) {
-                requests.push(getColorHTML(value, key.toString()));
+                keys_array.push(key);
+                requests.push(request_manager.getColorSchema(value));
             });
             $.when.apply($, requests).done(function () {
                 def.resolve(arguments);
@@ -1019,60 +1061,23 @@ const farbschema = {
 
         defCalls().done(function (arr) {
             color_container.empty();
-            $.each(arr, function (key, value) {
-                color_container.append(value[0]);
-            })
+            let html = "";
+            $.each(arr,function(key,value){
+                let key_color = keys_array[key];
+                let li = '';
+                let width = 100/klassenanzahl.getSelection();
+                $.each(value[0],function(k,v){
+                    li +='<i class="color_i" style="background:'+v+';width:'+width+'%;"></i>'
+                });
+                html +='<div id="'+key_color+'" class="color-line">'+li+"</div>";
+            });
+            color_container.append(html);
         });
     },
     init: function () {
         const object = this;
-        let click_farb = 0;
         this.fill();
-        $(document).on('click','.color-line',function(){
-            let content = $(this).html(),
-                id = $(this).attr("id");
-            object.getFarbwahlButtonDomObject()
-                .empty()
-                .append('<span id="color_remove" class="glyphicon glyphicon-remove"></span><div class="color-line">' + content + '</div>');
-            //craete the new colored map
-            let paramter = object.getParamter();
-            if (typeof paramter !== 'undefined') {
-                object.updateParamter(object.farben[id].toString());
-            } else {
-                object.setParamter(object.farben[id].toString());
-            }
-            object.setColorChoice();
-        });
-        $(document).on('click','#color_remove',function(){
-            object.removeParamter();
-            object.getFarbwahlButtonDomObject()
-                .empty()
-                .append('Bitte Wählen..<span class="caret"></span>');
-            object.getDOMObject().find('#color_schema').show();
-            if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'raster') {
-                indikator_raster.init();
-            }
-            else {
-                if (typeof raumgliederung.getSelectedId() === 'undefined') {
-                    indikatorJSON.init();
-                } else {
-                    indikatorJSON.init(raumgliederung.getSelectedId());
-                }
-            }
-        });
-        //the color schema
-        object.getFarbwahlButtonDomObject()
-            .unbind()
-            .click(function () {
-                if(click_farb==0) {
-                    object.getDOMObject().find('#color_schema').show();
-                    click_farb++;
-                }else{
-                    object.getDOMObject().find('#color_schema').hide();
-                    click_farb = 0;
-                }
-
-            });
+        this.controller.set();
     },
     reset:function(){
         this.removeParamter();
@@ -1115,6 +1120,56 @@ const farbschema = {
             return_value = value[1];
         }
         return return_value;
+    },
+    controller: {
+        set:function(){
+            let click_farb = 0;
+            $(document).on('click','.color-line',function(){
+                let content = $(this).html(),
+                    id = $(this).attr("id"),
+                    paramter = farbschema.getParamter();
+                farbschema.getFarbwahlButtonDomObject()
+                    .empty()
+                    .append('<span id="color_remove" class="glyphicon glyphicon-remove"></span><div class="color-line">' + content + '</div>');
+                //craete the new colored map
+                if (typeof paramter !== 'undefined') {
+                    farbschema.updateParamter(farbschema.farben[id].toString());
+                } else {
+                    farbschema.setParamter(farbschema.farben[id].toString());
+                }
+                farbschema.setColorChoice();
+            });
+            $(document).on('click','#color_remove',function(){
+                farbschema.removeParamter();
+                farbschema.getFarbwahlButtonDomObject()
+                    .empty()
+                    .append('Bitte Wählen..<span class="caret"></span>');
+                farbschema.getDOMObject().find('#color_schema').show();
+                if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'raster') {
+                    indikator_raster.init();
+                }
+                else {
+                    if (typeof raumgliederung.getSelectedId() === 'undefined') {
+                        indikatorJSON.init();
+                    } else {
+                        indikatorJSON.init(raumgliederung.getSelectedId());
+                    }
+                }
+            });
+            //the color schema
+            farbschema.getFarbwahlButtonDomObject()
+                .unbind()
+                .click(function () {
+                    if(click_farb==0) {
+                        farbschema.getDOMObject().find('#color_schema').show();
+                        click_farb++;
+                    }else{
+                        farbschema.getDOMObject().find('#color_schema').hide();
+                        click_farb = 0;
+                    }
+
+                });
+        }
     }
 };
 const klassifzierung = {
@@ -1153,26 +1208,30 @@ const klassifzierung = {
             }
         }
     },
-    init:function(){
-        const object = this;
-        object.getDOMObject()
-            .find('input')
-            .unbind()
-            .change(function () {
-                let value = $(this).val();
-                farbliche_darstellungsart.resetSelection();
-                object.updateParamter(value);
-                if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete'){
-                    if(typeof raumgliederung.getSelectedId() !=='undefined'){
-                        indikatorJSON.init(raumgliederung.getSelectedId());
-                    }else{
-                        indikatorJSON.init();
+    init:function() {
+        this.constroller.set();
+    },
+    constroller:{
+        set:function() {
+            klassifzierung.getDOMObject()
+                .find('input')
+                .unbind()
+                .change(function () {
+                    let value = $(this).val();
+                    farbliche_darstellungsart.resetSelection();
+                    klassifzierung.updateParamter(value);
+                    if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'gebiete') {
+                        if (typeof raumgliederung.getSelectedId() !== 'undefined') {
+                            indikatorJSON.init(raumgliederung.getSelectedId());
+                        } else {
+                            indikatorJSON.init();
+                        }
+                    } else {
+                        indikator_raster.init();
                     }
-                }else{
-                    indikator_raster.init();
-                }
-            });
+                });
         }
+    }
 };
 const klassenanzahl = {
     paramter:'klassenanzahl',
@@ -1204,28 +1263,32 @@ const klassenanzahl = {
 
     },
     init:function(){
-        const object = this;
-        object.getDOMObject()
-            .unbind()
-            .change(function(){
-                farbliche_darstellungsart.resetSelection();
-                let value =$(this).val(),
-                    param = object.getParamter();
-                if(!param){
-                    object.setParamter(value);
-                }else{
-                    object.updateParamter(value);
-                }
-                if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete'){
-                    if(typeof raumgliederung.getSelectedId() !=='undefined'){
-                        indikatorJSON.init(raumgliederung.getSelectedId());
+        this.controller.set();
+    },
+    controller:{
+        set:function(){
+            klassenanzahl .getDOMObject()
+                .unbind()
+                .change(function(){
+                    farbliche_darstellungsart.resetSelection();
+                    let value =$(this).val(),
+                        param = klassenanzahl.getParamter();
+                    if(!param){
+                        klassenanzahl .setParamter(value);
                     }else{
-                        indikatorJSON.init();
+                        klassenanzahl .updateParamter(value);
                     }
-                }else{
-                    indikator_raster.init();
-                }
-            });
+                    if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete'){
+                        if(typeof raumgliederung.getSelectedId() !=='undefined'){
+                            indikatorJSON.init(raumgliederung.getSelectedId());
+                        }else{
+                            indikatorJSON.init();
+                        }
+                    }else{
+                        indikator_raster.init();
+                    }
+                });
+        }
     }
 };
 const farbliche_darstellungsart = {
@@ -1260,21 +1323,25 @@ const farbliche_darstellungsart = {
         $('#farbreihe_auto').prop('checked', true);
     },
     init:function(){
-        const object = this;
-        //art of the vizualization
-        object.getDOMObject()
-            .find('input')
-            .unbind()
-            .change(function () {
-                let value = $(this).val();
-                object.updateParamter(value);
-                if(value==="auto"){
-                    if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete'){
-                        indikatorJSON.init()
-                    }else{
-                        indikator_raster.init();
+       this.constroller.set();
+    },
+    constroller:{
+        set:function(){
+            //art of the vizualization
+            farbliche_darstellungsart.getDOMObject()
+                .find('input')
+                .unbind()
+                .change(function () {
+                    let value = $(this).val();
+                    farbliche_darstellungsart.updateParamter(value);
+                    if(value==="auto"){
+                        if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete'){
+                            indikatorJSON.init()
+                        }else{
+                            indikator_raster.init();
+                        }
                     }
-                }
-            });
+                });
+        }
     }
 };

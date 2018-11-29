@@ -1,8 +1,7 @@
 <?php
-require_once ('database/MYSQL_QUERIES.php');
-require_once ('database/MYSQL_QUERIES.php');
+require_once('database/MYSQL_TASKREPOSITORY.php');
 
-class INDIKATOR_NOTES extends MYSQL_MANAGER{
+class NOTES{
     private $notes;
     protected static $instance = NULL;
     public static function get_instance()
@@ -16,7 +15,7 @@ class INDIKATOR_NOTES extends MYSQL_MANAGER{
         if(count($this->notes)==0) {
             $notes = array();
             $sql = "SELECT  HC, HC_INFO FROM  m_hinweiscodes";
-            $rs = $this->query($sql);
+            $rs = MYSQL_MANAGER::get_instance()->query($sql);
             foreach ($rs as $row) {
                 array_push($notes, array(
                     'HC' => $row->HC,

@@ -1,8 +1,7 @@
 <?php
-
 require_once("MYSQL_MANAGER.php");
 
-class MY_SQL_TASKREPOSITORY extends MYSQL_MANAGER {
+class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
     protected static $instance = NULL;
     private $berechtigung = 3;
     public static function get_instance()
@@ -12,14 +11,14 @@ class MY_SQL_TASKREPOSITORY extends MYSQL_MANAGER {
 
         return self::$instance;
     }
-    function getAllIndicatorsGebiete(){
+    function getAllCategoriesGebiete(){
         $sql= $sql_kategorie = "SELECT * FROM m_thematische_kategorien, m_them_kategorie_freigabe
                         WHERE m_thematische_kategorien.ID_THEMA_KAT = m_them_kategorie_freigabe.ID_THEMA_KAT
                         AND STATUS_KATEGORIE_FREIGABE >=  ".$this->berechtigung."
                         GROUP BY SORTIERUNG_THEMA_KAT";
         return $this->query($sql);
     }
-    function getAllIndicatorsRaster(){
+    function getAllCategoriesRaster(){
     $sql = "select * from m_thematische_kategorien, m_indikatoren, d_raster 
             where m_thematische_kategorien.ID_THEMA_KAT = m_indikatoren.ID_THEMA_KAT 
             and m_indikatoren.ID_INDIKATOR = d_raster.Indikator 
@@ -27,6 +26,28 @@ class MY_SQL_TASKREPOSITORY extends MYSQL_MANAGER {
             group by m_thematische_kategorien.id_thema_kat 
             order by m_thematische_kategorien.sortierung_thema_kat";
     return $this->query($sql);
+    }
+    function getSpatialExtend($modus,$year,$ind){
+        $sql_gebiete = "SELECT i.ID_INDIKATOR, i.RAUMEBENE_BLD,i.RAUMEBENE_ROR,i.RAUMEBENE_KRS,i.RAUMEBENE_LKS,
+                            i.RAUMEBENE_KFS,i.RAUMEBENE_VWG,i.RAUMEBENE_GEM,i.RAUMEBENE_G50,i.RAUMEBENE_STT
+                            FROM m_indikatoren i, m_indikator_freigabe f
+                            WHERE f.JAHR =".$year." AND i.ID_INDIKATOR= '".$ind."' 
+                            AND f.STATUS_INDIKATOR_FREIGABE =3 
+                            Group BY i.ID_INDIKATOR ";
+
+        $sql_raster = "SELECT d_raumgliederung.RAUMGLIEDERUNG FROM d_raster,d_raumgliederung
+                            WHERE d_raumgliederung.RAUMGLIEDERUNG = d_raster.RAUMGLIEDERUNG
+                            AND d_raster.INDIKATOR = '".$ind."' 
+                            group by d_raster.raumgliederung ORDER BY d_raumgliederung.SORTIERUNG ASC";
+        if($modus==="raster"){
+            return $this->query($sql_raster);
+        }else{
+            return $this->query($sql_gebiete);
+        }
+    }
+    function getSpatialExtendDictionary(){
+        $sql = "SELECT Raumgliederung_HTML as name, DB_KENNUNG as id, Sortierung as order_id from v_raumgliederung Group By NAME order by Sortierung";
+        return $this->query($sql);
     }
     function getAllIndicatorsByCategoryGebiete($kat, $modus){
         $sql = "SELECT * 

@@ -29,7 +29,6 @@ class HELPER
         $data = array_values($_data);
         return $data;
     }
-
     function in_array_r($needle, $haystack, $strict = false)
     {
         foreach ($haystack as $item) {
@@ -40,7 +39,6 @@ class HELPER
 
         return false;
     }
-
     function escapeJsonString($value)
     {
         $escapers = array("\\", "/", "\"", "\n", "\r", "\t", "\x08", "\x0c", "\r", "\n", "\t", "\u00b2", "\u00c4", "\u00e4", "u00d6", "u00f6", "u00dc", "u00fc", "\u00df", ",,", "Ã¤", "Ã„", "Ã¶", "Ã–", "Ã¼", "Ãœ", "ÃŸ");

@@ -141,11 +141,14 @@
                                     <!-- Selbständige Wahl durch den Nutzer-->
                                     <span id="grenzen_choice"></span>
                                     <hr class="hr"/>
-                                    <div id="dropdown_grenzen_container" class="ui fluid multiple search selection dropdown">
-                                        <input id="tags_grenzen" name="tags" type="hidden">
-                                        <i class="dropdown icon"></i>
-                                        <div id="default_text_ddm_grob" class="default text">Bitte Wählen..</div>
-                                        <div class="menu menu_grenzen" id="menu_grenzen_grob"></div>
+                                    <div class="dropdown_gebietsauswahl">
+                                        <div id="dropdown_grenzen_container" class="ui fluid multiple search selection dropdown">
+                                            <input id="tags_grenzen" name="tags" type="hidden">
+                                            <i class="dropdown icon"></i>
+                                            <div id="default_text_ddm_grob" class="default text">Bitte Wählen..</div>
+                                            <div class="menu menu_grenzen" id="menu_grenzen_grob"></div>
+                                        </div>
+                                        <span class="glyphicon glyphicon-trash destroy" title="Auswahl leeren" id="clear_gebietsauswahl"></span>
                                     </div>
                                     <!-- Feingliederung-->
                                     <div id="user_choice">
@@ -393,8 +396,7 @@
                                     <div class="item" data-value="S00AG" value="S00AG">Gebietsfläche</div>
                                     <div id="expand_b00ag" class="item" data-value="B00AG" value="B00AG">Einwohnerzahl</div>
                                     <div id="expand_kenngroessen" class="item" data-value="UE_RaumSum"><i class="dropdown icon left"></i>Übergeordnete Raumeinheiten
-                                        <div id="ue_raum_sum_content" class="menu pointing left">
-                                        </div>
+                                        <div id="ue_raum_sum_content" class="menu pointing left"></div>
                                     </div>
                                 </div>
                             </div>
@@ -861,7 +863,6 @@
 <script src="frontend/js/map_controller.js"></script>
 <script src="frontend/js/slider.js"></script>
 <script src="frontend/js/webtour.js"></script>
-<script src="frontend/js/table.js"></script>
 <script src="frontend/js/alert.js"></script>
 <script src="frontend/js/dialog.js"></script>
 <script src="frontend/js/search.js"></script>
@@ -869,8 +870,10 @@
 <script src="frontend/js/legende.js"></script>
 <script src="frontend/js/track.js"></script>
 <script src="frontend/js/ioer_layer.js"></script>
+<script src="frontend/js/table.js"></script>
 <script src="frontend/js/ajax.js"></script>
 <script src="frontend/js/helper.js"></script>
+<script src="frontend/js/config.js"></script>
 <script src="frontend/js/main.js"></script>
 </body>
 </html>

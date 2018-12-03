@@ -1,12 +1,10 @@
 //no indicator chosen
 function alertUpdate(version){
     swal({
-        title: "Ein Update ist Verfügbar",
+        title: "Die Anwendung wurde aktualisiert",
         text: '',
         type: "info",
-        html: true,
-        cancelButtonText: "Abbrechen",
-        showCancelButton: "Neu laden",
+        html: true
     },
         function(isConfirm){
             if (isConfirm) {

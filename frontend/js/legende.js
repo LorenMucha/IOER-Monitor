@@ -33,6 +33,15 @@ const legende = {
         $elem = $('#histogramm_pic');
         return $elem;
     },
+    getWidth:function(){
+      let width = function(){
+          return legende.getDOMObject().find(".legende_content").width();
+      };
+      if(width()==0){
+          this.resize();
+      }
+      return width();
+    },
     open: function(){
         this.getShowButtonObject().hide();
         this.getDOMObject().show("slow",function(){});
@@ -215,7 +224,7 @@ const legende = {
     controller:{
       set:function(){
           let click_dd = 0,
-              legende_width = legende.getDOMObject().width();
+              legende_width = legende.getWidth();
           //the onClick funcionality
           //open Button
           legende.getCloseIconObject()
@@ -244,6 +253,7 @@ const legende = {
                           }
                           return margin;
                       };
+                  console.log(legende_width);
                   legende.getDOMObject().css("width", margin());
                   legende.getShowButtonObject().css("right", margin());
                   if(click_dd===0){

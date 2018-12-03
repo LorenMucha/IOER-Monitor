@@ -3,19 +3,26 @@ $(document).ready(function() {
     //set the Unit test
     if(!viewState.getUnitTestState()) {
         //load the config data
-        $.getJSON( "frontend/config.json", function( data ) {
-           config.setData(data);
-           config.checkVersion();
-        });
-        search.init();
-        raeumliche_visualisierung.init();
-        farbschema.init();
-        webTour.init();
-        toolbar.init();
-        opacity_slider.init();
-        klassifzierung.init();
-        klassenanzahl.init();
-        farbliche_darstellungsart.init();
+        $.when($.ajax({
+            url:"frontend/config.json",
+            dataType:"json",
+            cache:false,
+            success:function(data){
+                config.setData(data);
+                config.checkVersion();
+            }
+        }))
+            //set the menu data
+        .then(search.init())
+        .then(raeumliche_visualisierung.init())
+        .then(farbschema.init())
+        .then(webTour.init())
+        .then(toolbar.init())
+        .then(opacity_slider.init())
+        .then(klassifzierung.init())
+        .then(klassenanzahl.init())
+        .then(farbliche_darstellungsart.init());
+        //set the Views
         $.when(mainView.restoreView())
             .then(leftView.setMapView())
             .then(function () {

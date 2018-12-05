@@ -757,22 +757,27 @@ const table = {
                     let ind = indikatorauswahl.getSelectedIndikator();
                     openEntwicklungsdiagramm(ags,name,ind,true);
                 });
+
             //Live Search in Table
-            $('#search_input_table').on('keyup', function() {
-                let value = $(this).val();
-
-                let patt = new RegExp(value, "i");
-                tableObject.find('tr').each(function () {
-                    if (!($(this).find('td').text().search(patt) >= 0)) {
-                        $(this).hide();
-                        $('#thead tr').show();
-
-                    }
-                    if (($(this).find('td').text().search(patt) >= 0)) {
-                        $(this).show();
+            $('#search_input_table')
+                .unbind()
+                .on('keyup', function() {
+                    let value = $(this).val().toLowerCase(),
+                        selector = tableObject.find('tr');
+                    if(value.length >2) {
+                        selector.each(function () {
+                            if ($(this).find('.td_name').text().toLocaleLowerCase().includes(value)) {
+                                console.log($(this));
+                               $(this).show();
+                            }else{
+                                $(this).hide();
+                            }
+                        });
+                    }else{
+                        selector.show();
                     }
                 });
-            });
+
             //Hover
             $("#tBody_value_table")
                 .unbind()
@@ -955,8 +960,6 @@ const table_expand_panel = {
                     return selection;
                 },
                 div = '<div class="item" data-value="brd" value="brd">Bundesrepublik</div>';
-
-        console.log(spatial_extend());
 
         if(spatial_extend() === 'ror'){
             div = 'Bundesrepublik';

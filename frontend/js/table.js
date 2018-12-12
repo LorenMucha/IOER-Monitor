@@ -908,7 +908,9 @@ const table_expand_panel = {
         const panel = this;
         panel.getDOMObject().show("slow",function() {
             //close the panel
-            panel.getCloseIconDOMObject().click(function () {
+            panel.getCloseIconDOMObject()
+                .unbind()
+                .click(function () {
                 panel.close();
             });
         });
@@ -959,16 +961,20 @@ const table_expand_panel = {
                     if(!selection){selection = raeumliche_analyseebene.getSelectionId();}
                     return selection;
                 },
-                div = '<div class="item" data-value="brd" value="brd">Bundesrepublik</div>';
+                spatial_name=function(){
+                    let names ={"de":["Bundesrepublik","Bundesländer"],"en":["Federal Republic","States"]};
+                    return names[language_manager.getLanguage()]
+                };
+                div = '<div class="item" data-value="brd" value="brd">'+spatial_name()[0]+'</div>';
 
         if(spatial_extend() === 'ror'){
-            div = 'Bundesrepublik';
+            div = spatial_name()[0];
         }
         //check if the string contains a k == something with 'kreis'
         else if(spatial_extend().indexOf("k") >= 0 ){
-            div = '<div class="item" data-value="bld" value="bld">Bundesländer</div>'+
+            div = '<div class="item" data-value="bld" value="bld">'+spatial_name()[1]+'</div>'+
                 '</br>'+
-                '<div class="item" data-value="brd" value="brd">Bundesrepublik</div>';
+                '<div class="item" data-value="brd" value="brd">'+spatial_name()[0]+'</div>';
         }
 
         $('#ue_raum_sum_content').empty().append(div);

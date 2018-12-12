@@ -46,7 +46,7 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
         }
     }
     function getSpatialExtendDictionary(){
-        $sql = "SELECT Raumgliederung_HTML as name, DB_KENNUNG as id, Sortierung as order_id from v_raumgliederung Group By NAME order by Sortierung";
+        $sql = "SELECT Raumgliederung_HTML as name, NAME_EN as name_en, DB_KENNUNG as id, Sortierung as order_id from v_raumgliederung Group By NAME order by Sortierung";
         return $this->query($sql);
     }
     function getAllIndicatorsByCategoryGebiete($kat, $modus){

@@ -80,7 +80,7 @@ const toolbar = {
 
                     if(ddm_container.hasClass('pinned')===false && !ddm_container.is(':visible')){
                         ddm_container.slideDown();
-                        if($(this).attr("id")==="hh_sf_drop_kat"){
+                        if($(this).attr("id")==="indikator_auswahl"){
                             indikatorauswahl.openMenu();
                         }
                     }else if(ddm_container.is(':visible')===true &&ddm_container.hasClass('pinned')===false){
@@ -140,7 +140,7 @@ const indikatorauswahl ={
         "X":{"name":"Relief","icon":"<i class='align right icon'></i>","color":false}
     },
     getPreviousIndikator:function(){
-      return this.previous_indikator;
+        return this.previous_indikator;
     },
     getSelectedIndikator:function(){
         return urlparamter.getUrlParameter(this.paramter);
@@ -169,13 +169,13 @@ const indikatorauswahl ={
         urlparamter.updateURLParameter(this.paramter, _value);
     },
     getAllPossibleYears:function(){
-      return this.all_possible_years;
+        return this.all_possible_years;
     },
     getFilteredPossibleYears:function(){
-      return this.filtered_years;
+        return this.filtered_years;
     },
     getPossebilities:function(){
-      return this.possebilities;
+        return this.possebilities;
     },
     getDOMObject:function(){
         $elem = $('#indicator_ddm');
@@ -186,7 +186,7 @@ const indikatorauswahl ={
         this.controller.set();
     },
     isVisible:function(){
-      return this.getDOMObject().is(':visible');
+        return this.getDOMObject().is(':visible');
     },
     fill:function(){
         const menu = this;
@@ -198,7 +198,13 @@ const indikatorauswahl ={
             //fill the Options
             $.each(data,function(cat_key,cat_value){
                 let cat_id = cat_key,
-                    cat_name = cat_value.cat_name,
+                    cat_name=function(){
+                        let cat_name = cat_value.cat_name;
+                        if(language_manager.language==="en"){
+                            cat_name = cat_value.cat_name_en
+                        }
+                        return  cat_name;
+                    },
                     color = menu.schema[cat_id]["color"],
                     icon= menu.schema[cat_id]["icon"],
                     background_color = '',
@@ -211,25 +217,31 @@ const indikatorauswahl ={
                 }
 
                 if(mainView.getWidth()>=500) {
-                    html += '<div id="kat_item_'+cat_id+'" class="ui left pointing dropdown link item link_kat" value="' + cat_id + '" style="'+background_color+'">'+icon_set+'<i class="dropdown icon"></i>' + cat_name + '<div id="submenu' + cat_id + '" class="menu submenu upward">';
+                    html += '<div id="kat_item_'+cat_id+'" class="ui left pointing dropdown link item link_kat" value="' + cat_id + '" style="'+background_color+'">'+icon_set+'<i class="dropdown icon"></i>' + cat_name() + '<div id="submenu' + cat_id + '" class="menu submenu upward">';
                 }else{
                     html += '<div class="header">' +
-                        '      <i class="tags icon"></i>'+cat_name+'</div>' +
+                        '      <i class="tags icon"></i>'+cat_name()+'</div>' +
                         '    <div class="divider"></div>'
                 }
                 $.each(cat_value.indicators, function (key, value) {
-                    let ind_id = key;
-                    let ind_name = value.ind_name;
-                    let markierung = value.significant;
-                    let grundakt_state = value.basic_actuality_state;
-                    let einheit = value.unit;
-                    let times = value.times;
+                    let ind_id = key,
+                        ind_name=function(){
+                            let ind_name = value.ind_name;
+                            if(language_manager.language==="en"){
+                                ind_name = value.ind_name_en
+                            }
+                            return  ind_name;
+                        },
+                        markierung = value.significant,
+                        grundakt_state = value.basic_actuality_state,
+                        einheit = value.unit,
+                        times = value.times;
                     if (markierung === 'true') {
-                        html += '<div class="indicator_ddm_item_bold item link_sub" id="' + ind_id + '_item' + '" data-times="'+times+'" data-einheit="'+einheit+'" data-value="' + ind_id + '" value="' + ind_id + '" data-kat="' + cat_id + '" data-name="' + ind_name + '" data-sort="1" data-actuality="'+grundakt_state+'">';
+                        html += '<div class="indicator_ddm_item_bold item link_sub" id="' + ind_id + '_item' + '" data-times="'+times+'" data-einheit="'+einheit+'" data-value="' + ind_id + '" value="' + ind_id + '" data-kat="' + cat_id + '" data-name="' + ind_name() + '" data-sort="1" data-actuality="'+grundakt_state+'">';
                     } else {
-                        html += '<div class="item link_sub" id="' + ind_id + '_item' + '" data-times="'+times+'" data-einheit="'+einheit+'" data-value="' + ind_id + '" value="' + ind_id + '" data-kat="' + cat_id + '" data-name="' + ind_name + '" data-sort="0" data-actuality="'+grundakt_state+'">';
+                        html += '<div class="item link_sub" id="' + ind_id + '_item' + '" data-times="'+times+'" data-einheit="'+einheit+'" data-value="' + ind_id + '" value="' + ind_id + '" data-kat="' + cat_id + '" data-name="' + ind_name() + '" data-sort="0" data-actuality="'+grundakt_state+'">';
                     }
-                    html += ind_name + "</div>";
+                    html += ind_name() + "</div>";
                 });
                 html +='</div></div>';
             });
@@ -297,9 +309,9 @@ const indikatorauswahl ={
             menu.all_possible_years = data_time;
             let years_selected = [];
             $.each(data_time,function(key,value){
-               if(value<getCurrentYear()){
-                   years_selected.push(value);
-               }
+                if(value<getCurrentYear()){
+                    years_selected.push(value);
+                }
             });
             menu.filtered_years = years_selected;
             zeit_slider.init(years_selected);
@@ -347,74 +359,73 @@ const indikatorauswahl ={
     },
     cloneMenu:function(appendToId,newClassId,orientation,exclude_kat,possible_indicators){
 
-            $('.'+newClassId).remove();
+        $('.'+newClassId).remove();
 
-            let target_ddm = $('.link_kat');
+        let target_ddm = $('.link_kat');
+        if(target_ddm.length===0){
+            target_ddm = $('.link_sub');
+        }
 
-            if(target_ddm.length===0){
-                target_ddm = $('.link_sub');
-            }
+        target_ddm.each(function(){
+            $(this)
+                .clone()
+                .appendTo('#'+appendToId)
+                .removeClass('link_kat')
+                .addClass(newClassId);
+        });
 
-            target_ddm.each(function(){
-                $(this)
-                    .clone()
-                    .appendTo('#'+appendToId)
-                    .removeClass('link_kat')
-                    .addClass(newClassId);
-            });
-
-            $('.'+newClassId).
-            each(function() {
-                let element = $(this);
-                let kat = $(this).attr("value");
-                let time = zeit_slider.getTimeSet();
-                //add  the needed classes and change the id
-                element
-                    .find('i')
-                    .addClass(orientation);
-                element
-                    .find('.submenu')
-                    .addClass(orientation)
-                    .addClass('transition')
-                    .removeAttr("id")
-                    .attr('id', 'submenu'+kat+newClassId)
-                    .find('.item').each(function(){
-                    //if true clone only indicators which times are possible with the indicator set times
-                    if(possible_indicators){
-                        let times_values = $(this).data("times").toString().split(',');
-                        let kat_name = $(this).data("kat");
-                        let time = zeit_slider.getTimeSet().toString();
-                        if($.inArray(time,times_values)===-1){
-                            $(this).remove();
-                        }
+        $('.'+newClassId).
+        each(function() {
+            let element = $(this);
+            let kat = $(this).attr("value");
+            let time = zeit_slider.getTimeSet();
+            //add  the needed classes and change the id
+            element
+                .find('i')
+                .addClass(orientation);
+            element
+                .find('.submenu')
+                .addClass(orientation)
+                .addClass('transition')
+                .removeAttr("id")
+                .attr('id', 'submenu'+kat+newClassId)
+                .find('.item').each(function(){
+                //if true clone only indicators which times are possible with the indicator set times
+                if(possible_indicators){
+                    let times_values = $(this).data("times").toString().split(',');
+                    let kat_name = $(this).data("kat");
+                    let time = zeit_slider.getTimeSet().toString();
+                    if($.inArray(time,times_values)===-1){
+                        $(this).remove();
                     }
-                })
-            });
-
-            //remove empty kats
-            $(' .'+newClassId).each(function(){
-                if($(this).find('.item').length ==0){
-                    $(this).remove();
                 }
-            });
+            })
+        });
 
-            //set the align css for the menu
-            let text_align = 'left';
-            if(orientation==='left'){
-                text_align = 'right';
+        //remove empty kats
+        $(' .'+newClassId).each(function(){
+            if($(this).find('.item').length ==0){
+                $(this).remove();
             }
-            $('#'+appendToId+' >.item').css('text-align',text_align);
+        });
 
-            //remove a excluded Kat
-            if(exclude_kat){
-                if(exclude_kat instanceof Array){
-                    $.each(exclude_kat,function(key,value){
-                        $('.' + newClassId + "[value=" + value + "]").remove();
-                    });
-                }else {
-                    $('.' + newClassId + "[value=" + exclude_kat + "]").remove();
-                }
+        //set the align css for the menu
+        let text_align = 'left';
+        if(orientation==='left'){
+            text_align = 'right';
+        }
+        $('#'+appendToId+' >.item').css('text-align',text_align);
+
+        //remove a excluded Kat
+        if(exclude_kat){
+            if(exclude_kat instanceof Array){
+                $.each(exclude_kat,function(key,value){
+                    $('.' + newClassId + "[value=" + value + "]").remove();
+                });
+            }else {
+                $('.' + newClassId + "[value=" + exclude_kat + "]").remove();
             }
+        }
     },
     openMenu:function(){
         this.getDOMObject().dropdown('show');
@@ -477,10 +488,10 @@ const raeumliche_visualisierung = {
         $('#spatial_range_raster').show();
         $('#spatial_range_gebiete').hide();
         $('#gebiete_label').css("color","black");
-         $('#raster_label').css("color",farbschema.getColorMain());
-         panner.hide();
-         glaetten.init();
-         raster_split.init();
+        $('#raster_label').css("color",farbschema.getColorMain());
+        panner.hide();
+        glaetten.init();
+        raster_split.init();
     },
     setGebiete:function(){
         this.upateParameter('gebiete');
@@ -531,6 +542,7 @@ const raeumliche_visualisierung = {
 const raeumliche_analyseebene = {
     values:'',
     param:'raumgl',
+    range:[],
     setParam:function(_value){
         urlparamter.setUrlParameter(this.param,_value);
     },
@@ -566,32 +578,38 @@ const raeumliche_analyseebene = {
         $elem = $('#menu_raumgl');
         return $elem;
     },
+    fill(){
+        const menu = this;
+        //clear array
+        menu.range = [];
+        let raumgl_selection = $('#Raumgliederung');
+        raumgl_selection.empty();
+        $.each(menu.values,function(key,value){
+            if(menu.values[key].state==="enabled"){
+                menu.range.push(value.id);
+            }
+            let spatial_name = value.name;
+            if(language_manager.getLanguage()==="en"){spatial_name=value.name_en;}
+            let html = '<option data-state="'+value.state+'" id="'+value.id+'_raumgl" name="'+spatial_name+'" value="'+value.id+'" '+value.state+'>'+spatial_name+'</option>';
+            raumgl_selection.append(html);
+        });
+        //set the disable title
+        raumgl_selection.find('option').each(function(){if($(this).is(':disabled')){$(this).attr("title","Für den Indikator nicht verfügbar")}});
+    },
     init:function(json_raumgl) {
         const menu = this;
         menu.values = json_raumgl;
         //create the spatial choice menu
         if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete') {
-            let raumgl_selection = $('#Raumgliederung'),
-                spatialRange = [],
-                raumgl_parameter = menu.getParamter();
+            let raumgl_parameter = menu.getParamter();
 
             if (!raumgl_parameter) {
                 menu.updateParamter('bld');
             }
-            raumgl_selection.empty();
-            $.each(json_raumgl,function(key,value){
-                if(json_raumgl[key].state==="enabled"){
-                    spatialRange.push(value.id);
-                }
-                let html = '<option data-state="'+value.state+'" id="'+value.id+'_raumgl" name="'+value.name+'" value="'+value.id+'" '+value.state+'>'+value.name+'</option>';
-                raumgl_selection.append(html);
-            });
-
-            //set the disable title
-            raumgl_selection.find('option').each(function(){if($(this).is(':disabled')){$(this).attr("title","Für den Indikator nicht verfügbar")}});
-
+            //set the options
+            menu.fill();
             //set the selected Option
-            let inArray = $.inArray(menu.getSelectionId(), spatialRange);
+            let inArray = $.inArray(menu.getSelectionId(), menu.range);
             let selected = menu.getSelectionId();
             //check if it's possible to set the stored parameter
             if (inArray != -1) {
@@ -599,7 +617,7 @@ const raeumliche_analyseebene = {
             }
             //if not check if krs is possible as the main option
             else {
-                selected = spatialRange[0];
+                selected = menu.range[0];
                 indikatorJSONGroup.clean();
                 alertNotinSpatialRange($('#Raumgliederung option:selected').text(), selected);
                 return false;
@@ -628,13 +646,13 @@ const raeumliche_analyseebene = {
                             if (selection_fein) {
                                 //check if the parameter is possible for the given indicator
                                 raumgliederung.init();
-                                if ($.inArray(selection_fein, spatialRange) !== -1) {
+                                if ($.inArray(selection_fein, menu.range) !== -1) {
                                     $('#raumgl_fein' + selection_fein).prop("selected", true);
                                     indikatorJSON.init(selection_fein);
                                 } else {
                                     indikatorJSONGroup.clean();
                                     alertNotinSpatialRange($('#Raumgliederung option:selected').text(), $('#Raumgliederung option:selected').val());
-                                    if (spatialRange.length < 1) {
+                                    if (menu.range.length < 1) {
                                         raumgliederung.hide();
                                     }
                                 }
@@ -904,16 +922,16 @@ const gebietsauswahl = {
 const raumgliederung = {
     param:'raumgl_fein',
     setParameter:function(_value){
-      urlparamter.setUrlParameter(this.param,_value);
+        urlparamter.setUrlParameter(this.param,_value);
     },
     getParamter:function(){
-      return urlparamter.getUrlParameter(this.param);
+        return urlparamter.getUrlParameter(this.param);
     },
     updateParamter:function(_value){
-      urlparamter.updateURLParameter(this.param,_value);
+        urlparamter.updateURLParameter(this.param,_value);
     },
     removeParameter:function(){
-      urlparamter.removeUrlParameter(this.param);
+        urlparamter.removeUrlParameter(this.param);
     },
     getSelectedId:function(){
         return this.getParamter();
@@ -943,7 +961,7 @@ const raumgliederung = {
         const object = this,
             menu = this.getDOMObject().find('#Raumgliederung_Fein');
         if(raeumliche_visualisierung.getRaeumlicheGliederung()==="gebiete") {
-           object.clear();
+            object.clear();
 
             let length_raumgl = $('#Raumgliederung option:not(:disabled)').length;
             if (raeumliche_analyseebene.getSelectionId() !== 'ror' && raeumliche_analyseebene.getSelectionId() !=='gem' && length_raumgl > 1) {
@@ -974,7 +992,7 @@ const raumgliederung = {
                     menu.append('<option data-val="preset" style="color: lightgrey;" selected="true" value="empty" disabled="disabled">keine Feingliederung verfügbar</option>');
                 }
             } else {
-               menu.append('<option data-val="preset" style="color: lightgrey;" selected="true" value="empty" disabled="disabled">keine Feingliederung verfügbar</option>');
+                menu.append('<option data-val="preset" style="color: lightgrey;" selected="true" value="empty" disabled="disabled">keine Feingliederung verfügbar</option>');
             }
         }
     },
@@ -1188,7 +1206,7 @@ const klassifzierung = {
         urlparamter.updateURLParameter(this.paramter,_value);
     },
     removeParameter:function(){
-      urlparamter.removeUrlParameter(this.paramter);
+        urlparamter.removeUrlParameter(this.paramter);
     },
     getSelectionId:function(_modus){
         const object = this;
@@ -1323,7 +1341,7 @@ const farbliche_darstellungsart = {
         $('#farbreihe_auto').prop('checked', true);
     },
     init:function(){
-       this.constroller.set();
+        this.constroller.set();
     },
     constroller:{
         set:function(){

@@ -62,7 +62,7 @@ try{
                 $id = "RAUMEBENE_".strtoupper($value->id);
                 $avaliable = str_replace(array("1","0"),array("enabled","disabled"),(string)$possibilities[0]->{$id});
                 $name = $value->name;
-                array_push($result,array("id"=>$value->id,"name"=>$name,"state"=>$avaliable));
+                array_push($result,array("id"=>$value->id,"name"=>$name,"name_en"=>$value->name_en,"state"=>$avaliable));
             }
         }else{
             foreach($possibilities as $value){
@@ -73,6 +73,7 @@ try{
     }
     //get all possible Indicators
     else if($query==='getallindicators'){
+        $language = $json_obj['format']['language'];
         $json = '{';
         $kategories = MYSQL_TASKREPOSITORY::get_instance()->getAllCategoriesGebiete();
         if($modus=='raster') {

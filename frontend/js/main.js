@@ -4,7 +4,7 @@ $(document).ready(function() {
     if(!viewState.getUnitTestState()) {
         //load the config data
         $.when($.ajax({
-            url:"frontend/config.json",
+            url:"frontend/data/config.json",
             dataType:"json",
             cache:false,
             success:function(data){

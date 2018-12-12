@@ -165,7 +165,14 @@ const indikator_map_header ={
                 indikator_text=object.getDOMObject().find('#header'),
                 indikator_name = indikatorauswahl.getSelectedIndikatorText_Lang(),
                 time = zeit_slider.getTimeSet(),
-                spatial_text = raeumliche_analyseebene.getSelectionText();
+                spatial_text = raeumliche_analyseebene.getSelectionText(),
+                split_txt=function(){
+                    let txt = "als";
+                    if(language_manager.getLanguage()==="en"){
+                        txt="as";
+                    }
+                    return " "+txt+" ";
+                };
 
             if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete'){
                 if(!raumgliederung.getSelectedId() && gebietsauswahl.countTags()==0){
@@ -173,7 +180,7 @@ const indikator_map_header ={
                 }else if(!raumgliederung.getSelectedId() && gebietsauswahl.countTags()>0){
                     spatial_text = gebietsauswahl.getSelectionAsString();
                 }else{
-                    spatial_text = gebietsauswahl.getSelectionAsString()+" als "+raumgliederung.getSelectionText();
+                    spatial_text = gebietsauswahl.getSelectionAsString()+split_txt()+raumgliederung.getSelectionText();
                 }
             }
             indikator_text.text(indikator_name+" ("+time+")");
@@ -219,7 +226,6 @@ const startMap= {
     set:function(){
         this.state=true;
         layer_control.remove();
-        $('#drop_kat').addClass("expanded").slideDown("slow", function () {});
 
         this.layer = startMap.getLeafletJSON();
         this.layer.addTo(map);
@@ -227,7 +233,6 @@ const startMap= {
         map.fitBounds(bounds);
 
         $('.kennblatt').hide();
-        $('#ind_choice_info').css({"color":"red","font-weight": "bold"});
         legende.close();
     },
     remove:function(){

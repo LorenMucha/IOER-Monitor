@@ -113,7 +113,7 @@ const webTour={
                     }
                 },
                 {
-                    element: "#hh_sf_dropdown_layer",
+                    element: "#kartengestaltung",
                     title: "Kartengestaltung",
                     content: "Passen Sie die Karte nach Ihren Vorstellungen an.",
                     onShow: function () {

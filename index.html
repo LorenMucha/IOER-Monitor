@@ -49,35 +49,13 @@
 <!-- the map content-->
 <div id="Modal">
     <!--Navbar--------------------------->
-    <div class="navbar-default navbar">
-        <div class="navbar-primary">
-            <nav class="navbar navbar-static-top" role="navigation">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-8">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="https://www.ioer.de" target="_blank"></a>
-                </div>
-                <div>
-                    <a href="http://www.ioer-monitor.de"><p class = "navbar-text">Monitor der Siedlungs- und Freiraumentwicklung (IÖR-Monitor)</p></a>
-                </div>
-                <div class="collapse navbar-collapse" id="navbar-collapse-8">
-                    <ul class="nav navbar-nav">
-                        <li><a id="webtour" title="unternehmen Sie eine Tour durch die Funktionalitäten des IÖR-Monitors">IÖR-Monitor Tour</a></li>
-                        <li><a id="feedback_a">Feedback</a></li>
-                    </ul>
-                </div>
-            </nav>
-        </div>
-    </div>
+    <div id="navbar"></div>
     <div id="mapwrap">
         <div id="leftPane">
             <div class="left_content">
                 <div id="toolbar" class="toolbar">
                     <div class="menu_m">
-                        <span>Menü</span>
+                        <span id="menu_name">Menü</span>
                     </div>
                     <div class="content" id="content">
                         <div id="no_overflow">
@@ -91,9 +69,9 @@
                             </div>
                             <!---Indicator choice--------------->
                             <div class="dropdown_choice">
-                                <div class="hh_sf" id="hh_sf_drop_kat">
+                                <div class="hh_sf" id="indikator_auswahl">
                                     <i class="large angle down icon" data-ddm="drop_kat"></i>
-                                    Indikatorauswahl
+                                    <span>Indikator</span>
                                 </div>
                                 <div class="pin">
                                     <i class="glyphicon glyphicon-pushpin" data-ddm="drop_kat"></i>
@@ -114,9 +92,9 @@
                         <div id="overflow_content">
                             <!--spatial choice--------------------->
                             <div class="dropdown_choice">
-                                <div class="hh_sf" id="hh_sf_dropdown_raumgl">
+                                <div class="hh_sf" id="raumgl_auswahl">
                                     <i class="large angle down icon" data-ddm="dropdown_raumgl"></i>
-                                    Räumliche Gliederung
+                                    <span>Räumliche Gliederung</span>
                                 </div>
                                 <div class="pin">
                                     <i class="glyphicon glyphicon-pushpin" data-ddm="dropdown_raumgl"></i>
@@ -127,7 +105,7 @@
                                 <div class="spatial_choice" id="spatial_choice">
                                     <label class="label_spatial_choice" id="gebiete_label">Gebiete</label>
                                     <div class="ui toggle large angle checkbox" id="spatial_choice_checkbox_container">
-                                        <input name="public" type="checkbox" class="massive">
+                                        <input name="public" type="checkbox" class="massive"/>
                                     </div>
                                     <label class="label_spatial_choice" id="raster_label">Raster</label>
                                 </div>
@@ -135,8 +113,7 @@
                                     <span>Räumliche Analyseebene</span>
                                     <hr class="hr"/>
                                     <form id="menu_raumgl" name="menu_zeitschnitt">
-                                        <select name="Raumgliederung" id="Raumgliederung" class="form-control" style="margin-bottom: 10px;">
-                                        </select>
+                                        <select name="Raumgliederung" id="Raumgliederung" class="form-control" style="margin-bottom: 10px;"></select>
                                     </form>
                                     <!-- Selbständige Wahl durch den Nutzer-->
                                     <span id="grenzen_choice"></span>
@@ -171,9 +148,9 @@
                             </div>
                             <!--map layout-------------------->
                             <div class="dropdown_choice">
-                                <div class="hh_sf" id="hh_sf_dropdown_layer">
+                                <div class="hh_sf" id="kartengestaltung">
                                     <i class="large angle down icon" data-ddm="dropdown_layer"></i>
-                                    Kartengestaltung
+                                    <span>Kartengestaltung</span>
                                 </div>
                                 <div class="pin">
                                     <i class="glyphicon glyphicon-pushpin" data-ddm="dropdown_layer"></i>
@@ -196,7 +173,7 @@
                                     <div id="color_schema">
                                     </div>
                                 </div>
-                                <div class="klassenbesetzung">
+                                <div class="klassenbesetzung" id="klassenbesetzung">
                                     <span class="span">Klassenanzahl</span>
                                     <hr class="hr"/>
                                     <form id="menu_klassenbesetzung" name="menu_klassifizierung">
@@ -209,48 +186,48 @@
                                         </select>
                                     </form>
                                 </div>
-                                <span class="span">Klassifizierung</span>
+                                <span id="klassifizierung" class="span">Klassifizierung</span>
                                 <hr class="hr"/>
                                 <div class="klassifizierung">
                                     <form id="menu_klassifizierung" name="menu_klassifizierung2">
                                         <div class="radio_left">
                                             <label class="radio-inline" id="haeufigkeit_label">
                                                 <input checked="checked" class="Klassifikationsmethode" name="Klassifikationsmethode" type="radio" value="haeufigkeit"/>
-                                                Gleiche <br>Klassenbesetzung
+                                                <span>Gleiche Klassenbesetzung</span>
                                             </label>
                                         </div>
                                         <div class="radio_right">
                                             <label class="radio-inline" id="gleich_label">
                                                 <input class="Klassifikationsmethode" name="Klassifikationsmethode" type="radio" value="gleich"/>
-                                                Gleiche <br>Klassenbreite
+                                                <span>Gleiche Klassenbreite</span>
                                             </label>
                                         </div>
                                     </form>
                                 </div>
-                                <div class="klassifizierung">
+                                <div class="klassifizierung" id="setting_klassifizierung">
                                     <span class="span">Art der Darstellung</span>
                                     <hr class="hr"/>
                                     <form id="menu_darstellung" name="menu_klassifizierung2">
                                         <div class="radio_left">
-                                            <label class="radio-inline">
+                                            <label class="radio-inline" id="classify_auto">
                                                 <input id="farbreihe_auto" checked="checked" class="Klassifikationsmethode" name="Klassifikationsmethode" type="radio" value="auto"/>
-                                                Farbreihe automatisch
+                                                <span>Farbreihe automatisch</span>
                                             </label>
                                         </div>
                                         <div class="radio_right">
-                                            <label class="radio-inline">
+                                            <label class="radio-inline" id="keep_settings">
                                                 <input class="Klassifikationsmethode" name="Klassifikationsmethode" title="sinnvoll für Zeitschnittvergleiche & manuelle Farbreihe" type="radio" value="manuell"/>
-                                                Einstellungen beibehalten
+                                                <span>Einstellungen beibehalten</span>
                                             </label>
                                         </div>
                                     </form>
                                 </div>
                             </div>
                             <!--Tools-------------------------->
-                            <div class="dropdown_choice">
+                            <div class="dropdown_choice" id="tools">
                                 <div class="hh_sf" id="hh_sf_dropdown_werkzeug">
                                     <i class="large angle down icon" data-ddm="dropdown_werkzeug"></i>
-                                    Werkzeuge
+                                    <span>Werkzeuge</span>
                                 </div>
                                 <div class="pin">
                                     <i class="glyphicon glyphicon-pushpin" data-ddm="dropdown_werkzeug"></i>
@@ -260,19 +237,19 @@
                                 <ul class="tools">
                                     <li class="tool_li"><div class="btn_container">
                                         <div id="measure"></div>
-                                        <div class="btn_txt">Messen</div>
+                                        <div class="btn_txt" id="measure_btn">Messen</div>
                                     </div>
                                     </li>
                                     <li class="tool_li">
                                         <div class="btn_container">
                                             <div id="lupe"></div>
-                                            <div class="btn_txt">Lupe</div>
+                                            <div class="btn_txt" id="lupe_btn">Lupe</div>
                                         </div>
                                     </li>
                                     <li class="tool_li">
                                         <div class="btn_container">
                                             <div id="import"></div>
-                                            <div class="btn_txt">Import</div>
+                                            <div class="btn_txt" id="import_btn">Import</div>
                                         </div>
                                     </li>
                                 </ul>
@@ -293,16 +270,16 @@
                                 <button id="wms" class="btn .btn-info btn_export raster_export" data-format="WMS">WMS</button>
                                 <button id="wcs" class="btn .btn-info btn_export raster_export" data-format="WCS">WCS</button>
                                 <button id="wfs" class="btn .btn-info btn_export gebiete_export" data-format="WFS">WFS</button>
-                                <div class="export_div"><b>Export der Kartendarstellung als</b></div>
+                                <div class="export_div" id="export_map_display"><b>Export der Kartendarstellung als</b></div>
                                 <hr class="hr_export"/>
                                 <div class="btn-group">
                                     <button type="button" class="btn .btn-info btn_export print_button" id="pdf_export_btn" data-format="pdf">PDF</button>
                                     <button type="button" class="btn .btn-info btn_export print_button" id="png_export_btn" data-format="png">PNG</button>
                                 </div>
-                                <div class="export_div"><b>Dauerhaftes Speichern der Karte auf dem IÖR-Server</b></div>
+                                <div class="export_div" id="save_map_link"><b>Dauerhaftes Speichern der Karte auf dem IÖR-Server</b></div>
                                 <hr class="hr_export"/>
                                 <button id="kartenlink" class="btn .btn-info">Kartenlink erzeugen</button>
-                                <div class="export_div"><b>Kartenlink laden</b></div>
+                                <div class="export_div" id="load_map_link"><b>Kartenlink laden</b></div>
                                 <hr class="hr_export"/>
                                 <form id="KartenlinkLaden" name="KartenlinkLaden">
                                     <input class="form-control" type="text"  id="rid" name="rid" placeholder="Kartenlink Nr.">
@@ -310,11 +287,11 @@
                             </div>
                             <!--Reset Map-->
                             <button type="button" class="btn btn-primary" id="btn_reset">
-                                <i class="glyphicon glyphicon-trash drop_arrow"></i>Viewer zurücksetzen</button>
+                                <i class="glyphicon glyphicon-trash drop_arrow"></i><span>Viewer zurücksetzen</span></button>
                         </div>
                         <div id="impressum">
-                            <a target="_blank" href="https://www.ioer.de/index.php?id=287">Impressum</a>
-                            <a target="_blank" href="https://www.ioer.de/index.php?id=292">Datenschutz</a>
+                            <a target="_blank" href="https://www.ioer.de/index.php?id=287" id="impressum_a">Impressum</a>
+                            <a target="_blank" href="https://www.ioer.de/index.php?id=292" id="data_protection">Datenschutz</a>
                         </div>
                     </div>
                 </div>
@@ -336,7 +313,7 @@
                         </div>
                         <div id="interact_div">
                             <button type="button" class="btn btn-primary" id="btn_table">
-                                <i class="glyphicon glyphicon-chevron-right"></i>Tabelle erweitern</button>
+                                <i class="glyphicon glyphicon-chevron-right"></i><span>Tabelle erweitern</span></button>
                             <div title="Tabelle filtern" id="filter_table" class="filter"></div>
                             <div title="Tabelle als CSV exportieren" id="csv_export"></div>
                         </div>
@@ -352,7 +329,10 @@
                     <div id="panel_close" class="close_table">
                         <span title="Tabelle schließen" class="glyphicon glyphicon-remove checker"></span>
                     </div>
-                    <div id="hinweis_time_expand_linear" class="hinweis"><b style="color:red;">Hinweis: </b>Anzeige von zusätzlichen Zeitschnitten und weiteren Kenngrößen nur bei Deaktivierung der Trendfortschreibung. </div>
+                    <div id="hinweis_time_expand_linear" class="hinweis">
+                        <b style="color:red;" class="note">Hinweis:</b>
+                        <span>Anzeige von zusätzlichen Zeitschnitten und weiteren Kenngrößen nur bei Deaktivierung der Trendfortschreibung.</span>
+                    </div>
                     <div id="ind_expand_container" class="ddm_expand">
                         <span><b>Indikator zum Vergleich anfügen</b></span>
                         <hr class="hr"/>
@@ -377,10 +357,10 @@
                                 <div  id="zeit_auswahl_table" class="menu"></div>
                             </div>
                             <div class="checkbox" id="differences_div">
-                                <label><input id="differences" type="checkbox" value="">Differenzen anzeigen</label>
+                                <label><input id="differences" type="checkbox" value=""/><span>Differenzen anzeigen</span></label>
                             </div>
-                            <div id="hinweis_time" class="hinweis"><b style="color:red;">Hinweis:</b> Für Vergleiche können nur frühere Zeitschnitte angezeigt werden.</div>
-                            <div id="hinweis_time_expand_null" class="hinweis"><b style="color:red;">Hinweis:</b> Es ist nur ein Zeitschnitt verfügbar. </div>
+                            <div id="hinweis_time" class="hinweis"><b style="color:red;" class="note">Hinweis:</b><span>Für Vergleiche können nur frühere Zeitschnitte angezeigt werden.</span></div>
+                            <div id="hinweis_time_expand_null" class="hinweis"><b style="color:red;" class="note">Hinweis:</b> Es ist nur ein Zeitschnitt verfügbar. </div>
                         </div>
                     </div>
                     <div id="kenngroessen_expand_container" class="ddm_expand">
@@ -393,9 +373,11 @@
                                 <div id="kenngroessen_ddm_table_header" class="default text">Bitte wählen.....</div>
                                 <div  id="kenngroessen_auswahl_table" class="menu">
                                     <div id="expand_abs" class="item" data-value="ABS" value="ABS">Absoluter Indikatorwert</div>
-                                    <div class="item" data-value="S00AG" value="S00AG">Gebietsfläche</div>
+                                    <div id="area_size" class="item" data-value="S00AG" value="S00AG">Gebietsfläche</div>
                                     <div id="expand_b00ag" class="item" data-value="B00AG" value="B00AG">Einwohnerzahl</div>
-                                    <div id="expand_kenngroessen" class="item" data-value="UE_RaumSum"><i class="dropdown icon left"></i>Übergeordnete Raumeinheiten
+                                    <div id="expand_kenngroessen" class="item" data-value="UE_RaumSum">
+                                        <i class="dropdown icon left"></i>
+                                        <span>Übergeordnete Raumeinheiten</span>
                                         <div id="ue_raum_sum_content" class="menu pointing left"></div>
                                     </div>
                                 </div>
@@ -415,12 +397,16 @@
                                     <div class="item" data-value="2030" value="2030">2030</div>
                                 </div>
                             </div>
-                            <div id="trend_hinweis_expand" class="hinweis"><b>Hinweis:</b>  Anzeige von Trendwerten nur für ausgewählte Indikatoren.</div>
+                            <div id="trend_hinweis_expand" class="hinweis">
+                                <b class="note">Hinweis:</b>
+                                <span>Anzeige von Trendwerten nur für ausgewählte Indikatoren.</span>
+                            </div>
                         </div>
                     </div>
                     <button type="button" class="btn btn-primary" id="btn_table_load_expand">Tabelle aktualisieren</button>
                     <button type="button" class="btn btn-primary" id="btn_table_clear_expand">
-                        <i class="glyphicon glyphicon-trash"></i>zurücksetzen
+                        <i class="glyphicon glyphicon-trash"></i>
+                        <span>zurücksetzen</span>
                     </button>
                 </div>
                 <!---Tabelle filtern---------------------------------------------------------------->
@@ -855,7 +841,14 @@
 <script src="frontend/lib/export/html2canvas.js"></script>
 <script src="frontend/lib/export/html2pdf.bundle.min.js"></script>
 
+<!--react-->
+<script src="frontend/lib/react/react.min.js"></script>
+<script src="frontend/lib/react/react-dom.min.js"></script>
+<script src="frontend/lib/react/JSXTransformer.js"></script>
+
 <!-- Page js-->
+<script src="frontend/js/language_manager.js" type="text/javascript"></script>
+<script src="frontend/js/Navbar.jsx" type="text/jsx"></script>
 <script src="frontend/js/menu.js"></script>
 <script src="frontend/js/urlparamter.js"></script>
 <script src="frontend/js/view.js"></script>

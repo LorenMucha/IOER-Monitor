@@ -56,8 +56,7 @@ const request_manager={
         let json = JSON.parse('{"ind":{"id":"'+ind_set+
             '","time":"'+zeit_slider.getTimeSet()+'"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+
             '"},"query":"getSpatialExtend"}');
-        return this.makeRequest({"file":json,"query":"getAllAvaliableIndicators","type":"POST","debug":false});
-
+        return this.makeRequest({"file":json,"query":"getRaumgliederung","type":"POST","debug":false});
     },
     // get extra info`s for the legend f. eg. info, datengrundlage....
     getIndZusatzinformationen:function(ind,time){

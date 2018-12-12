@@ -295,7 +295,7 @@ const viewState = {
     },
     getProductionState:function(){
        let path = window.location.pathname;
-        if(path.includes("monitor_test")){
+        if(path.indexOf("monitor_test") !== -1){
             this.test_system = true;
         }
       return this.test_system;
@@ -380,9 +380,9 @@ const progressbar ={
     }
 };
 const modal_layout ={
-    getJQueryObject:function(){return $('#Modal');},
+    geJDOMObject:function(){return $('#Modal');},
     init:function(){
-        this.getJQueryObject().css(
+        this.geJDOMObject().css(
             {
                 "position":"absolute",
                 "width":"100%",
@@ -399,7 +399,7 @@ const modal_layout ={
         );
     },
     remove:function(){
-        this.getJQueryObject().css(
+        this.geJDOMObject().css(
             {
                 "position":"",
                 "width":"",

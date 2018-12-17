@@ -56,7 +56,7 @@ try{
 
                 foreach($erg_indikator as $row_ind){
                     $grundakt_state = "verfügbar";
-                    if (MYSQL_TASKREPOSITORY::get_instance()->getGrundaktState($row_ind->ID_INDIKATOR) == 1) {
+                    if ($row_ind-> MITTLERE_AKTUALITAET_IGNORE == 1) {
                         $grundakt_state = "nicht verfügbar";
                     }
                     $significant = 'false';
@@ -97,61 +97,6 @@ try{
         header('Content-type: application/json; charset=utf-8');
         echo HELPER::get_instance()->escapeJsonString($json);
     }
-    //get all possible years
-    else if($query=='getyears'){
-        $jahre = array();
-        $years = MYSQL_TASKREPOSITORY::get_instance()->getIndicatorPossibleTimeArray($indicator,$modus);
-        foreach ($years as $x){
-                array_push($jahre,intval($x["time"]));
-        }
-        echo json_encode($jahre);
-    }
-    //check avability
-    else if($query=="getavability"){
-        $array = array();
-            array_push($array, array(
-                "ind" => $indicator,
-                "avability" => MYSQL_TASKREPOSITORY::get_instance()->checkIndicatorAvability($indicator,$modus))
-            );
-        echo json_encode($array);
-    }
-    //get additional indicator info
-    else if($query =="getadditionalinfo") {
-        $sql = "SELECT INFO_VIEWER_ZEILE_1,INFO_VIEWER_ZEILE_2,INFO_VIEWER_ZEILE_3,INFO_VIEWER_ZEILE_4,INFO_VIEWER_ZEILE_5,INFO_VIEWER_ZEILE_6,DATENGRUNDLAGE_ZEILE_1,DATENGRUNDLAGE_ZEILE_2, DATENGRUNDLAGE_ATKIS FROM m_indikatoren WHERE ID_INDIKATOR='" . $indicator . "'";
-        $ergObject = MYSQL_MANAGER::get_instance()->query($sql);
-        $array = array();
-        $info = "";
-        $datengrundlage = "";
-        $atkis = "";
-        foreach ($ergObject[0] as $key => $row) {
-            if (strpos($key, "INFO_VIEWER") !== false) {
-                $info .= $row . " ";
-            }
-            if (strpos($key, "DATENGRUNDLAGE_ZEILE") !== false) {
-                $datengrundlage .= $row . " ";
-            }
-            if ($key == "DATENGRUNDLAGE_ATKIS") {
-                if (intval($row) == 1) {
-                    $atkis = "© GeoBasis-DE / BKG (" . $year . ")";
-                }
-            }
-        }
-        array_push($array, array(
-            "info" => $info,
-            "datengrundlage" => $datengrundlage,
-            "atkis" => $atkis
-        ));
-        echo json_encode($array);
-    }
-    //search for a indicator or place
-    else if($query=="search"){
-        $search_string = $json_obj['q'];
-        $option = $json_obj['option'];
-        $search = new SEARCH($search_string,$option);
-        echo json_encode($search->query());
-    }
-
-
 }catch(Error $e){
     $trace = $e->getTrace();
     echo $e->getMessage().' in '.$e->getFile().' on line '.$e->getLine().' called from '.$trace[0]['file'].' on line '.$trace[0]['line'];

@@ -70,3 +70,7 @@ function slideUpElementByID(id){
     $('#'+id).slideUp("slow", function () {});
     return true;
 }
+function htmlEntities(str) {
+    return str.replace(/&#(\d+);/g, function(match, dec) {
+        return String.fromCharCode(dec);
+    });}

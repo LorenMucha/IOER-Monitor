@@ -51,7 +51,7 @@ const legende = {
             table_container = rightView.getDOMObject(),
             right_content = $('#rightPane'),
             leaflet_right_controls = $('.leaflet-right'),
-            width = 250,
+            width = 270,
             height = map_content.height()- leaflet_right_controls.height()-100,
             close_icon = this.getCloseIconObject(),
             show_button = this.getShowButtonObject(),
@@ -105,7 +105,8 @@ const legende = {
             datengrundlage_container = this.getDatengrundlageObject(),
             indikator_info_container = this.getIndikatorInfoObject(),
             einheit_container = this.getEinheitObject(),
-            klasseneinteilung_contaiener = this.getKlasseneinteilungObject();
+            klasseneinteilung_contaiener = this.getKlasseneinteilungObject(),
+            info_json = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()];
 
         //close datenalter
         if(indikatorauswahl.getSelectedIndiktorGrundaktState() && object.getDatenalterContainerObject().find('#dropdown_datenalter').is(":visible")){
@@ -115,21 +116,30 @@ const legende = {
         }
 
         /*------hole Zusatzinfos------------------------------------------------------------------------*/
-        $.when(request_manager.getIndZusatzinformationen()).done(function(data){
-            let datengrundlage = data[0]["datengrundlage"];
-            if (datengrundlage.length >= 3) {
-                datengrundlage = datengrundlage + "</br>";
-            }
-            let atkis = data[0]["atkis"];
-            indikator_info_container.text(data[0]["info"]);
-            datengrundlage_container.html(datengrundlage + atkis);
-            if (einheit.length<=0) {
-                einheit_container.hide();
-            } else {
-                einheit_container.show();
-                einheit_container.find('#legende_einheit').text(einheit);
-            }
-        });
+        let indicator_id = indikatorauswahl.getSelectedIndikator(),
+            language_tag = function(){
+                let tag = '';
+                if(language_manager.getLanguage()==="en"){
+                    tag = '_en';
+                }
+                return tag;
+            },
+            datengrundlage = info_json['indicators'][indicator_id][("datengrundlage"+language_tag())],
+            atkis =  function(){
+                let val = parseInt(info_json['indicators'][indicator_id]["atkis"]);
+                if(val==1){
+                    return " © GeoBasis-DE / BKG ("+getCurrentYear()+")";
+                }
+            };
+
+        indikator_info_container.text( info_json['indicators'][indicator_id][("info"+language_tag())]);
+        datengrundlage_container.html(datengrundlage + atkis());
+        if (einheit.length<=0) {
+            einheit_container.hide();
+        } else {
+            einheit_container.show();
+            einheit_container.find('#legende_einheit').text(einheit);
+        }
         /*-------------------------KLasseneinteilung---------------------------------------------*/
         klasseneinteilung_contaiener.text($('#' + klassifzierung.getSelectionId("gebiete") + '_label').text());
 

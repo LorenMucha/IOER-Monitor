@@ -13,7 +13,7 @@ $(function menu_interaction() {
 
     //open the "kennblatt"
     $( ".kennblatt" ).click(function() {
-        openKennblatt();
+        kennblatt.open();
     });
 
 });
@@ -543,6 +543,9 @@ const raeumliche_analyseebene = {
     values:'',
     param:'raumgl',
     range:[],
+    getRange:function(){
+      return this.range;
+    },
     setParam:function(_value){
         urlparamter.setUrlParameter(this.param,_value);
     },
@@ -674,6 +677,9 @@ const raeumliche_analyseebene = {
         }
         menu.constroller.set();
 
+    },
+    getSpatialExtentNameById(id){
+        return $(`#${id}_raumgl`).text();
     },
     constroller:{
         set:function() {

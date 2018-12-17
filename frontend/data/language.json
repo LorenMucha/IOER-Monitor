@@ -337,5 +337,68 @@
       "en":"Filter table",
       "type":"."
     }
+  },
+  "legende":{
+      "legende_header":{
+        "de":"Legende",
+        "en":"Map legend",
+        "type":"#"
+      },
+      "einheit_container":{
+        "de":"Einheit:",
+        "en":"Unit:",
+        "type":"#",
+        "selector":"span"
+      },
+      "Klassifikationsmethode_legende":{
+        "de":"Klassifikationsmethode",
+        "en":"Classification method",
+        "type":"#",
+        "selector":"b"
+      },
+      "indicator_info":{
+        "de":"Informationen zum Indikator",
+        "en":"Information about the indicator",
+        "type":"#",
+        "selector":"b"
+      },
+      "legende_kennblatt":{
+        "de":"Kennblatt",
+        "en":"Datasheet",
+        "type":"#"
+      },
+      "legende_datangrundlage":{
+        "de":"Datengrundlage",
+        "en":"Data basis",
+        "type":"#",
+        "selector":"b"
+      },
+      "legende_map_projection":{
+        "de":"Kartenprojektion",
+        "en":"Map projection",
+        "type":"#",
+        "selector":"b"
+      },
+      "legende_histogramm":{
+        "de":"Histogramm",
+        "en":"Histogram",
+        "type":"#",
+        "selector":"b"
+      },
+      "datenalter":{
+        "de":"Datenalter",
+        "en":"Statistics age",
+        "type":"#",
+        "selector":"span"
+      },
+      "hover_info_grundaktmap":{
+        "de":"Ein und Ausblenden der Grundaktualität im Kartenfenster (hier klicken)",
+        "en":"On and hide the basic update in the map window (click here)",
+        "type":"#",
+        "callback":["setTimeout(function(){legende.fillContent();},1000)"]
+      }
+  },
+  "wms_text":{
+
   }
 }

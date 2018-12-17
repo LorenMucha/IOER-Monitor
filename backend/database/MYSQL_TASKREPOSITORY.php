@@ -3,7 +3,7 @@ require_once("MYSQL_MANAGER.php");
 
 class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
     protected static $instance = NULL;
-    private $berechtigung = 3;
+    //singelton pattern ->Creates exactly one instance of an object.
     public static function get_instance()
     {
         if ( NULL === self::$instance )
@@ -11,10 +11,11 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
 
         return self::$instance;
     }
+
     function getAllCategoriesGebiete(){
         $sql= $sql_kategorie = "SELECT * FROM m_thematische_kategorien, m_them_kategorie_freigabe
                         WHERE m_thematische_kategorien.ID_THEMA_KAT = m_them_kategorie_freigabe.ID_THEMA_KAT
-                        AND STATUS_KATEGORIE_FREIGABE >=  ".$this->berechtigung."
+                        AND STATUS_KATEGORIE_FREIGABE >=  ".$this->getBerechtigung()."
                         GROUP BY SORTIERUNG_THEMA_KAT";
         return $this->query($sql);
     }
@@ -22,7 +23,7 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
     $sql = "select * from m_thematische_kategorien, m_indikatoren, d_raster 
             where m_thematische_kategorien.ID_THEMA_KAT = m_indikatoren.ID_THEMA_KAT 
             and m_indikatoren.ID_INDIKATOR = d_raster.Indikator 
-            and d_raster.freigabe_aussen = ".$this->berechtigung." 
+            and d_raster.freigabe_aussen = ".$this->getBerechtigung()." 
             group by m_thematische_kategorien.id_thema_kat 
             order by m_thematische_kategorien.sortierung_thema_kat";
     return $this->query($sql);
@@ -54,7 +55,7 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
             FROM m_indikatoren, m_indikator_freigabe
             WHERE m_indikatoren.ID_THEMA_KAT =  '" . $kat . "'
             AND m_indikatoren.ID_INDIKATOR = m_indikator_freigabe.ID_INDIKATOR
-            AND m_indikator_freigabe.STATUS_INDIKATOR_FREIGABE =  '".$this->berechtigung."'
+            AND m_indikator_freigabe.STATUS_INDIKATOR_FREIGABE =  '".$this->getBerechtigung()."'
             GROUP BY m_indikatoren.INDIKATOR_NAME_KURZ
             ORDER BY  m_indikatoren.MARKIERUNG DESC, m_indikatoren.SORTIERUNG ASC";
 
@@ -63,7 +64,7 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
                 FROM m_indikatoren, d_raster
                 WHERE ID_THEMA_KAT =  '".$kat."'
                 AND m_indikatoren.ID_INDIKATOR = d_raster.INDIKATOR
-                AND d_raster.Freigabe_AUSSEN >=  '".$this->berechtigung."'
+                AND d_raster.Freigabe_AUSSEN >=  '".$this->getBerechtigung()."'
                 GROUP BY m_indikatoren.INDIKATOR_NAME_KURZ
                 ORDER BY m_indikatoren.INDIKATOR_NAME_KURZ ASC";
         }
@@ -86,7 +87,7 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
                                 COALESCE((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS =i.AGS AND y.INDIKATORWERT <= ".$year."),0) as grundakt_month
                                 FROM m_indikatorwerte_" . $year . " i, m_indikator_freigabe f, m_indikatoren z
                                 Where f.ID_INDIKATOR = i.ID_INDIKATOR AND f.ID_INDIKATOR =  '" . $indikator_id . "'
-                                AND f.STATUS_INDIKATOR_FREIGABE = " . $this->berechtigung . "
+                                AND f.STATUS_INDIKATOR_FREIGABE = " . $this->getBerechtigung() . "
                                 And z.ID_INDIKATOR = f.ID_INDIKATOR
                                 And LENGTH(i.AGS) = " .(strlen($length_ags))
                                 .$ags_extend."
@@ -108,23 +109,23 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
                 $ex_q .= " And NOT JAHR =" . $value;
             }
             $query = "SELECT JAHR FROM m_indikator_freigabe
-		  WHERE STATUS_INDIKATOR_FREIGABE >= '".$this->berechtigung."'
-          AND ID_INDIKATOR = '" . $ind . "'" . $ex_q . "
-          Order by JAHR DESC";
+                      WHERE STATUS_INDIKATOR_FREIGABE >= '".$this->getBerechtigung()."'
+                      AND ID_INDIKATOR = '" . $ind . "'" . $ex_q . "
+                      Order by JAHR DESC";
         } else {
             if ($exclude_year) {
                 $query = "SELECT JAHR FROM d_raster
-            WHERE d_raster.freigabe_aussen >= '".$this->berechtigung."'
-            AND INDIKATOR = '" . $ind . "' AND NOT JAHR=" . $exclude_year . "
-            group by JAHR
-            Order by JAHR DESC";
+                            WHERE d_raster.freigabe_aussen >= '".$this->getBerechtigung()."'
+                            AND INDIKATOR = '" . $ind . "' AND NOT JAHR=" . $exclude_year . "
+                            group by JAHR
+                            Order by JAHR DESC";
             }
             else {
                 $query = "SELECT JAHR FROM d_raster
-            WHERE d_raster.freigabe_aussen >= '".$this->berechtigung."'
-            AND INDIKATOR = '" . $ind . "'
-            group by JAHR
-            Order by JAHR DESC";
+                            WHERE d_raster.freigabe_aussen >= '".$this->getBerechtigung()."'
+                            AND INDIKATOR = '" . $ind . "'
+                            group by JAHR
+                            Order by JAHR DESC";
             }
         }
         $ergObject = $this->query($query);
@@ -140,9 +141,9 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
     }
     function checkIndicatorAvability($indikator,$modus)
     {
-        $query = "SELECT ID_INDIKATOR, Jahr FROM m_indikator_freigabe WHERE ID_INDIKATOR = '" . $indikator . "' AND STATUS_INDIKATOR_FREIGABE ='".$this->berechtigung."' Group by Jahr";
+        $query = "SELECT ID_INDIKATOR, Jahr FROM m_indikator_freigabe WHERE ID_INDIKATOR = '" . $indikator . "' AND STATUS_INDIKATOR_FREIGABE ='".$this->getBerechtigung()."' Group by Jahr";
         if($modus==='raster') {
-            $query = "SELECT Indikator,Jahr FROM d_raster WHERE INDIKATOR = '" . $indikator . "' AND FREIGABE_AUSSEN ='".$this->berechtigung."' Group by JAHR";
+            $query = "SELECT Indikator,Jahr FROM d_raster WHERE INDIKATOR = '" . $indikator . "' AND FREIGABE_AUSSEN ='".$this->getBerechtigung()."' Group by JAHR";
         }
         $rs = $this->query($query);
             if (count($rs)>0) {

@@ -91,14 +91,13 @@ try{
 
                 foreach($erg_indikator as $row_ind){
                     $grundakt_state = "verfügbar";
-                    if (MYSQL_TASKREPOSITORY::get_instance()->getGrundaktState($row_ind->ID_INDIKATOR) == 1) {
+                    if ($row_ind-> MITTLERE_AKTUALITAET_IGNORE== 1) {
                         $grundakt_state = "nicht verfügbar";
                     }
                     $significant = 'false';
                     if (intval($row_ind->MARKIERUNG) == 1) {
                         $significant = 'true';
                     }
-
                     //get all possible times
                     $time_string = '';
                     $times = MYSQL_TASKREPOSITORY::get_instance()->getIndicatorPossibleTimeArray($row_ind->ID_INDIKATOR,$modus,false);
@@ -110,15 +109,34 @@ try{
                         '","ind_name_short":"' . str_replace('"', "'", $row_ind->INDIKATOR_NAME_KURZ) .
                         '","basic_actuality_state":"' . $grundakt_state .
                         '","significant":"' . $significant .
-                        '","unit":"' . $row_ind->EINHEIT .
+                        '","atkis":"' . $row_ind->DATENGRUNDLAGE_ATKIS.
+                        '","ogc":{' .
+                            '"wfs":"' . $row_ind->WFS.
+                            '","wcs":"' . $row_ind->WCS.
+                            '","wms":"' . $row_ind->WMS.
+                        '"},"unit":"' . $row_ind->EINHEIT .
+                        '","spatial_extends":{'.
+                            '"bld":"' . $row_ind->RAUMEBENE_BLD.
+                            '","krs":"' . $row_ind->RAUMEBENE_KRS.
+                            '","gem":"' . $row_ind->RAUMEBENE_GEM .
+                            '","g50":"' . $row_ind->RAUMEBENE_G50 .
+                            '","stt":"' . $row_ind->RAUMEBENE_STT .
+                            '","ror":"' . $row_ind->RAUMEBENE_ROR .
+                        '"},"literatur":"' . preg_replace('/\s+/', ' ',str_replace('"',"'",htmlentities($row_ind->LITERATUR))) .
+                        '","verweise":"' . preg_replace('/\s+/', ' ',str_replace('"',"'",htmlentities($row_ind->VERWEISE))) .
+                        '","verweise_en":"' . preg_replace('/\s+/', ' ',str_replace('"',"'",htmlentities($row_ind->VERWEISE_EN))) .
                         '","interpretation":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->BEDEUTUNG_INTERPRETATION))) .
                         '","interpretation_en":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->BEDEUTUNG_INTERPRETATION_EN))) .
                         '","methodik":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->METHODIK))) .
-                        '","methodology":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->METHODIK_EN))) .
+                        '","bemerkungen":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->BEMERKUNGEN))) .
+                        '","bemerkungen_en":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->BEMERKUNGEN_EN))) .
+                        '","methodik_en":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->METHODIK_EN))) .
+                        '","info":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->INFO_VIEWER_ZEILE_1." ".$row_ind->INFO_VIEWER_ZEILE_2." ".$row_ind->INFO_VIEWER_ZEILE_3." ".$row_ind->INFO_VIEWER_ZEILE_4." ".$row_ind->INFO_VIEWER_ZEILE_5." ".$row_ind->INFO_VIEWER_ZEILE_6))) .
+                        '","info_en":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->INFO_VIEWER_ZEILE_1_EN." ".$row_ind->INFO_VIEWER_ZEILE_2_EN." ".$row_ind->INFO_VIEWER_ZEILE_3_EN." ".$row_ind->INFO_VIEWER_ZEILE_4_EN." ".$row_ind->INFO_VIEWER_ZEILE_5_EN." ".$row_ind->INFO_VIEWER_ZEILE_6_EN))) .
                         '","datengrundlage":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->DATENGRUNDLAGE_ZEILE_1))) .
                         " ".
                         trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->DATENGRUNDLAGE_ZEILE_2))).
-                        '","data_foundation":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->DATENGRUNDLAGE_ZEILE_1_EN))) .
+                        '","datengrundlage_en":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->DATENGRUNDLAGE_ZEILE_1_EN))) .
                         " ".
                         trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->DATENGRUNDLAGE_ZEILE_2_EN))).
                         '","times":"' . $time_string . '"},';
@@ -148,34 +166,6 @@ try{
                 "ind" => $indicator,
                 "avability" => MYSQL_TASKREPOSITORY::get_instance()->checkIndicatorAvability($indicator,$modus))
             );
-        echo json_encode($array);
-    }
-    //get additional indicator info
-    else if($query =="getadditionalinfo") {
-        $sql = "SELECT INFO_VIEWER_ZEILE_1,INFO_VIEWER_ZEILE_2,INFO_VIEWER_ZEILE_3,INFO_VIEWER_ZEILE_4,INFO_VIEWER_ZEILE_5,INFO_VIEWER_ZEILE_6,DATENGRUNDLAGE_ZEILE_1,DATENGRUNDLAGE_ZEILE_2, DATENGRUNDLAGE_ATKIS FROM m_indikatoren WHERE ID_INDIKATOR='" . $indicator . "'";
-        $ergObject = MYSQL_MANAGER::get_instance()->query($sql);
-        $array = array();
-        $info = "";
-        $datengrundlage = "";
-        $atkis = "";
-        foreach ($ergObject[0] as $key => $row) {
-            if (strpos($key, "INFO_VIEWER") !== false) {
-                $info .= $row . " ";
-            }
-            if (strpos($key, "DATENGRUNDLAGE_ZEILE") !== false) {
-                $datengrundlage .= $row . " ";
-            }
-            if ($key == "DATENGRUNDLAGE_ATKIS") {
-                if (intval($row) == 1) {
-                    $atkis = "© GeoBasis-DE / BKG (" . $year . ")";
-                }
-            }
-        }
-        array_push($array, array(
-            "info" => $info,
-            "datengrundlage" => $datengrundlage,
-            "atkis" => $atkis
-        ));
         echo json_encode($array);
     }
     //get the color Range for a given count

@@ -35,6 +35,7 @@ const request_manager={
     getAllAvaliableIndicators:function(){
         const manager = this;
         let json = JSON.parse('{"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+'"},"query":"getAllIndicators"}');
+        console.log(JSON.stringify(json));
         return manager.makeRequest({"file":json,"query":"getAllAvaliableIndicators","type":"POST","debug":false});
     },
     //get the possible time`s
@@ -57,21 +58,6 @@ const request_manager={
             '","time":"'+zeit_slider.getTimeSet()+'"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+
             '"},"query":"getSpatialExtend"}');
         return this.makeRequest({"file":json,"query":"getRaumgliederung","type":"POST","debug":false});
-    },
-    // get extra info`s for the legend f. eg. info, datengrundlage....
-    getIndZusatzinformationen:function(ind,time){
-        let ind_set = indikatorauswahl.getSelectedIndikator(),
-            time_set = zeit_slider.getTimeSet();
-        if(ind){
-            ind_set = ind;
-        }
-        if(time){
-            time_set= time;
-        }
-        let json = JSON.parse('{"ind":{"id":"'+ind_set+'","time":"'+time_set+
-                                '"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+
-                                '"},"query":"getAdditionalInfo"}');
-        return this.makeRequest({"file":json,"query":"getIndZusatzinformationen","type":"POST","debug":false});
     },
     //get colors to give the user the possibility to manipulate the color of the indicator map
      getColorSchema:function(color_array){

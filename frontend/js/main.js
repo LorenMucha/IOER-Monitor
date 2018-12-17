@@ -13,6 +13,7 @@ $(document).ready(function() {
             }
         }))
             //set the menu data
+        .then(navbar.init())
         .then(search.init())
         .then(raeumliche_visualisierung.init())
         .then(farbschema.init())

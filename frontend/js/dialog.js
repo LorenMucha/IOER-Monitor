@@ -1,4 +1,5 @@
 //This file stores all the jquery Dialogs inside the Page
+//TODO weiter umschreiben
 $(function ogc_export(){
     $("#wms").click(function () {
         let indikator = indikatorauswahl.getSelectedIndikator(),
@@ -216,62 +217,6 @@ $(function feedback() {
 
 //OGC Export
 });
-//Feedback
-function openKennblatt(ind){
-    let ind_set = indikatorauswahl.getSelectedIndikator();
-    if(ind){
-        ind_set = ind;
-    }
-    $("#kennblatt_text").dialog({
-        title: 'Indikatorkennblatt',
-        hide: 'blind',
-        show: 'blind',
-        width: calculateWidth(),
-        height: calculateHeight(),
-        open: function (ev, ui) {
-            $.ajax({
-                url: "backend/dialog/kennblatt.php",
-                type: "POST",
-                data: {
-                    'ID_IND': ind_set
-                },
-                dataType: "html",
-                error: function (xhr, ajaxOptions, thrownError) {
-                    console.log(xhr.status);
-                    console.log(thrownError);
-                },
-                success: function (data) {
-                    $('#kennblatt_text')
-                        .html(data);
-                    setTimeout(function() {
-                        $('#kennblatt_text').scrollTop(0);
-                    },500);
-                    $(document).on("click","#print_btn_kennblatt",function(){
-                        let element = document.getElementById('kennblatt_form'),
-                            opt = {
-                                margin: 5,
-                                quality: 1,
-                                enableLinks: true,
-                                filename: indikatorauswahl.getSelectedIndikator() + "_" + raeumliche_analyseebene.getSelectionId() + "_" + zeit_slider.getTimeSet() + '.' + ".pdf",
-                                image: {type: 'pdf', quality: 1},
-                                html2canvas:  { scale: 2 },
-                                jsPDF: {unit: 'mm', format: 'a4', orientation: 'portrait'}
-                            };
-                        progressbar.init();
-                        progressbar.setHeaderText("erstelle PDF");
-                        let worker = html2pdf()
-                            .from(element)
-                            .set(opt)
-                            .save()
-                            .then(function(){
-                                progressbar.remove();
-                            });
-                    });
-                }
-            });
-        }
-    });
-}
 //indikatorenvergleich
 function openGebietsprofil(ags,name){
     let $dialogContainer = $('#gebietsprofil_content'),
@@ -801,3 +746,250 @@ function calculateHeight(){
         return height-100;
     }
 }
+const kennblatt={
+    endpoint:$("#kennblatt_text"),
+    open:function(){
+        let lang_tag = function(){
+            let tag = '';
+            if(language_manager.getLanguage()==="en"){tag="_en"}
+            return tag;
+        },
+        ind_name = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()]['indicators'][indikatorauswahl.getSelectedIndikator()][("ind_name"+lang_tag())],
+        category = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()][('cat_name'+lang_tag())],
+        unit = indikatorauswahl.getIndikatorEinheit(),
+        info = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()]['indicators'][indikatorauswahl.getSelectedIndikator()][("info"+lang_tag())],
+        methodik = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()]['indicators'][indikatorauswahl.getSelectedIndikator()][("methodik"+lang_tag())],
+        verweise = function(){
+            let cont = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()]['indicators'][indikatorauswahl.getSelectedIndikator()][("verweise"+lang_tag())],
+                encode = he.decode(cont),
+                split = encode.split("</a>"),
+                html=function(){
+                  let ul="<ul>",
+                      i=0;
+                  $.each(split,function(x,y){
+                      i+=1;
+                     let res = y
+                                .replace("target"," target")
+                                .replace("href"," href")
+                                .replace(">- ",">")
+                                .replace("http://www.ioer -monitor.de/methodik/glossar/b/","https://www.ioer-monitor.de/methodik/glossar/b/")
+                                +"</a>";
+                     if(i<split.length) {
+                         ul += `<li>${res}</li>`;
+                     }
+                  });
+                  return `${ul}</ul>`;
+                };
+           return html();
+        },
+        interpretation = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()]['indicators'][indikatorauswahl.getSelectedIndikator()][("interpretation"+lang_tag())],
+        bemerkungen = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()]['indicators'][indikatorauswahl.getSelectedIndikator()][("bemerkungen"+lang_tag())],
+        ebenen = raeumliche_analyseebene.getRange(),
+        ogc = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()]['indicators'][indikatorauswahl.getSelectedIndikator()]["ogc"],
+        spatial_extends = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()]['indicators'][indikatorauswahl.getSelectedIndikator()]["spatial_extends"],
+        language = language_manager.getLanguage(),
+        datengrundlage=legende.getDatengrundlageObject().text(),
+        bezugsebenen=function(){
+            let form = '';
+            $.each(spatial_extends,function(key,value){
+                let state = function(){
+                    let state = 'checked="checked"';
+                    if(parseInt(value)!=1){
+                        state = "";
+                    }
+                    return state;
+                },
+                checkbox = `<div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" ${state()} disabled>
+                                <label class="form-check-label">${raeumliche_analyseebene.getSpatialExtentNameById(key)}</label>
+                             </div>`;
+                form +=checkbox;
+            });
+            return `${form}`;
+        },
+        ogc_links=function(){
+            let form = '';
+            $.each(ogc,function(key,value){
+                let state = function(){
+                    let state = 'checked="checked"';
+                    if(parseInt(value)!=1){
+                        state = "";
+                    }
+                    return state;
+                },
+                link=function(){
+                    let ind_id = indikatorauswahl.getSelectedIndikator();
+                    if(key==="wms"){
+                        return "http://maps.ioer.de/cgi-bin/wms?map="+ind_id+"_100&";
+                    }
+                    else if (key==="wcs"){
+                        return "http://maps.ioer.de/cgi-bin/wcs?map="+ind_id+"_wcs";
+                    }else{
+                       return "http://maps.ioer.de/cgi-bin/wfs?map="+ind_id;
+                    }
+                },
+                checkbox = `<div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" ${state()} disabled>
+                                <label class="form-check-label">${key.toUpperCase()}: ${link()}</label>
+                             </div>`;
+                form +=checkbox;
+            });
+            return `${form}`;
+        },
+        literatur=function(){
+            let litereatur = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()]['indicators'][indikatorauswahl.getSelectedIndikator()][("literatur"+lang_tag())];
+            return he.decode(litereatur);
+        },
+        header_text={"de":{
+                        "header":"Indikatorkennblatt",
+                        "export":"Exportieren",
+                        "cat":"Kategorie",
+                        "einheit":"Maßeinheit",
+                        "beschreibung":"Kurzbeschreibung",
+                        "bedeutung":"Bedeutung und Interpretation",
+                        "daten":"Datengrundlagen",
+                        "methodik":"Methodik",
+                        "verweise":"Verweise",
+                        "bemerkung":"Bemerkungen",
+                        "bezugsebenen":"Bezugsebenen",
+                        "ogc":"Verfügbare Geodienste mit Links",
+                        "literatur":"Quellen/Literatur"
+                    },
+                "en":{
+                        "header":"Indicator data sheet",
+                        "export":"Export",
+                        "cat":"Category:",
+                        "einheit":"Unit",
+                        "beschreibung":"Short description",
+                        "bedeutung":"Importance and interpretation",
+                        "daten":"Data basis",
+                        "methodik":"Methodology",
+                        "verweise":"Eprimands",
+                        "bemerkung":"Remarks",
+                        "bezugsebenen":"Available levels",
+                        "ogc":"Links to available geoservices",
+                        "literatur":"Sources/References"
+                        }
+                };
+        //create the html
+        let html = `
+            <div class="export">
+                <button class="btn btn-primary" id="print_btn_kennblatt">
+                    <i class="glyphicon glyphicon-print"></i>
+                    <span>${header_text[language]["export"]}</span>
+                </button>            
+            </div>
+            <div id="kennblatt_form">
+                <h3>${ind_name}</h3>
+                <hr/>
+                <div class="header" >${header_text[language]["cat"]}</div>
+                <div class="text">${category}</div>
+                <div class="header" >${header_text[language]["einheit"]}</div>
+                <div class="text">${unit}</div>
+                <div class="header" >${header_text[language]["beschreibung"]}</div>
+                <div class="text">${info}</div>
+                <div class="header" >${header_text[language]["bedeutung"]}</div>
+                <div class="text">${interpretation}</div>
+                <div class="header" >${header_text[language]["daten"]}</div>
+                <div class="text">${datengrundlage}</div>
+                <div class="header" >${header_text[language]["methodik"]}</div>
+                <div class="text">${methodik}</div>
+                <div class="header" >${header_text[language]["verweise"]}</div>
+                <div class="text">${verweise()}</div>
+                <div class="header" >${header_text[language]["bemerkung"]}</div>
+                <div class="text">${bemerkungen}</div>
+                <div class="header" >${header_text[language]["bezugsebenen"]}</div>
+                <div class="text">${bezugsebenen()}</div>
+                <div class="html2pdf__page-break"></div>
+                <div class="header">${header_text[language]["ogc"]}</div>
+                <div class="text">${ogc_links()}</div>
+                 <div class="header">${header_text[language]["literatur"]}</div>
+                <div class="text">${literatur()}</div>
+            </div>
+        `;
+        dialog_manager.create(this.endpoint,html,header_text[language]["header"]);
+        this.controller.set();
+    },
+    controller:{
+        set:function(){
+            let print_button = $('#print_btn_kennblatt');
+                print_button
+                    .unbind()
+                    .click(function(){
+                        print_button.hide();
+                        let element = document.getElementById('kennblatt_form'),
+                            opt = {
+                                margin: 5,
+                                quality: 0.98,
+                                enableLinks: true,
+                                filename: indikatorauswahl.getSelectedIndikator() + "_" + raeumliche_analyseebene.getSelectionId() + "_" + zeit_slider.getTimeSet() + '.' + ".pdf",
+                                image: {type: 'pdf', quality: 1},
+                                html2canvas:  { scale: 2,letterRendering: true},
+                                jsPDF: {unit: 'mm', format: 'a4', orientation: 'portrait'}
+                            };
+                        progressbar.init();
+                        progressbar.setHeaderText("erstelle PDF");
+                        let worker = html2pdf()
+                            .from(element)
+                            .set(opt)
+                            .save()
+                            .then(function(){
+                                progressbar.remove();
+                                print_button.show();
+                                dialog_manager.restoreDimension();
+                            });
+                    });
+            }
+    }
+};
+const dialog_manager={
+    content:null,
+    calculateWidth:function(){
+        const manager = this;
+        let width = mainView.getWidth();
+        if($('.right_content').is(':visible') || width >=1280 && width<2000){
+            return (width*0.5);
+        }
+        else if(width>2000){
+            return 1200;
+        }
+        else{
+            return (width-50);
+        }
+    },
+    calculateHeight:function(){
+        const manager = this;
+        let height = mainView.getHeight();
+        if($('.right_content').is(':visible') || height >= 800){
+            return (height-210);
+        }else{
+            return (height-100);
+        }
+    },
+    changeHeight:function(_height){
+        this.content.dialog("option", "height", _height);
+    },
+    changeWidth:function(_width){
+        this.content.dialog("option", "width", _width);
+    },
+    restoreDimension(){
+      this.changeWidth(this.calculateWidth());
+      this.changeHeight(this.calculateHeight());
+    },
+    create:function(endpoint,html,title) {
+        const manager = this;
+        manager.content=endpoint;
+        endpoint.dialog({
+            title: title,
+            hide: 'blind',
+            show: 'blind',
+            width: manager.calculateWidth(),
+            height: manager.calculateHeight(),
+            open: function (ev, ui) {
+                $(this)
+                    .empty()
+                    .append(html);
+            }
+        });
+    }
+};

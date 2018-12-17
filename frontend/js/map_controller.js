@@ -596,7 +596,7 @@ const raster_split={
                 });
 
                 $("#kennblatt_vergleich").click(function(){
-                    openKennblatt($('#indicator_ddm_vergleich').dropdown('get value'));
+                   kennblatt.open();
                 });
             },
             initElements:function(indikator_id){

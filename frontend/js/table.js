@@ -1081,7 +1081,7 @@ const table_expand_panel = {
                 .dropdown({
                     maxSelections: 1,
                     onShow:function(){
-                        //adjust width of the right view, if the dropdown overlayse the splitter
+                        //adjust width of the right view, if the dropdown overlay the splitter
                         if(viewState.getViewState()==="mw") {
                             mainView.resizeSplitter(rightView.getWidth() + 100);
                         }
@@ -1106,7 +1106,8 @@ const table_expand_panel = {
                     }
                 });
             //the times to expand the table
-            table_expand_panel.getZeitschnittauswahlDDMObject()
+            table_expand_panel
+                .getZeitschnittauswahlDDMObject()
                 .unbind()
                 .dropdown({
                     onAdd: function (addedValue, addedText, $addedChoice) {

@@ -3,20 +3,6 @@ var page_init = true,
     changed = false,
     step;
 
-$(function menu_interaction() {
-    //The Map Reset
-    $('#btn_reset').click(function () {
-        let url = window.location.href.replace(window.location.search,'');
-        window.open(url,"_self");
-        return false;
-    });
-
-    //open the "kennblatt"
-    $( ".kennblatt" ).click(function() {
-        kennblatt.open();
-    });
-
-});
 //Models--------------------------------------------------------------------
 //Toolbar
 const toolbar = {

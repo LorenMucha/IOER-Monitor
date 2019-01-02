@@ -82,9 +82,6 @@ function alertNotinSpatialRange(raumglTXT,selection){
                                 .then(gebietsauswahl.clear())
                                 .then(raumgliederung.hide())
                                 .then(indikatorJSON.init(selection));
-                        }else{
-                            //TODO
-                            //indikatorauswahl.setIndicator(indikatorauswahl.getPreviousIndikator());
                         }
                     }
                 );

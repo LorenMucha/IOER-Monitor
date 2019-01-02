@@ -728,6 +728,7 @@ const grundakt_layer = {
         });
     }
 };
+/*contains the styling of the json maps*/
 const style = {
     startMap:{
         color: "grey",
@@ -744,7 +745,7 @@ const style = {
         color: 'grey'
     },
     gewaesser:{
-        weight: 3,
+        weight: 1,
         opacity: 1,
         color: 'blue'
     },

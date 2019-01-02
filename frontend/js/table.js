@@ -68,15 +68,15 @@ const table = {
                 colspan=5;
             }
 
-            let html = '<thead id="thead" class="full-width">'+
-                '<tr id="first_row_head">' +
-                '<th colspan="'+colspan+'" data-sorter="false" class="sorter-false expand" id="header_ind_set">'+indikatorauswahl.getSelectedIndikatorText_Lang()+' ('+zeit_slider.getTimeSet()+')</th>'+
-                '</tr>'+
-                '<tr class="header" id="second_row_head">' +
-                '<th class="th_head" id="tr_rang">lfd. Nr.</th>'+
-                '<th class="th_head ags">AGS</th>'+
-                '<th class="th_head gebietsname">Gebietsname</th>'+
-                '<th id="tabel_header_raumgl" class="th_head">'+value_text+'</th>';
+            let html = `<thead id="thead" class="full-width">
+                <tr id="first_row_head">
+                <th colspan="${colspan}" data-sorter="false" class="sorter-false expand" id="header_ind_set">${indikatorauswahl.getSelectedIndikatorText_Lang()+' ('+zeit_slider.getTimeSet()}</th>
+                </tr>
+                <tr class="header" id="second_row_head">
+                <th class="th_head" id="tr_rang">lfd. Nr.</th>
+                <th class="th_head ags">AGS</th>
+                <th class="th_head gebietsname">Gebietsname</th>
+                <th id="tabel_header_raumgl" class="th_head">${value_text}</th>`;
 
             if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
                 html += '<th class="th_head grundakt_head" id="grundakt_head">Mittlere Grund- aktualität</th>';
@@ -120,7 +120,7 @@ const table = {
                         name = name + " (" + des + ")";
                     }
                 }
-
+                //disbale diagramm views for mobile devices
                 if(mainView.getMobileState()) {
                     img_trend = '';
                     img_trend_ind = '';
@@ -162,9 +162,9 @@ const table = {
         }
         function createTableFooter(){
             //germany values
-            let stat_array = indikatorJSON.getStatistikArray();
-            let ags_ind_array = [];
-            let value_g,grundakt_val;
+            let stat_array = indikatorJSON.getStatistikArray(),
+                ags_ind_array = [],
+                value_g,grundakt_val;
 
             //ags_values
             $.each(stat_array,function(key,value){

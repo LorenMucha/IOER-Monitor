@@ -22,7 +22,7 @@ const navbar={
                           <li><a id="webtour"
                                  title="unternehmen Sie eine Tour durch die Funktionalitäten des IÖR-Monitors">IÖR-Monitor
                               Tour</a></li>
-                          <li><a id="feedback_a">Feedback</a></li>
+                          <li><a id="feedback_a" onclick="feedback.open();">Feedback</a></li>
                           <li><a id="language" data-value="en"><i class="gb uk flag"></i></a></li>
                       </ul>
                   </div>
@@ -45,15 +45,15 @@ const navbar={
                     $(this)
                         .data('value',"de")
                         .find('i')
-                        .removeClass("de")
-                        .addClass("gb uk");
+                        .removeClass("gb uk")
+                        .addClass("de");
                     navbar.getDomObject().find('.navbar-text').text('Monitor of Settlement and Open Space Development');
                 }else{
                     $(this)
                         .data('value',"en")
                         .find("i")
-                        .removeClass("gb uk")
-                        .addClass("de");
+                        .removeClass("de")
+                        .addClass("gb uk");
                     navbar.getDomObject().find('.navbar-text').text('Monitor der Siedlungs- und Freiraumentwicklung (IÖR-Monitor)');
                 }
           });

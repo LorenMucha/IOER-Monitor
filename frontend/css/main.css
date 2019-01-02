@@ -349,23 +349,24 @@ Legende
     font-weight: bold;
     position: fixed;
 }
-.legende #legende_i .legende_line{
+/* also for export needed*/
+.legende_line{
     line-height: 15px;
     width: 100%;
     display: inline-block;
 }
-.legende #legende_i .legende_line i{
+.legende_line i{
     width: 15px;
     height: 10px;
     float: left;
     margin-right: 8px;
 }
-.legende #legende_i .zusatzlayer{
+.legende_map .zusatzlayer{
     line-height: 15px;
     width: 100%;
     display: inline-block;
 }
-.legende #legende_i .zusatzlayer div{
+.legende_map .zusatzlayer div{
     width: 15px;
     height: 5px;
     float: left;
@@ -1037,9 +1038,6 @@ Vergleichskarte Dialog------------------------------------
 /*
 OGC Dialoge-----------------------------
  */
-.ogc_dialog{
-    display : none;
-}
 .ogc_dialog img{
     display: block;
     margin-left: auto;
@@ -1421,6 +1419,10 @@ Icons for diagramme in Table and Map PopUp
 #entwicklungsdiagramm_content{
     margin: 20px;
     overflow-y: hidden;
+    display:none;
+    width: 90%;
+    height: 90%;
+    padding: 0;
 }
 #entwicklungsdiagramm_content #diagramm_button{
     width: 80%;
@@ -1609,7 +1611,7 @@ print
 }
 #print_container .print_map_content{
     display: block;
-    width: 100%;
+    width: 90%;
     height: 600px;
     margin-top: 20px;
 }

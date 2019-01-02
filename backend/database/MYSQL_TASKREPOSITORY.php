@@ -20,13 +20,13 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
         return $this->query($sql);
     }
     function getAllCategoriesRaster(){
-    $sql = "select * from m_thematische_kategorien, m_indikatoren, d_raster 
-            where m_thematische_kategorien.ID_THEMA_KAT = m_indikatoren.ID_THEMA_KAT 
-            and m_indikatoren.ID_INDIKATOR = d_raster.Indikator 
-            and d_raster.freigabe_aussen = ".$this->getBerechtigung()." 
-            group by m_thematische_kategorien.id_thema_kat 
-            order by m_thematische_kategorien.sortierung_thema_kat";
-    return $this->query($sql);
+        $sql = "select * from m_thematische_kategorien, m_indikatoren, d_raster 
+                where m_thematische_kategorien.ID_THEMA_KAT = m_indikatoren.ID_THEMA_KAT 
+                and m_indikatoren.ID_INDIKATOR = d_raster.Indikator 
+                and d_raster.freigabe_aussen = ".$this->getBerechtigung()." 
+                group by m_thematische_kategorien.id_thema_kat 
+                order by m_thematische_kategorien.sortierung_thema_kat";
+        return $this->query($sql);
     }
     function getSpatialExtend($modus,$year,$ind){
         $sql_gebiete = "SELECT i.ID_INDIKATOR, i.RAUMEBENE_BLD,i.RAUMEBENE_ROR,i.RAUMEBENE_KRS,i.RAUMEBENE_LKS,

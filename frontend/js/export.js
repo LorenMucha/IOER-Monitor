@@ -105,6 +105,7 @@ function loadRID(rid){
     });
     return false;
 }
+//todo umschreiben und in den Dialog einordnen
 $(function map_export(){
     //print
     let pdf_dialog_container = $("#print_container");
@@ -199,7 +200,7 @@ $(function map_export(){
                                     })
                                     .then(
                                         setTimeout(function(){
-                                            pdf_dialog_container.dialog('close')
+                                            pdf_dialog_container.dialog("option", "height", 750);
                                         },500)
                                     );
                             });
@@ -210,10 +211,10 @@ $(function map_export(){
                             let element = document.getElementById('print_container');
                             let opt = {
                                 margin: 5,
-                                quality: 1,
+                                quality: 0.98,
                                 filename: indikatorauswahl.getSelectedIndikator() + "_" + raeumliche_analyseebene.getSelectionId() + "_" + zeit_slider.getTimeSet() + '.' + format,
                                 image: {type: 'png', quality: 1},
-                                html2canvas: {scale: 3},
+                                html2canvas: {scale: 2},
                                 jsPDF: {unit: 'mm', format: 'a4', orientation: 'portrait'}
                             };
                             if (format === "pdf") {

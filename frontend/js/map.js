@@ -4,6 +4,7 @@ var map= L.map('map',{
 });
 
 $(function(){
+    //make map and conatining elemnts touchable
     $('#widget').draggable();
     /*
     Callbacks on map interactions
@@ -20,7 +21,7 @@ $(function(){
         let zoom = map.getZoom();
         urlparamter.updateURLParameter('zoom',zoom);
     });
-
+    /**/
     map.on('overlayadd', function(e) {
 
         let time = zeit_slider.getTimeSet();
@@ -48,16 +49,12 @@ $(function(){
             });
         }
         else if(e.name === "Hauptfließgewässer"){
-            $.ajax({
-                url:"https://sg.geodatenzentrum.de/wfs_dlm250?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&typeNames=dlm250:objart_44001_f&SRSNAME=EPSG:4326&OUTPUTFORMAT=JSON",
-                type:"GET",
-                success:function(data){
-                    layer_control.zusatzlayer.gew_haupt.addData(data);
-                    layer_control.zusatzlayer.gew_haupt.setStyle(style.gewaesser);
-                    layer_control.zusatzlayer.setStyleSet(style.gewaesser);
-                    layer_control.zusatzlayer.setParam();
-                    legende.getLegendeColorsObject().append('<div class="zusatzlayer"><div style="border-bottom: 3px solid '+style.gewaesser.color+';"></div>'+e.name+'</div>');
-                }
+            $.when(request_manager.getZusatzlayer('gew_grossmasstaeblich')).done(function(json){
+                layer_control.zusatzlayer.gew_haupt.addData(json);
+                layer_control.zusatzlayer.gew_haupt.setStyle(style.gewaesser);
+                layer_control.zusatzlayer.setStyleSet(style.gewaesser);
+                layer_control.zusatzlayer.setParam();
+                legende.getLegendeColorsObject().append('<div class="zusatzlayer"><div style="border-bottom: 3px solid '+style.gewaesser.color+';"></div>'+e.name+'</div>');
             });
         }
         else if(e.name === "Ländergrenzen") {

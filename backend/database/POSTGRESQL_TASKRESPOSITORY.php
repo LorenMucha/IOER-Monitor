@@ -22,15 +22,17 @@ class POSTGRESQL_TASKRESPOSITORY extends POSTGRESQL_MANAGER
         if ($year == 2000) {
             $geom = "x.geom";
         }
-        if($spatial_extend==="gem" and count($ags_array) > 0){
+        if($spatial_extend==="gem"){
             $krs_col = ",k.gen as kreis";
             $sql_join_krs =" inner join vg250_krs_2016_grob k on cast(k.ags as text) Like substring(cast(x.ags as text) for 5)";
         }
         if (count($ags_array) == 0) {
             // Build SQL SELECT statement and return the geometry as a GeoJSON element in EPSG: 4326
-            $sql = "select x.gid, x.ags, x.des, replace(x.gen, '''','') as gen, st_asgeojson(transform(" . pg_escape_string($geom) . ",4326)) AS geojson ".$krs_col." from  vg250_" . $spatial_extend . "_" . $year . "_grob ".$sql_join_krs." x where x.ags is not null";
+            $sql = "select x.gid, x.ags, x.des, replace(x.gen, '''','') as gen, st_asgeojson(transform(" .
+                pg_escape_string($geom) . ",4326)) AS geojson ".$krs_col." from  vg250_" . $spatial_extend . "_" . $year . "_grob x".$sql_join_krs." where x.ags is not null";
         } else {
-            $sql = "select x.gid, x.ags, x.des, replace(x.gen, '''','') as gen, st_asgeojson(transform(" . pg_escape_string($geom) . ",4326)) AS geojson ".$krs_col." from  vg250_" . $spatial_extend . "_" . $year . "_grob x ".$sql_join_krs." where CAST(x.ags AS TEXT) Like'" . $ags_array[0] . "";
+            $sql = "select x.gid, x.ags, x.des, replace(x.gen, '''','') as gen, st_asgeojson(transform(" .
+                pg_escape_string($geom) . ",4326)) AS geojson ".$krs_col." from  vg250_" . $spatial_extend . "_" . $year . "_grob x ".$sql_join_krs." where CAST(x.ags AS TEXT) Like'" . $ags_array[0] . "";
 
             foreach ($ags_array as $value) {
                 if (strlen($value) <= 5) {

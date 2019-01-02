@@ -1,5 +1,4 @@
 <?php
-//TODO-> herauslösen für SoRa
 header('Access-Control-Allow-Origin: *');
 header('Content-type: application/json; charset=utf-8');
 require("../database/MYSQL_TASKREPOSITORY.php");
@@ -20,20 +19,10 @@ $query = strtolower($json_obj['query']);
 try{
     //get all possible Extends for a indictaor
     if($query==="getspatialextend"){
-        $dictionary = MYSQL_TASKREPOSITORY::get_instance()->getSpatialExtendDictionary();
         $possibilities = MYSQL_TASKREPOSITORY::get_instance()->getSpatialExtend($modus,$year,$indicator);
         $result = array();
-        if($modus==="gebiete"){
-            foreach($dictionary as $value){
-                $id = "RAUMEBENE_".strtoupper($value->id);
-                $avaliable = str_replace(array("1","0"),array("enabled","disabled"),(string)$possibilities[0]->{$id});
-                $name = $value->name;
-                array_push($result,array("id"=>$value->id,"name"=>$name,"state"=>$avaliable));
-            }
-        }else{
-            foreach($possibilities as $value){
-                array_push($result,$value->RAUMGLIEDERUNG);
-            }
+        foreach($possibilities as $value){
+            array_push($result,str_replace(array("Raster"," ","m"),array("","",""),$value->RAUMGLIEDERUNG));
         }
         echo json_encode($result);
     }

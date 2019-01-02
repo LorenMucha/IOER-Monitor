@@ -172,12 +172,12 @@ const legende = {
                         sign = '>';
 
                     if(i===grades.length){sign='';}
-                    legende_colors.append('<div id="legende_' + value_id + '" class="legende_line"><i style="background:' + farbe + '"></i> '+sign+ DotToComma(value.min) + ' - ' + DotToComma(value.max) + '</div>');
+                    legende_colors.append(`<div id="legende_${value_id}" class="legende_line"><i style="background:${farbe}"></i>${sign+ DotToComma(value.min)} - ${DotToComma(value.max)}</div>`);
                     i +=1;
                 });
 
                 if (errorcode != false) {
-                    legende_colors.append('<div class="legende_line error"><i style="background: repeating-linear-gradient(45deg,rgb(255, 0, 0),rgb(255,255,255) 5px, rgb(255,255,255) 1px, rgb(255,255,255) 1px);"></i>' + errorcode + '</div>');
+                    legende_colors.append(`<div class="legende_line error"><i style="background: repeating-linear-gradient(45deg,rgb(255, 0, 0),rgb(255,255,255) 5px, rgb(255,255,255) 1px, rgb(255,255,255) 1px);"></i>${errorcode}</div>`);
                 }
                 legende_colors.append(zusatzlayer);
             }

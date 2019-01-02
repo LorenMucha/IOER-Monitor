@@ -165,7 +165,7 @@ $(function(){
     });
 
     lupe_container.click(function(){
-        if(lupe_click == 0){
+        if(lupe_click== 0){
             $('.toolbar').toggleClass("toolbar_close",500);
             zeit_slider.getContainerDOMObject().toggleClass("slider_zeit_container_toggle",500);
             lupe_container.css('background-color',farbschema.getColorActive());
@@ -182,6 +182,7 @@ $(function(){
         return false;
     });
 });
+
 const layer_control={
     control:'',
     state:'sw',
@@ -814,4 +815,10 @@ const raster_split={
     getState:function(){
         return this.getSplitterContainer().length >= 1;
     }
+};
+const map_reset={
+  reset:function(){
+      let url = window.location.href.replace(window.location.search,'');
+      window.open(url,"_self");
+  }
 };

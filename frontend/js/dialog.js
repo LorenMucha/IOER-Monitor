@@ -1,222 +1,4 @@
 //This file stores all the jquery Dialogs inside the Page
-//TODO weiter umschreiben
-$(function ogc_export(){
-    $("#wms").click(function () {
-        let indikator = indikatorauswahl.getSelectedIndikator(),
-            wms_link = 'http://maps.ioer.de/cgi-bin/wms?MAP=' + indikator + '_100',
-            checkbox = $('#checkbox_wms'),
-            allow = $('#wms_allow');
-
-        if(typeof indikatorauswahl.getSelectedIndikator() !=='undefined') {
-            checkbox.prop('checked', false);
-            allow.hide();
-
-            checkbox.change(function () {
-                if ($(this).is(":checked")) {
-                    allow.show();
-                    $('#wms_link').text(wms_link);
-                    $('.link_container').find('a').attr("href",wms_link+"&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetCapabilities");
-                } else {
-                    allow.hide();
-                }
-            });
-            $("#wms_text").dialog({
-                title: 'WMS Dienst',
-                hide: 'blind',
-                show: 'blind',
-                width: 500,
-                resizable: false
-            });
-        }else{
-            alertNoIndicatorChosen();
-        }
-        return false;
-    });
-    $("#wcs").click(function () {
-        let indikator = indikatorauswahl.getSelectedIndikator(),
-            wcs_link = 'http://maps.ioer.de/cgi-bin/wcs?MAP=' + indikator + '_wcs',
-            checkbox = $('#checkbox_wcs'),
-            allow = $('#wcs_allow');
-        if(typeof indikatorauswahl.getSelectedIndikator() !=='undefined') {
-            checkbox.prop('checked', false);
-            allow.hide();
-            checkbox.change(function () {
-                if ($(this).is(":checked")) {
-                    allow.show();
-                    $('#wcs_link').text(wcs_link);
-                    $('.link_container').find('a').attr("href",wcs_link+"&SERVICE=WCS&VERSION=1.0.0&REQUEST=GetCapabilities");
-                } else {
-                    allow.hide();
-                }
-            });
-
-            $("#wcs_text").dialog({
-                title: 'WCS Dienst',
-                hide: 'blind',
-                show: 'blind',
-                width: 500,
-                resizable: false
-            });
-        }else{
-            alertNoIndicatorChosen();
-        }
-
-        return false;
-    });
-    $("#wfs").click(function () {
-        let indikator = indikatorauswahl.getSelectedIndikator(),
-            wfs_link = 'http://maps.ioer.de/cgi-bin/wfs?MAP=' + indikator,
-            checkbox = $('#checkbox_wfs'),
-            allow = $('#wfs_allow');
-        if(typeof indikatorauswahl.getSelectedIndikator() !=='undefined') {
-            checkbox.prop('checked', false);
-            allow.hide();
-            checkbox.change(function () {
-                if ($(this).is(":checked")) {
-                    allow.show();
-                    $('#wfs_link').text(wfs_link);
-                    $('.link_container').find('a').attr("href",wfs_link+"&SERVICE=WFS&VERSION=1.0.0&REQUEST=GetCapabilities");
-                } else {
-                    allow.hide();
-                }
-            });
-
-            $("#wfs_text").dialog({
-                title: 'WFS Dienst',
-                hide: 'blind',
-                show: 'blind',
-                width: 500,
-                resizable: false
-            });
-        }else{
-            alertNoIndicatorChosen();
-        }
-        return false;
-    });
-});
-$(function feedback() {
-    //Feedback
-    $('#feedback_a').click(function () {
-
-        //workaround for backend 7 -> run in PHP 5
-        let url = 'https://maps.ioer.de/monitor_raster/backend/mail/mailer.php';
-
-        $("#feedback_div").dialog({
-            title: 'Feedback',
-            hide: 'blind',
-            show: 'blind',
-            resizable: true,
-            modal: true,
-            width: "70%",
-            position: {
-                my: "center",
-                at: "center",
-                of: window
-            },
-            open: function (ev, ui) {
-                //Quelle: http://twitterbootstrap.org/bootstrap-form-validation/
-                $('#reg_form').bootstrapValidator({
-                    feedbackIcons: {
-                        valid: 'glyphicon glyphicon-ok',
-                        invalid: 'glyphicon glyphicon-remove',
-                        validating: 'glyphicon glyphicon-refresh'
-                    },
-                    fields: {
-                        name: {
-                            validators: {
-                                stringLength: {
-                                    min: 2,
-                                    message: 'Bitte nennen Sie uns ihren Namen'
-
-                                },
-                                notEmpty: {
-                                    message: 'Dies ist kein gültiger Name'
-                                }
-                            }
-                        },
-                        message: {
-                            validators: {
-                                stringLength: {
-                                    min: 10,
-                                    max: 1000,
-                                    message: 'Bitte hinterlassen Sie uns eine Nachricht, mit mindestens 10 und maximal 1000 Zeichen'
-                                },
-                                notEmpty: {
-                                    message: 'Bitte hinterlassen Sie uns eine Nachricht, mit mindestens 10 und maximal 1000 Zeichen'
-                                }
-                            }
-                        },
-                        email: {
-                            validators: {
-                                notEmpty: {
-                                    message: 'Bitten nennen Sie uns ihre Email Adresse'
-                                },
-                                emailAddress: {
-                                    message: 'Dies ist keine gültige Email Adresse'
-                                }
-                            }
-                        }
-                    }
-                });
-                let send = 'true';
-                $('#send_btn').click(function () {
-                    $('#success_message').slideDown({opacity: "show"}, "slow");
-                    $('#reg_form').data('bootstrapValidator').resetForm();
-
-                    // Use Ajax to submit form data
-                    let name = $("#name").val(),
-                        email = $("#email").val(),
-                        message = $("#message").val();
-
-                    $.ajax({
-                        type: 'POST',
-                        url: url,
-                        data: "name=" + name + "&email=" + email + "&message=" + message,
-                        error: function (request, status, error) {
-                            console.log(request.responseText);
-                        },
-                        success: function (data) {
-
-                            if (data.indexOf("Error") >= 0) {
-                                send = 'false';
-                                swal({
-                                    title: 'Fehler!',
-                                    text: 'Ihre Nachricht konnte nicht zugestellt werden. Bitte kontaktieren Sie uns unter: <a id="mail_to">Email</a>',
-                                    type: 'error',
-                                    html: true
-                                })
-                            }
-                            $('#mail_to').click(function () {
-                                window.location.href = "mailto:l.mucha@ioer.de";
-                            });
-                        }
-                    });
-                    $('#feedback_div').dialog('close');
-                    if (send === 'true') {
-                        swal(
-                            'Vielen Dank!',
-                            'Ihre Nachricht wurde zugestellt.',
-                            'success'
-                        )
-                    }
-
-                    return false;
-                });
-                $('#cancel').click(function () {
-                    $('#feedback_div').dialog('close');
-                    swal(
-                        'Abgebrochen',
-                        'Falls Sie sich es anders überlegen, würde wir uns sehr freuen !',
-                        'error'
-                    );
-                    return false;
-                });
-            }
-        });
-    });
-
-//OGC Export
-});
 //indikatorenvergleich
 function openGebietsprofil(ags,name){
     let $dialogContainer = $('#gebietsprofil_content'),
@@ -256,7 +38,6 @@ function openGebietsprofil(ags,name){
     });
 }
 function openStatistik(ags, name, wert){
-    console.log("open Stat for:"+ags+"||"+name+"||"+wert);
     let dialogContainer = $('#objektinformationen_content');
     dialogContainer.dialog({
         title: 'Statistik Gebietseinheit',
@@ -746,8 +527,462 @@ function calculateHeight(){
         return height-100;
     }
 }
+/*
+TODO: Development chart
+ */
+const dev_chart={
+
+};
+/*
+User Feedback
+ */
+const feedback={
+    endpoint_id:"feedback_div",
+    text:{
+        de:{
+            like:'Wie gefällt Ihnen unser neuer IÖR-Monitor ?</b><br/>Lassen Sie es uns wissen',
+            message:"Nachricht",
+            send:"Senden",
+            cancel:"Abbrechen"
+        },
+        en:{
+            like:'How do you like our new IÖR monitor? </b><br/> Let us know',
+            message:"Message",
+            send:"Send",
+            cancel:"Cancel"
+        }
+    },
+    open:function(){
+        let lan = language_manager.getLanguage(),
+            html = he.encode(`
+                            <div class ="jq_dialog" id="${this.endpoint_id}">
+                                <span><b>${this.text[lan].like}</span>
+                                <form class="form" id="reg_form">
+                                    <fieldset>
+                                        <div class="form-group feedback_form">
+                                            <label class="col-md-4 control-label feeback_label first" >Name</label>
+                                            <div class="col-md-6  inputGroupContainer">
+                                                <div class="input-group"> <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                                    <input id="name" name="name" placeholder="Name" class="form-control input_feedback"  type="text"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group feedback_form">
+                                            <label class="col-md-4 control-label feeback_label">E-Mail</label>
+                                            <div class="col-md-6  inputGroupContainer">
+                                                <div class="input-group"> <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+                                                    <input id="email" name="email" placeholder="E-Mail Addresse" class="form-control input_feedback"  type="text"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group feedback_form">
+                                            <label class="col-md-4 control-label feeback_label">${this.text[lan].message}</label>
+                                            <div class="col-md-6  inputGroupContainer">
+                                                <div class="input-group"> <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                                                    <textarea class="form-control input_feedback" rows="10" id="message" name="message" placeholder="${this.text[lan].message}.. "></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </form>
+                                 <div class="form-group btn-group-feedback">
+                                        <div class="btn-group">
+                                            <button class="btn btn-primary send" style="margin-right: 30px;" onclick="feedback.controller.send();">${this.text[lan].send} 
+                                                <span class="glyphicon glyphicon-send"></span>
+                                            </button>
+                                            <button class="btn btn-primary cancel" onclick="dialog_manager.content.remove()">${this.text[lan].cancel} 
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </button>
+                                        </div>
+                                </div>
+                            </div>
+            `);
+        //settings for the manager
+        dialog_manager.instructions.endpoint = `${this.endpoint_id}`;
+        dialog_manager.instructions.html= html;
+        dialog_manager.instructions.title="Feedback";
+        dialog_manager.instructions.modal=true;
+        dialog_manager.create();
+       this.controller.validate();
+    },
+    controller:{
+        /*validator*/
+        validate:function() {
+
+            let lan = language_manager.getLanguage(),
+                messages = {
+                    de: {
+                        name: "Bitte nennen Sie uns ihren Namen",
+                        name_notEmpty: "Dies ist kein gültiger Name",
+                        message: "Bitte hinterlassen Sie uns eine Nachricht, mit mindestens 10 und maximal 1000 Zeichen",
+                        message_notEmpty: "Bitte hinterlassen Sie uns eine Nachricht, mit mindestens 10 Zeichen",
+                        email: "Bitten nennen Sie uns ihre Email Adresse",
+                        email_notEmpty: "Dies ist keine gültige Email Adresse"
+                    },
+                    en: {
+                        name: "Please tell us your name",
+                        name_notEmpty: "This is not a valid name",
+                        message: "Please leave us a message with at least 10 characters",
+                        message_notEmpty: "Please leave us a message with at least 10 and a maximum of 1000 characters",
+                        email: "Please give us your email address",
+                        email_notEmpty: "This is not a valid email address"
+                    }
+                };
+
+            //Quelle: http://bootstrapvalidator.votintsev.ru/getting-started/
+            $('#reg_form').bootstrapValidator({
+                feedbackIcons: {
+                    valid: 'glyphicon glyphicon-ok',
+                    invalid: 'glyphicon glyphicon-remove',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                fields: {
+                    name: {
+                        validators: {
+                            stringLength: {
+                                min: 2,
+                                message: messages[lan].name
+
+                            },
+                            notEmpty: {
+                                message: messages[lan].name_notEmpty
+                            }
+                        }
+                    },
+                    message: {
+                        validators: {
+                            stringLength: {
+                                min: 10,
+                                max:1000,
+                                message: messages[lan].message
+                            },
+                            notEmpty: {
+                                message: messages[lan].message_notEmpty
+                            }
+                        }
+                    },
+                    email: {
+                        validators: {
+                            notEmpty: {
+                                message: messages[lan].email
+                            },
+                            emailAddress: {
+                                message: messages[lan].email_notEmpty
+                            }
+                        }
+                    }
+                }
+            });
+        },
+        send:function(){
+            let send = 'true',
+                selector = $("#reg_form"),
+                // Use Ajax to submit form data
+                name = selector.find("#name").val(),
+                email = selector.find("#email").val(),
+                message = selector.find("#message").val(),
+                url = 'https://monitor.ioer.de/monitor_api/email/';
+
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: {
+                    name:name,
+                    sender:email,
+                    message:message
+                },
+                error:function(xhr, ajaxOptions, thrownError){
+                   console.log(thrownError);
+                   console.log(this.data);
+                    swal({
+                        title: 'Fehler!',
+                        text: 'Ihre Nachricht konnte nicht zugestellt werden. Bitte kontaktieren Sie uns unter: <a id="mail_to" href="mailto:l.mucha@ioer.de" target="_blank">Email</a>',
+                        type: 'error',
+                        html: true
+                    });
+                },
+                success:function(data){
+                    dialog_manager.content.remove();
+                    swal(
+                        'Vielen Dank!',
+                        'Ihre Nachricht wurde zugestellt.',
+                        'success'
+                    );
+                }
+            });
+        }
+    }
+};
+/*
+Show the dialog for the OGC Export services
+ */
+const ogc_export={
+  wms:{
+      endpoint_id:"wms_text",
+      text:{
+          de:{
+              title:"WMS Dienst",
+              use:"Dieser WMS-Dienst steht Ihnen für die Verwendung der Karten in Ihrem eigenen GIS-System zur Verfügung. Voraussetzung ist die Zustimmung zu geltenden Nutzungsbedingungen.",
+              terms:'Ich akzeptiere alle geltenden <a target="_blank" href="http://www.ioer-monitor.de/fileadmin/Dokumente/PDFs/Nutzungsbedingungen_IOER-Monitor.pdf">Nutzungsbedingungen</a>',
+              url:"Die zu verwendende URL für den WMS-Dienst lautet:"
+
+          },
+          en:{
+              title:"WMS Service",
+              use:"This WMS service is available to you for using the maps in your own GIS system. Prerequisite is the approval of applicable terms of use.",
+              terms:'I accept all applicable <a target="_blank" href="http://www.ioer-monitor.de/fileadmin/Dokumente/PDFs/Nutzungsbedingungen_IOER-Monitor.pdf">terms of use</a>',
+              url:"The URL for the WMS service to use is:"
+          }
+      },
+      open:function(){
+          if(typeof indikatorauswahl.getSelectedIndikator() !=='undefined') {
+              let lan = language_manager.getLanguage(),
+                  html = he.encode(`
+                                     <div class="jq_dialog ogc_dialog" id="${this.endpoint_id}">
+                                        <img src="frontend/images/icon/worldwide.png"/>
+                                        <h4>${this.text[lan].use}</h4>
+                                        <div class="ogc_accecpt_container">
+                                            <input title="Aktzeptieren" type="checkbox" name="allow" id="checkbox_wms" />
+                                            <span>${this.text[lan].terms}</span>
+                                        </div>
+                                        <div class="ogc_allow" id="wms_allow">
+                                            <h4>${this.text[lan].url}</h4>
+                                            <div class="link_container">
+                                                <h3 id="wms_link"></h3>
+                                                <a target="_blank">
+                                                    <div class="btn btn-primary ogc_info"></div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                  `);
+              //settings for the manager
+              dialog_manager.instructions.endpoint = `${this.endpoint_id}`;
+              dialog_manager.instructions.html= html;
+              dialog_manager.instructions.title=this.text[lan].title;
+              dialog_manager.instructions.width=500;
+              dialog_manager.instructions.height=300;
+              dialog_manager.create();
+              this.controller.set();
+          }else{
+              alertNoIndicatorChosen();
+          }
+      },
+      controller:{
+          set:function(){
+              const object = ogc_export.wms;
+              let indikator = indikatorauswahl.getSelectedIndikator(),
+                  endpoint = $(`#${object.endpoint_id}`),
+                  wms_link = 'http://maps.ioer.de/cgi-bin/wms?MAP=' + indikator + '_100',
+                  checkbox = endpoint.find("#checkbox_wms"),
+                  allow =endpoint.find('#wms_allow');
+
+              allow.hide();
+
+              checkbox.change(function () {
+                  if ($(this).is(":checked")) {
+                      allow.show();
+                      endpoint
+                          .find('#wms_link')
+                          .text(wms_link);
+                      endpoint
+                          .find('.link_container')
+                          .find('a')
+                          .attr("href",wms_link+"&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetCapabilities");
+                  } else {
+                      allow.hide();
+                  }
+              });
+          }
+      }
+  },
+  wcs:{
+        endpoint_id:"wcs_text",
+        text:{
+            de:{
+                title:"WCS Dienst",
+                use:"Dieser WCS-Dienst steht Ihnen für die Verwendung der Karten in Ihrem eigenen GIS-System zur Verfügung. Voraussetzung ist die Zustimmung zu geltenden Nutzungsbedingungen.",
+                terms:'Ich akzeptiere alle geltenden <a target="_blank" href="http://www.ioer-monitor.de/fileadmin/Dokumente/PDFs/Nutzungsbedingungen_IOER-Monitor.pdf">Nutzungsbedingungen</a>',
+                url:"Die zu verwendende URL für den WMS-Dienst lautet:",
+                instruction:"Kurzanleitung für die Einbindung von WCS Diensten:"
+
+            },
+            en:{
+                title:"WCS Service",
+                use:"This WCS service is available to you for using the maps in your own GIS system. Prerequisite is the approval of applicable terms of use.",
+                terms:'I accept all applicable <a target="_blank" href="http://www.ioer-monitor.de/fileadmin/Dokumente/PDFs/Nutzungsbedingungen_IOER-Monitor.pdf">terms of use</a>',
+                url:"The URL for the WMS service to use is:",
+                instruction:"Brief instructions for the integration of WCS services:"
+            }
+        },
+        open:function() {
+            if (typeof indikatorauswahl.getSelectedIndikator() !== 'undefined') {
+                let lan = language_manager.getLanguage(),
+                    html = he.encode(`
+                         <div class="jq_dialog ogc_dialog" id="${this.endpoint_id}">
+                            <img src="frontend/images/icon/worldwide.png"/>
+                            <h4 >${this.text[lan].use}</h4>
+                            <div class="ogc_accecpt_container">
+                                <input title="Aktzeptieren" type="checkbox" name="allow" id="checkbox_wcs" />
+                                <span>${this.text[lan].terms}</span>
+                            </div>
+                            <div class="ogc_allow" id="wcs_allow">
+                                <h4>${this.text[lan].url}</h4>
+                                <div class="link_container">
+                                    <h3 id="wcs_link"></h3>
+                                    <a target="_blank">
+                                        <div class="btn btn-primary ogc_info"></div>
+                                    </a>
+                                </div>
+                                <!--
+                                Todo
+                                <hr class="hr">
+                                <div class="ogc_anleitung">${this.text[lan].instruction}</div>
+                                <a target="_blank" href="data/anleitung_import_arcgis_wcs.pdf">
+                                    <button>ArcGIS</button>
+                                </a>
+                                <a target="_blank" href="data/anleitung_import_qgis_wcs.pdf">
+                                    <button>QGIS</button>
+                                </a>
+                                -->
+                            </div>
+                        </div>
+                    `);
+                //settings for the manager
+                dialog_manager.instructions.endpoint = `${this.endpoint_id}`;
+                dialog_manager.instructions.html= html;
+                dialog_manager.instructions.title=this.text[lan].title;
+                dialog_manager.instructions.width=500;
+                dialog_manager.instructions.height=300;
+                dialog_manager.create();
+                this.controller.set();
+            }else{
+                alertNoIndicatorChosen();
+            }
+        },
+        controller:{
+            set:function(){
+                const object = ogc_export.wcs;
+                let indikator = indikatorauswahl.getSelectedIndikator(),
+                    endpoint = $(`#${object.endpoint_id}`),
+                    wcs_link = 'http://maps.ioer.de/cgi-bin/wcs?MAP=' + indikator + '_wcs',
+                    checkbox = endpoint.find("#checkbox_wcs"),
+                    allow=endpoint.find('#wcs_allow');
+
+                allow.hide();
+
+                checkbox.change(function () {
+                    if ($(this).is(":checked")) {
+                        allow.show();
+                        endpoint
+                            .find('#wcs_link')
+                            .text(wcs_link);
+                        endpoint
+                            .find('.link_container')
+                            .find('a')
+                            .attr("href",wcs_link+"&SERVICE=WCS&VERSION=1.0.0&REQUEST=GetCapabilities");
+                    } else {
+                        allow.hide();
+                    }
+                });
+            }
+        }
+    },
+    wfs:{
+        endpoint_id:"wfs_text",
+        text:{
+            de:{
+                title:"WFS Dienst",
+                use:"Dieser WFS-Dienst steht Ihnen für die Verwendung der Karten in Ihrem eigenen GIS-System zur Verfügung. Voraussetzung ist die Zustimmung zu geltenden Nutzungsbedingungen.",
+                terms:'Ich akzeptiere alle geltenden <a target="_blank" href="http://www.ioer-monitor.de/fileadmin/Dokumente/PDFs/Nutzungsbedingungen_IOER-Monitor.pdf">Nutzungsbedingungen</a>',
+                url:"Die zu verwendende URL für den WFS-Dienst lautet:",
+                instruction:"Kurzanleitung für die Einbindung von WCS Diensten:"
+
+            },
+            en:{
+                title:"WFS Service",
+                use:"This WFS service is available to you for using the maps in your own GIS system. Prerequisite is the approval of applicable terms of use.",
+                terms:'I accept all applicable <a target="_blank" href="http://www.ioer-monitor.de/fileadmin/Dokumente/PDFs/Nutzungsbedingungen_IOER-Monitor.pdf">terms of use</a>',
+                url:"The URL for the WMS service to use is:",
+                instruction:"Brief instructions for the integration of WFS services:"
+            }
+        },
+        open:function() {
+            if (typeof indikatorauswahl.getSelectedIndikator() !== 'undefined') {
+                let lan = language_manager.getLanguage(),
+                    html = he.encode(`
+                          <div class ="jq_dialog ogc_dialog" id="${this.endpoint_id}">
+                                <img src="frontend/images/icon/worldwide.png"/>
+                                <h4>${this.text[lan].use}</h4>
+                                <div class="ogc_accecpt_container">
+                                    <input title="Aktzeptieren" type="checkbox" name="allow" id="checkbox_wfs" />
+                                    <span>${this.text[lan].terms}</span>
+                                </div>
+                                <div class="ogc_allow" id="wfs_allow">
+                                    <h4>${this.text[lan].url}</h4>
+                                    <div class="link_container">
+                                        <h3 id="wfs_link"></h3>
+                                        <a target="_blank">
+                                            <div class="btn btn-primary ogc_info"></div>
+                                        </a>
+                                    </div>
+                                    <!--
+                                    Todo
+                                    <hr class="hr">
+                                    <div class="ogc_anleitung">Kurzanleitung für die Einbindung von WFS Diensten:</div>
+                                    <a target="_blank" href="frontend/data/anleitung_import_arcgis.pdf">
+                                        <button>ArcGIS</button>
+                                    </a>
+                                    <a target="_blank" href="frontend/data/anleitung_import_qgis.pdf">
+                                        <button>QGIS</button>
+                                    </a>
+                                    -->
+                                </div>
+                            </div>
+                    `);
+                //settings for the manager
+                dialog_manager.instructions.endpoint = `${this.endpoint_id}`;
+                dialog_manager.instructions.html= html;
+                dialog_manager.instructions.title=this.text[lan].title;
+                dialog_manager.instructions.width=500;
+                dialog_manager.instructions.height=300;
+                dialog_manager.create();
+                this.controller.set();
+            }else{
+                alertNoIndicatorChosen();
+            }
+        },
+        controller:{
+            set:function(){
+                const object = ogc_export.wfs;
+                let indikator = indikatorauswahl.getSelectedIndikator(),
+                    endpoint = $(`#${object.endpoint_id}`),
+                    wfs_link = 'http://maps.ioer.de/cgi-bin/wfs?MAP=' + indikator,
+                    checkbox = endpoint.find("#checkbox_wfs"),
+                    allow=endpoint.find('#wfs_allow');
+
+                allow.hide();
+
+                checkbox.change(function () {
+                    if ($(this).is(":checked")) {
+                        allow.show();
+                        endpoint
+                            .find('#wfs_link')
+                            .text(wfs_link);
+                        endpoint
+                            .find('.link_container')
+                            .find('a')
+                            .attr("href",wfs_link+"&SERVICE=WFS&VERSION=1.0.0&REQUEST=GetCapabilities");
+                    } else {
+                        allow.hide();
+                    }
+                });
+            }
+        }
+    }
+};
 const kennblatt={
-    endpoint:$("#kennblatt_text"),
+    endpoint_id:"kennblatt_text",
     open:function(){
         let lang_tag = function(){
             let tag = '';
@@ -760,27 +995,32 @@ const kennblatt={
         info = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()]['indicators'][indikatorauswahl.getSelectedIndikator()][("info"+lang_tag())],
         methodik = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()]['indicators'][indikatorauswahl.getSelectedIndikator()][("methodik"+lang_tag())],
         verweise = function(){
-            let cont = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()]['indicators'][indikatorauswahl.getSelectedIndikator()][("verweise"+lang_tag())],
-                encode = he.decode(cont),
-                split = encode.split("</a>"),
-                html=function(){
-                  let ul="<ul>",
-                      i=0;
-                  $.each(split,function(x,y){
-                      i+=1;
-                     let res = y
-                                .replace("target"," target")
-                                .replace("href"," href")
-                                .replace(">- ",">")
-                                .replace("http://www.ioer -monitor.de/methodik/glossar/b/","https://www.ioer-monitor.de/methodik/glossar/b/")
-                                +"</a>";
-                     if(i<split.length) {
-                         ul += `<li>${res}</li>`;
-                     }
-                  });
-                  return `${ul}</ul>`;
-                };
-           return html();
+            try {
+                let cont = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()]['indicators'][indikatorauswahl.getSelectedIndikator()][("verweise" + lang_tag())],
+                    encode = he.decode(cont),
+                    split = encode.split("</a>"),
+                    html = function () {
+                        let ul = "<ul>",
+                            i = 0;
+                        $.each(split, function (x, y) {
+                            i += 1;
+                            let res = y
+                                    .replace("target", " target")
+                                    .replace("href", " href")
+                                    .replace(">- ", ">")
+                                    .replace("http://www.ioer -monitor.de/methodik/glossar/b/", "https://www.ioer-monitor.de/methodik/glossar/b/")
+                                + "</a>";
+                            if (i < split.length) {
+                                ul += `<li>${res}</li>`;
+                            }
+                        });
+                        return `${ul}</ul>`;
+                    };
+                return html();
+            }catch(err){
+                console.log(err);
+                return "";
+            }
         },
         interpretation = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()]['indicators'][indikatorauswahl.getSelectedIndikator()][("interpretation"+lang_tag())],
         bemerkungen = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()]['indicators'][indikatorauswahl.getSelectedIndikator()][("bemerkungen"+lang_tag())],
@@ -790,55 +1030,69 @@ const kennblatt={
         language = language_manager.getLanguage(),
         datengrundlage=legende.getDatengrundlageObject().text(),
         bezugsebenen=function(){
-            let form = '';
-            $.each(spatial_extends,function(key,value){
-                let state = function(){
-                    let state = 'checked="checked"';
-                    if(parseInt(value)!=1){
-                        state = "";
-                    }
-                    return state;
-                },
-                checkbox = `<div class="form-check form-check-inline">
+            try {
+                let form = '';
+                $.each(spatial_extends, function (key, value) {
+                    let state = function () {
+                            let state = 'checked="checked"';
+                            if (parseInt(value) != 1) {
+                                state = "";
+                            }
+                            return state;
+                        },
+                        checkbox = `<div class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" ${state()} disabled>
                                 <label class="form-check-label">${raeumliche_analyseebene.getSpatialExtentNameById(key)}</label>
                              </div>`;
-                form +=checkbox;
-            });
-            return `${form}`;
+                    form += checkbox;
+                });
+                return `${form}`;
+            }catch(err){
+                console.log(err);
+                return "";
+            }
         },
         ogc_links=function(){
-            let form = '';
-            $.each(ogc,function(key,value){
-                let state = function(){
-                    let state = 'checked="checked"';
-                    if(parseInt(value)!=1){
-                        state = "";
-                    }
-                    return state;
-                },
-                link=function(){
-                    let ind_id = indikatorauswahl.getSelectedIndikator();
-                    if(key==="wms"){
-                        return "http://maps.ioer.de/cgi-bin/wms?map="+ind_id+"_100&";
-                    }
-                    else if (key==="wcs"){
-                        return "http://maps.ioer.de/cgi-bin/wcs?map="+ind_id+"_wcs";
-                    }else{
-                       return "http://maps.ioer.de/cgi-bin/wfs?map="+ind_id;
-                    }
-                },
-                checkbox = `<div class="form-check form-check-inline">
+            try {
+                let form = '';
+                $.each(ogc, function (key, value) {
+                    let state = function () {
+                            let state = 'checked="checked"';
+                            if (parseInt(value) != 1) {
+                                state = "";
+                            }
+                            return state;
+                        },
+                        link = function () {
+                            let ind_id = indikatorauswahl.getSelectedIndikator();
+                            if (key === "wms") {
+                                return "http://maps.ioer.de/cgi-bin/wms?map=" + ind_id + "_100&";
+                            } else if (key === "wcs") {
+                                return "http://maps.ioer.de/cgi-bin/wcs?map=" + ind_id + "_wcs";
+                            } else {
+                                return "http://maps.ioer.de/cgi-bin/wfs?map=" + ind_id;
+                            }
+                        },
+                        checkbox = `<div class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" ${state()} disabled>
                                 <label class="form-check-label">${key.toUpperCase()}: ${link()}</label>
                              </div>`;
-                form +=checkbox;
-            });
-            return `${form}`;
+                    form += checkbox;
+                });
+                return `${form}`;
+            }catch(err){
+                console.log(err);
+                return "";
+            }
         },
         literatur=function(){
-            let litereatur = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()]['indicators'][indikatorauswahl.getSelectedIndikator()][("literatur"+lang_tag())];
-            return he.decode(litereatur);
+            try {
+                let litereatur = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()]['indicators'][indikatorauswahl.getSelectedIndikator()][("literatur" + lang_tag())];
+                return he.decode(litereatur);
+            }catch(err){
+                console.log(err);
+                return "";
+            }
         },
         header_text={"de":{
                         "header":"Indikatorkennblatt",
@@ -872,42 +1126,47 @@ const kennblatt={
                         }
                 };
         //create the html
-        let html = `
-            <div class="export">
-                <button class="btn btn-primary" id="print_btn_kennblatt">
-                    <i class="glyphicon glyphicon-print"></i>
-                    <span>${header_text[language]["export"]}</span>
-                </button>            
-            </div>
-            <div id="kennblatt_form">
-                <h3>${ind_name}</h3>
-                <hr/>
-                <div class="header" >${header_text[language]["cat"]}</div>
-                <div class="text">${category}</div>
-                <div class="header" >${header_text[language]["einheit"]}</div>
-                <div class="text">${unit}</div>
-                <div class="header" >${header_text[language]["beschreibung"]}</div>
-                <div class="text">${info}</div>
-                <div class="header" >${header_text[language]["bedeutung"]}</div>
-                <div class="text">${interpretation}</div>
-                <div class="header" >${header_text[language]["daten"]}</div>
-                <div class="text">${datengrundlage}</div>
-                <div class="header" >${header_text[language]["methodik"]}</div>
-                <div class="text">${methodik}</div>
-                <div class="header" >${header_text[language]["verweise"]}</div>
-                <div class="text">${verweise()}</div>
-                <div class="header" >${header_text[language]["bemerkung"]}</div>
-                <div class="text">${bemerkungen}</div>
-                <div class="header" >${header_text[language]["bezugsebenen"]}</div>
-                <div class="text">${bezugsebenen()}</div>
-                <div class="html2pdf__page-break"></div>
-                <div class="header">${header_text[language]["ogc"]}</div>
-                <div class="text">${ogc_links()}</div>
-                 <div class="header">${header_text[language]["literatur"]}</div>
-                <div class="text">${literatur()}</div>
-            </div>
-        `;
-        dialog_manager.create(this.endpoint,html,header_text[language]["header"]);
+        let html = he.encode(`
+            <div id="${this.endpoint_id}" class="dialog">
+                <div class="export">
+                    <button class="btn btn-primary" id="print_btn_kennblatt">
+                        <i class="glyphicon glyphicon-print"></i>
+                        <span>${header_text[language]["export"]}</span>
+                    </button>            
+                </div>
+                <div id="kennblatt_form">
+                    <h3>${ind_name}</h3>
+                    <hr/>
+                    <div class="header" >${header_text[language]["cat"]}</div>
+                    <div class="text">${category}</div>
+                    <div class="header" >${header_text[language]["einheit"]}</div>
+                    <div class="text">${unit}</div>
+                    <div class="header" >${header_text[language]["beschreibung"]}</div>
+                    <div class="text">${info}</div>
+                    <div class="header" >${header_text[language]["bedeutung"]}</div>
+                    <div class="text">${interpretation}</div>
+                    <div class="header" >${header_text[language]["daten"]}</div>
+                    <div class="text">${datengrundlage}</div>
+                    <div class="header" >${header_text[language]["methodik"]}</div>
+                    <div class="text">${methodik}</div>
+                    <div class="header" >${header_text[language]["verweise"]}</div>
+                    <div class="text">${verweise()}</div>
+                    <div class="header" >${header_text[language]["bemerkung"]}</div>
+                    <div class="text">${bemerkungen}</div>
+                    <div class="header" >${header_text[language]["bezugsebenen"]}</div>
+                    <div class="text">${bezugsebenen()}</div>
+                    <div class="html2pdf__page-break"></div>
+                    <div class="header">${header_text[language]["ogc"]}</div>
+                    <div class="text">${ogc_links()}</div>
+                     <div class="header">${header_text[language]["literatur"]}</div>
+                    <div class="text">${literatur()}</div>
+                </div>
+            </div>`);
+        //settings for the manager
+        dialog_manager.instructions.endpoint = `${this.endpoint_id}`;
+        dialog_manager.instructions.html= html;
+        dialog_manager.instructions.title=header_text[language]["header"];
+        dialog_manager.create();
         this.controller.set();
     },
     controller:{
@@ -944,6 +1203,16 @@ const kennblatt={
 };
 const dialog_manager={
     content:null,
+    instructions:{
+        endpoint: "",
+        html:"",
+        title:"",
+        open:false,
+        close:false,
+        height:this.calculateHeight(),
+        width:this.calculateWidth(),
+        modal:false
+    },
     calculateWidth:function(){
         const manager = this;
         let width = mainView.getWidth();
@@ -976,19 +1245,30 @@ const dialog_manager={
       this.changeWidth(this.calculateWidth());
       this.changeHeight(this.calculateHeight());
     },
-    create:function(endpoint,html,title) {
+    create:function(instructions) {
         const manager = this;
-        manager.content=endpoint;
-        endpoint.dialog({
-            title: title,
+        let body = $('body'),
+            /*
+           html needs to encodes or decoded for storing inside the instroduction object,
+           use he from lib: https://github.com/mathiasbynens/he
+            */
+            html = he.decode(manager.instructions.html);
+        body.append(html);
+        manager.content=body.find(`#${manager.instructions.endpoint}`);
+        manager.content.dialog({
+            title: manager.instructions.title,
             hide: 'blind',
             show: 'blind',
-            width: manager.calculateWidth(),
-            height: manager.calculateHeight(),
+            width: manager.instructions.width,
+            height: manager.instructions.height,
+            modal: manager.instructions.modal,
             open: function (ev, ui) {
                 $(this)
                     .empty()
                     .append(html);
+            },
+            close:function(){
+                manager.content.remove();
             }
         });
     }

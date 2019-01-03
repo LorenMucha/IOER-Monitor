@@ -401,10 +401,20 @@ const indikatorJSON = {
             openStatistik(ags,gen,value_ags);
         });
         $(document).on('click','#pop_up_diagramm_entwicklung_ags_'+id_popup,function(){
-            openEntwicklungsdiagramm(ags,gen,indikatorauswahl.getSelectedIndikator(),true);
+            //openEntwicklungsdiagramm(ags,gen,indikatorauswahl.getSelectedIndikator(),true);
+            dev_chart.chart.settings.ags = ags;
+            dev_chart.chart.settings.name=gen;
+            dev_chart.chart.settings.ind=indikatorauswahl.getSelectedIndikator();
+            dev_chart.chart.settings.ind_vergleich=true;
+            dev_chart.open();
         });
         $(document).on('click','#pop_up_diagramm_ind_ags_'+id_popup,function(){
-            openEntwicklungsdiagramm(ags,gen,indikatorauswahl.getSelectedIndikator(),false);
+            //openEntwicklungsdiagramm(ags,gen,indikatorauswahl.getSelectedIndikator(),false);
+            dev_chart.chart.settings.ags = ags;
+            dev_chart.chart.settings.name=gen;
+            dev_chart.chart.settings.ind=indikatorauswahl.getSelectedIndikator();
+            dev_chart.chart.settings.ind_vergleich=false;
+            dev_chart.open();
         });
     },
     setMarker:function(lat,lng,title){

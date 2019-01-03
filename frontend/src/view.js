@@ -270,7 +270,6 @@ const rightView = {
         this.getDOMObject().hide();
     },
     show:function(){
-        indikatorJSONGroup.fitBounds();
         this.getDOMObject().show();
     },
     getWidth:function(){

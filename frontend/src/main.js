@@ -45,7 +45,7 @@ $(document).ready(function() {
             .append('<div id="qunit"></div>')
             .find("#Modal")
             .css("display", "none"))
-            .then($('head').append('<script src="frontend/lib/qunit/qunit-2.6.2.js"></script><link rel="stylesheet" href="frontend/lib/qunit/qunit-2.6.2.css">'))
+            .then($('head').append('<script src="frontend/lib/qunit/qunit-2.6.2.src"></script><link rel="stylesheet" href="frontend/lib/qunit/qunit-2.6.2.css">'))
             .then(
                 QUnit.test("init map", function (assert) {
                     assert.equal(raeumliche_visualisierung.init());

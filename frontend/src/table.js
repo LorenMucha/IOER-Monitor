@@ -745,7 +745,11 @@ const table = {
                     let ags = $(this).data('ags');
                     let name = $(this).data('name');
                     let ind = indikatorauswahl.getSelectedIndikator();
-                    openEntwicklungsdiagramm(ags,name,ind,false);
+                    dev_chart.chart.settings.ags = ags;
+                    dev_chart.chart.settings.name=name;
+                    dev_chart.chart.settings.ind=indikatorauswahl.getSelectedIndikator();
+                    dev_chart.chart.settings.ind_vergleich=false;
+                    dev_chart.open();
                 });
 
             //development chart single indicator
@@ -755,7 +759,11 @@ const table = {
                     let ags = $(this).data('ags');
                     let name = $(this).data('name');
                     let ind = indikatorauswahl.getSelectedIndikator();
-                    openEntwicklungsdiagramm(ags,name,ind,true);
+                    dev_chart.chart.settings.ags = ags;
+                    dev_chart.chart.settings.name=name;
+                    dev_chart.chart.settings.ind=indikatorauswahl.getSelectedIndikator();
+                    dev_chart.chart.settings.ind_vergleich=true;
+                    dev_chart.open();
                 });
 
             //Live Search in Table

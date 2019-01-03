@@ -1,4 +1,7 @@
 <?php
+/*
+ * TODO umschreiben auf den neuen DB-Manager
+ */
 session_start();
 header('Content-type: application/json; charset=utf-8');
 include("../database/db_manager.php");
@@ -53,7 +56,7 @@ foreach ($timeArray as $t) {
 usort($data_future, function ($item1, $item2) {
     return $item1['year'] <=> $item2['year'];
 });
-//smooth line data
+//smooth line
 if($state_stueztpnt === 'true') {
     $data = glaetteArray($data,$ags);
     echo json_encode($data, JSON_UNESCAPED_UNICODE);

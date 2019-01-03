@@ -429,7 +429,7 @@ const indikatorauswahl ={
                         indikatorauswahl.setIndicator(value);
                         if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'gebiete') {
                             farbliche_darstellungsart.resetSelection();
-                            clearChartArray();
+                            dev_chart.chart.controller.clearChartArray();
                             table_expand_panel.close();
                         }
                     },

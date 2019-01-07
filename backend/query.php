@@ -8,6 +8,7 @@ require("OVERLAY.php");
 require('CLASSIFY.php');
 require('EXPAND.php');
 require('SEARCH.php');
+require('TREND.php');
 require_once('CACHE_MANAGER.php');
 
 $q =  $_POST["values"];
@@ -180,6 +181,7 @@ try{
         $count = POSTGRESQL_TASKRESPOSITORY::get_instance()->countGeometries($year,$raumgliederung,$ags_array);
         echo json_encode($count);
     }
+    //get the map overlay
     else if($query=="getzusatzlayer"){
         $zusatzlayer = $json_obj['ind']['zusatzlayer'];
         $overlay = new OVERLAY($zusatzlayer);
@@ -199,6 +201,36 @@ try{
         $option = $json_obj['option'];
         $search = new SEARCH($search_string,$option);
         echo json_encode($search->query());
+    }
+    //get the values to create the chart
+    else if($query=="gettrend"){
+        //example setting: set":{"all_points":"true","forecast":"true","compare":"true"}
+        $settings = (object)$json_obj['set'];
+        $forecast = HELPER::get_instance()->extractBoolen($settings->forecast);
+        $compare = HELPER::get_instance()->extractBoolen($settings->compare);
+        $all_points = HELPER::get_instance()->extractBoolen($settings->all_points);
+        $trend = new TREND($ags_array[0],$indicator,$all_points,$compare,$forecast);
+        echo json_encode($trend->getTrendValues(),JSON_UNESCAPED_UNICODE);
+        //echo json_encode($trend->toJSON());
+    }
+    /*get all indicator values for a gives ags with differences to BRD and KRS if set*/
+    else if($query=="getvaluesags"){
+        //takes exactly one ags value
+        $ags =$json_obj['ind']['ags'];
+        $values=MYSQL_TASKREPOSITORY::get_instance()->getAllIndicatorValuesInAGS($year,$ags,true,true);
+        $keys = array();
+        foreach(MYSQL_TASKREPOSITORY::get_instance()->getAllCategoriesGebiete() as $k){array_push($keys,$k->ID_THEMA_KAT);}
+        $result = array_fill_keys($keys,array());
+        //foreach($result as $value)
+        foreach($result as $key=>$value){
+            foreach($values as $v){
+                if($key==$v->category){
+                    unset($v->category);
+                    $result[$key][] = $v;
+                }
+            }
+        }
+        echo json_encode($result);
     }
 
 

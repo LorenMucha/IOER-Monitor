@@ -94,6 +94,11 @@ const request_manager={
             '","raumgliederung":"'+raumgliederung_set+'"},"expand_values":'+JSON.stringify(expand_values)+',"ags_array":'+JSON.stringify(ags_set)+',"query":"getTableExpandValues"}');
         return this.makeRequest({"file":json,"query":"getTableExpandValues","type":"POST","debug":false});
     },
+    getTrendValues:function(indicator_id,ags,settings){
+        console.log('{"ind":{"id":"'+indicator_id+'","ags_array":"'+ags+'"},"set":'+JSON.stringify(settings)+',"query":"getTrend"}');
+        let json = JSON.parse('{"ind":{"id":"'+indicator_id+'","ags_array":"'+ags+'"},"set":'+JSON.stringify(settings)+',"query":"getTrend"}');
+        return this.makeRequest({"file":json,"query":"getTrend","type":"POST","debug":true});
+    },
     makeRequest:function(json){
         const manager = this;
         this.call= $.ajax({
@@ -125,6 +130,7 @@ const request_manager={
         alertError();
     }
 };
+//Todo noch umschreiben auf den neuen Mapserver
 function getRasterMap(time,ind,_raumgliederung,klassifizierung,klassenanzahl,darstellung_map,_seite){
     return $.ajax({
         type: "GET",

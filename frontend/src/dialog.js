@@ -223,28 +223,18 @@ const dev_chart={
                 let legend = svg.append("g")
                     .attr("class", "legend");
 
-                //callback for returning the Data
-                function getDataArray(ind) {
-                    return $.ajax({
-                        type: "GET",
-                        url: "backend/dialog/entwicklungs_diagramm.php",
-                        data: {
-                            ags: chart.settings.ags,
-                            indikator: ind,
-                            state_stueztpnt:  chart.settings.state_stueztpnt,
-                            state_ind_vergleich: chart.settings.ind_vergleich,
-                            prognose: chart.settings.state_prognose
-                        }
-                    });
-                }
-
                 let def = $.Deferred();
 
                 //create the call
                 function defCalls() {
-                    let requests = [];
+                    let requests = [],
+                        settings = {
+                            "forecast":chart.settings.state_prognose.toString(),
+                            "all_points":chart.settings.state_stueztpnt.toString(),
+                            "compare":chart.settings.ind_vergleich.toString()
+                    };
                     $.each(array, function (key, value) {
-                        requests.push(getDataArray(value.id));
+                        requests.push(request_manager.getTrendValues(value.id,chart.settings.ags.toString(),settings));
                     });
                     $.when.apply($, requests).done(function () {
                         def.resolve(arguments);
@@ -522,8 +512,6 @@ const dev_chart={
                             chart.init();
                         }
                     });
-                //TODO öffnet sich immer wenn Diagramm initialisert wird;
-                //export the diagramm as image
                 download
                     .dropdown({
                         onChange: function (value, text, $choice) {
@@ -559,7 +547,7 @@ const dev_chart={
                     x = elem.position().left-document.getElementById('visualisation').getBoundingClientRect().x +10,
                     y = elem.position().top-document.getElementById('visualisation').getBoundingClientRect().y + 80,
                     html = '',
-                    text_value = "Wert: " + real_value + einheit;
+                    text_value = "Wert: " + real_value + " "+einheit;
                 //the tooltip for ind vergleich
                 if (dev_chart.chart.settings.ind_vergleich) {
                     let data = [],
@@ -590,7 +578,7 @@ const dev_chart={
                     } else {
                         //the text part
                         let date_before = "von " + data[0][index].month + "/" +data[0][index].year + " bis " + month + "/" + year;
-                        let text_value_dev = "Entwicklung: " + (value - data[0][index].value).toFixed(2) + einheit;
+                        let text_value_dev = "Entwicklung: " + (value - data[0][index].value).toFixed(2) + " "+einheit;
                         html = text_value + "<br/>" + text_value_dev + "<br/>" + date_before;
                     }
                 } else {
@@ -1216,7 +1204,7 @@ const kennblatt={
                 };
         //create the html
         let html = he.encode(`
-            <div id="${this.endpoint_id}" class="dialog">
+            <div id="${this.endpoint_id}" class="dialog jq_dialog">
                 <div class="export">
                     <button class="btn btn-primary" id="print_btn_kennblatt">
                         <i class="glyphicon glyphicon-print"></i>
@@ -1362,7 +1350,7 @@ dialog_manager={
                 if(manager.instructions.open)manager.instructions.open();
             },
             close:function(){
-                manager.content.remove();
+                $('.jq_dialog').remove();
             }
         });
     }

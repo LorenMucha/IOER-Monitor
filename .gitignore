@@ -2,7 +2,8 @@
 backend/database/access.php
 backend/database/DB_SETTINGS.php
 backend/database/db_manager.php
-backend/dialog
+backend/dialog/
+backend/sora/
 
 # Created by https://www.gitignore.io/api/phpstorm
 

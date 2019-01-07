@@ -26,7 +26,7 @@ class JSON
             //get the PostgreObject
             $geometry_object = POSTGRESQL_TASKRESPOSITORY::get_instance()->getGeometry($this->year_pg, $this->spatial_extend, $this->ags_array_user);
             //get the Indicator Object
-            $indicator_object = MYSQL_TASKREPOSITORY::get_instance()->getIndicatorValueInSpatialExtend($this->year, $this->indicator_id, $geometry_object[0]->ags,$this->ags_array_user);
+            $indicator_object = MYSQL_TASKREPOSITORY::get_instance()->getIndicatorValuesInSpatialExtend($this->year, $this->indicator_id, $geometry_object[0]->ags,$this->ags_array_user);
             //get the Grundaktualität
             $indikator_grundaktualitaet = MYSQL_TASKREPOSITORY::get_instance()->getGrundaktState($this->indicator_id);
             //get the ags array's to calculate the differences

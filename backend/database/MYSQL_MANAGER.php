@@ -4,7 +4,7 @@ require_once('DB_SETTINGS.php');
 class MYSQL_MANAGER extends DB_SETTINGS {
 
     protected static $instance = NULL;
-    private $berechtigung = 3;
+    public $berechtigung = 3;
     public function __construct() {
 
         $settings = DB_SETTINGS::getSettings_mysql();
@@ -14,7 +14,7 @@ class MYSQL_MANAGER extends DB_SETTINGS {
         $this->database = $settings['dbname'];
         $this->host = $settings['dbhost'];
     }
-
+    
     public static function get_instance()
     {
         if ( NULL === self::$instance )

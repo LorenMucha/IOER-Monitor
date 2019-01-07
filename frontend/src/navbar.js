@@ -19,11 +19,11 @@ const navbar={
                   </div>
                   <div class="collapse navbar-collapse" id="navbar-collapse-8">
                       <ul class="nav navbar-nav">
-                          <li><a id="webtour"
+                          <!--<li><a id="webtour"
                                  title="unternehmen Sie eine Tour durch die Funktionalitäten des IÖR-Monitors">IÖR-Monitor
-                              Tour</a></li>
+                              Tour</a></li>-->
                           <li><a id="feedback_a" onclick="feedback.open();">Feedback</a></li>
-                          <li><a id="language" data-value="en"><i class="gb uk flag"></i></a></li>
+                          <!--<li><a id="language" data-value="en"><i class="gb uk flag"></i></a></li>-->
                       </ul>
                   </div>
               </nav>

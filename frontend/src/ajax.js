@@ -81,7 +81,7 @@ const request_manager={
     },
     //get the needed values to expand the table, has it´s own parameters, because the logic is slightly different
     getTableExpandValues:function(expand_values,ags_array){
-        let ags_set = indikatorJSONGroup.getLayerArray(table.excludedAreas);
+        let ags_set = indikator_json_group.getLayerArray(table.excludedAreas);
         let raumgliederung_set = raeumliche_analyseebene.getSelectionId();
         if(raumgliederung.getSelectedId()){raumgliederung_set=raumgliederung.getSelectedId();}
         //optional ags array must include ags object {ags:01}
@@ -97,7 +97,7 @@ const request_manager={
     getTrendValues:function(indicator_id,ags,settings){
         console.log('{"ind":{"id":"'+indicator_id+'","ags_array":"'+ags+'"},"set":'+JSON.stringify(settings)+',"query":"getTrend"}');
         let json = JSON.parse('{"ind":{"id":"'+indicator_id+'","ags_array":"'+ags+'"},"set":'+JSON.stringify(settings)+',"query":"getTrend"}');
-        return this.makeRequest({"file":json,"query":"getTrend","type":"POST","debug":true});
+        return this.makeRequest({"file":json,"query":"getTrend","type":"POST","debug":false});
     },
     makeRequest:function(json){
         const manager = this;
@@ -113,7 +113,7 @@ const request_manager={
             success:function(data){
                 if(json.debug){
                     console.log(this.url);
-                    console.log(data);
+                    console.log(JSON.stringify(data));
                 }
             }
         });
@@ -168,7 +168,7 @@ function getStatistik(ags, name, wert){
             raeumliche_ausdehnung:gebietsauswahl.getSelectionAsString(),
             indikator:indikatorauswahl.getSelectedIndikator(),
              jahr:zeit_slider.getTimeSet(),
-            map_array:indikatorJSONGroup.getLayerArray(),
+            map_array:indikator_json_group.getLayerArray(),
         },
         success:function(){
             console.log(this.url);

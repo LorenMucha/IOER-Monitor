@@ -1,4 +1,21 @@
-/* Works not on IE -> a shame*/
+@import url("../lib/jquery/plugin/jquery.splitter.css");
+@import url("../lib/bootstrap/bootstrap.min.css");
+@import url("../lib/bootstrap/font-awesome.min.css");
+@import url("../lib/bootstrap-tour/bootstrap-tour-standalone.css");
+@import url("../lib/jquery/jquery-ui.min.css");
+@import url("../lib/jquery/jquery-ui.structure.min.css");
+@import url("../lib/jquery/jquery-ui.theme.min.css");
+@import url("../lib/jquery/jquery-ui-slider-pips.min.css");
+@import url("../lib/leaflet/leaflet.css");
+@import url("../lib/leaflet/plugin/leaflet-measure.css");
+@import url("../lib/leaflet/plugin/L.Control.ZoomBox.css");
+@import url("../lib/leaflet/plugin/leaflet.magnifyingglass.css");
+@import url("../lib/leaflet/plugin/Control.MiniMap.css");
+@import url("../lib/semanticUi/semantic.min.css");
+@import url("../lib/d3/animate.min.css");
+@import url("../lib/sweetalert/sweetalert.css");
+@import url("../lib/qunit/qunit-2.6.2.css");
+
 :root{
     --main-color:#4E60AA;
     --active-color:#8CB91B
@@ -20,6 +37,9 @@ body {
     margin: 0;
     //font-family: 'Roboto', sans-serif;
     overflow: hidden;
+}
+.cursor{
+    cursor:pointer;
 }
 /*JQuery Dialog*/
 .ui-widget-overlay.custom-overlay
@@ -62,7 +82,7 @@ body {
     height: 50px;
     left:0;
     width: 50px;
-    background: white url(../images/kopf.png) no-repeat center;
+    background: white url(../assets/kopf.png) no-repeat center;
 }
 .navbar .navbar-nav{
     float: right;
@@ -271,12 +291,114 @@ Feedack
     line-height: 50px;
     font-size: 25px;
 }
+/*Button group for legend and map choice*/
+.btn-group-map{
+    position:absolute;
+    z-index: 1000;
+    display: inline-block;
+    bottom: 20px;
+}
+.btn-group-map .map-btn{
+    background-color: #4E60AA;
+    transform: rotate(270deg);
+    margin-bottom: 50px;
+    height: 40px;
+    right: -25px;
+}
+.btn-group-map .legende_button{
+    display: none;
+}
 /*
+Layer Control
+*/
+#layer_control .container{
+    width:90%;
+}
+#layer_control .container h3{
+    margin-top: 20px;
+}
+#layer_control .maps{
+    width:100%;
+    margin-top: 20px;
+}
+#layer_control .maps .image-content{
+    display: inline-block;
+    width: 100%;
+}
+#layer_control .maps .float-left{
+    float:left;
+    width:40%;
+}
+#layer_control .maps .float-right{
+    float: right;
+    width:40%;
+}
+#layer_control .maps .image{
+    width: 90px;
+    height: 50px;
+    background-repeat: no-repeat;
+    background-position: center;
+    float:left;
+}
+#layer_control .extra-maps .extra-image{
+    width: 90px;
+    height: 118px;
+    background-repeat: no-repeat;
+    background-position: center;
+    float:left;
+}
+#layer_control .maps .name{
+    float:left;
+    margin-left: 20px;
+    font-weight: bold;
+    font-size: 17px;
+    margin-top: 20px;
+    width:auto;
+    max-width: 50%;
+}
+#layer_control .maps #osm .pic{
+    background-image: url("../assets/icon/osm.png");
+}
+#layer_control .maps #webatlas .pic{
+    background-image: url("../assets/icon/webatlas.png");
+}
+#layer_control .maps #topplus .pic{
+    background-image: url("../assets/icon/topplus.png");
+}
+#layer_control .maps #satellite .pic{
+    background-image: url("../assets/icon/satellite_view.png");
+}
+#layer_control .maps #leer .pic{
+    border: 1px solid black;
+}
+#layer_control .extra-maps #laendergrenzen .pic{
+    background-image: url("../assets/icon/bld.png");
+}
+#layer_control .extra-maps #kreisgrenzen .pic{
+    background-image: url("../assets/icon/krs.png");
+}
+#layer_control .extra-maps #gemeindegrenzen .pic{
+    background-image: url("../assets/icon/gem.png");
+}
+#layer_control .extra-maps #autobahn .pic{
+    background-image: url("../assets/icon/bab.png");
+}
+#layer_control .extra-maps #fernbahnnetz .pic{
+    background-image: url("../assets/icon/bahn.png");
+}
+#layer_control .extra-maps #gewaesser .pic{
+    background-image: url("../assets/icon/water.png");
+}
+.active{
+    border: 3px solid green;
+    padding: 5px;
+}
+ /*
 Legende
  */
 .legende{
     font-size: 12px;
-    display: block;
+    display: none;
     position: absolute;
     background: white;
     padding: 5px;
@@ -286,19 +408,6 @@ Legende
     overflow-y: auto;
     overflow-x: hidden;
     bottom: 30px;
-}
-.legende_button{
-    display: none;
-    position:absolute;
-    width:40px;
-    height:40px;
-    top:90%;
-    z-index: 10000;
-    font-weight: bold;
-    color:white;
-    background-color: #4E60AA;
-    font-size: 32px;
-    padding: 10px;
 }
 .legende #grundakt_legende{
     float:left;
@@ -642,51 +751,51 @@ Tools
     box-shadow: 0 0 3px gray;
 }
 .vergleich{
-    background: #4E60AA url(../images/icon/split.png) no-repeat center;
+    background: #4E60AA url(../assets/icon/split.png) no-repeat center;
 }
 .germany {
-    background: #4E60AA url(../images/icon/germany.png) no-repeat center;
+    background: #4E60AA url(../assets/icon/germany.png) no-repeat center;
 }
 .zoomIn {
-    background: #4E60AA url(../images/icon/plus.png) no-repeat center;
+    background: #4E60AA url(../assets/icon/plus.png) no-repeat center;
 }
 .zoomOut {
-    background: #4E60AA url(../images/icon/minus.png) no-repeat center;
+    background: #4E60AA url(../assets/icon/minus.png) no-repeat center;
 }
 .info {
-    background: #4E60AA url(../images/icon/information-button.png) no-repeat center;
+    background: #4E60AA url(../assets/icon/information-button.png) no-repeat center;
 }
 .locate{
-    background: #4E60AA url(../images/icon/navigation.png) no-repeat center;
+    background: #4E60AA url(../assets/icon/navigation.png) no-repeat center;
 }
 .rasterize{
-    background: #4E60AA url(../images/icon/smooth.png) no-repeat center;
+    background: #4E60AA url(../assets/icon/smooth.png) no-repeat center;
 }
 .layer_control{
-    background: #4E60AA url(../images/icon/navigation.png) no-repeat center;
+    background: #4E60AA url(../assets/icon/navigation.png) no-repeat center;
 }
 #content .dropdown_menu .btn_container .full_screen{
     width: 32px;
     height: 32px;
-    background: #4E60AA url(../images/icon/fullscreen-symbol.png) no-repeat center center;
+    background: #4E60AA url(../assets/icon/fullscreen-symbol.png) no-repeat center center;
     margin-left: 7px;
 }
 #content .dropdown_menu .btn_container #measure {
     width: 32px;
     height: 32px;
-    background: #4E60AA url(../images/icon/ruler.png) no-repeat center center;
+    background: #4E60AA url(../assets/icon/ruler.png) no-repeat center center;
     margin-left: 7px;
 }
 #content .dropdown_menu .btn_container #t_slider{
     width: 32px;
     height: 32px;
-    background: #4E60AA url(../images/icon/timeslider.png) no-repeat center center;
+    background: #4E60AA url(../assets/icon/timeslider.png) no-repeat center center;
     margin-left: 7px;
 }
 #content .dropdown_menu .btn_container #lupe {
     width: 32px;
     height: 32px;
-    background: #4E60AA url(../images/icon/lupe.png) no-repeat center center;
+    background: #4E60AA url(../assets/icon/lupe.png) no-repeat center center;
     margin-left: 7px;
 }
 #content .dropdown_menu hr {
@@ -696,7 +805,7 @@ Tools
 #content #dropdown_werkzeug #import {
     width: 32px;
     height: 32px;
-    background: #4E60AA url(../images/icon/import.png) no-repeat center center;
+    background: #4E60AA url(../assets/icon/import.png) no-repeat center center;
     margin-left: 7px;
 }
 #content #dropdown_werkzeug #import .leaflet-control-filelayer{
@@ -710,7 +819,7 @@ Tools
 #content .dropdown_menu #vergleich{
     width: 32px;
     height: 32px;
-    background: grey url(../images/icon/split.png) no-repeat center center;
+    background: grey url(../assets/icon/split.png) no-repeat center center;
     margin-left: 7px;
 }
 /*
@@ -771,17 +880,17 @@ color schema
     position:fixed;
     width:60px;
     height:60px;
-    z-index: 10000;
+    z-index: 1000;
     right: 0;
     top: 265px;
     border-top-left-radius: 50px;
     border-bottom-left-radius: 50px;
 }
 .tablebackground{
-    background: #4E60AA url(../images/icon/table-grid.png) no-repeat center;
+    background: #4E60AA url(../assets/icon/table-grid.png) no-repeat center;
 }
 .mapbackground{
-    background: #4E60AA url(../images/icon/germany_32.png) no-repeat center;
+    background: #4E60AA url(../assets/icon/germany_32.png) no-repeat center;
 }
 /*barchart*/
 .chart div {
@@ -1070,7 +1179,7 @@ OGC Dialoge-----------------------------
 }
 .ogc_dialog .ogc_allow .link_container .ogc_info{
     border-radius: 50%;
-    background: #006dcc url(../images/icon/information.png) no-repeat center;
+    background: #006dcc url(../assets/icon/information.png) no-repeat center;
     width:32px;
     height:32px;
     float: right;
@@ -1125,7 +1234,7 @@ Solution fixed headers: https://stackoverflow.com/questions/673153/html-table-wi
 .right_content .table_page_header #interact_div #print_table{
     width: 30px;
     height: 30px;
-    background: white url(../images/icon/print_dark.png) no-repeat center center;
+    background: white url(../assets/icon/print_dark.png) no-repeat center center;
     float: right;
     margin-right: 10px;
     cursor: pointer;
@@ -1133,7 +1242,7 @@ Solution fixed headers: https://stackoverflow.com/questions/673153/html-table-wi
 .right_content  .table_page_header #interact_div #csv_export{
     width: 30px;
     height: 30px;
-    background: white url(../images/icon/csv-down.png) no-repeat center center;
+    background: white url(../assets/icon/csv-down.png) no-repeat center center;
     float: right;
     margin-right: 10px;
     cursor: pointer;
@@ -1167,17 +1276,17 @@ Solution fixed headers: https://stackoverflow.com/questions/673153/html-table-wi
 }
 .right_content .scrollable-area table.tablesorter thead .header:not(.expand)
 {
-    background: white url(../images/icon/bg.gif) no-repeat center right;
+    background: white url(../assets/icon/bg.gif) no-repeat center right;
     padding-right: 20px;
     cursor: pointer;
 }
 .right_content .scrollable-area table.tablesorter thead tr .headerSortUp
 {
-    background-image: url(../images/icon/asc.gif);
+    background-image: url(../assets/icon/asc.gif);
 }
 .right_content .scrollable-area table.tablesorter thead tr .headerSortDown
 {
-    background-image: url(../images/icon/desc.gif);
+    background-image: url(../assets/icon/desc.gif);
 }
 .right_content .scrollable-area table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp
 {
@@ -1261,7 +1370,7 @@ tabelle filtern
 .right_content .filter{
     width: 35px;
     height: 35px;
-    background: white url(../images/icon/filter.png) no-repeat center center;
+    background: white url(../assets/icon/filter.png) no-repeat center center;
     float: right;
     margin-right: 10px;
     cursor: pointer;
@@ -1632,7 +1741,7 @@ print
     width: 95%;
 }
 #print_container .print_map_content .ioer_logo{
-    background-image: url(../images/header.png);
+    background-image: url(../assets/header.png);
     background-repeat: no-repeat;
     background-position: center;
     height: 150px;
@@ -1760,10 +1869,6 @@ print
     .navbar-text{
         display: none;
     }
-    #legende_button{
-        display: block;
-        right: 0;
-    }
     #legende_l{
         display: none;
     }
@@ -1836,5 +1941,8 @@ print
     }
     #scrollable-area{
         width: 100%;
+    }
+    #layer_control .maps .float-right{
+        width:100%;
     }
 }

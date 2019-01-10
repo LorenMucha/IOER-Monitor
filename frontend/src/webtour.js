@@ -12,7 +12,7 @@ const webTour={
             e.preventDefault();
             $('.navbar-collapse').hide();
             object.create();
-            rightView.close();
+            right_view.close();
             object.tour.restart();
         });
     },
@@ -39,11 +39,11 @@ const webTour={
                     content: "Suchen Sie nach passenden Indikatoren und Orten.",
                     onShow:function(){
                         toolbar.open();
-                        highlightElementByID('search');
+                        helper.highlightElementByID('search');
                     },
                     onNext: function(){
-                        resetHighlightElementByID('search');
-                        slideDownElementByID('drop_kat');
+                        resethelper.highlightElementByID('search');
+                        helper.slideDownElementByID('drop_kat');
                     }
                 },
                 {
@@ -57,8 +57,8 @@ const webTour={
                         if(typeof indikatorauswahl.getSelectedIndikator()==='undefined') {
                             indikatorauswahl.setIndicator('S12RG');
                         }
-                        slideUpElementByID('drop_kat');
-                        slideDownElementByID('dropdown_raumgl');
+                        helper.slideUpElementByID('drop_kat');
+                        helper.slideDownElementByID('dropdown_raumgl');
                     }
                 },
                 {
@@ -66,11 +66,11 @@ const webTour={
                     title:"Darstellungsmodus",
                     content: "Wählen Sie den gewünschten Darstellungsmodus der Indikatoren aus.",
                     onShow:function(){
-                        highlightElementByID('spatial_choice');
+                        helper.highlightElementByID('spatial_choice');
 
                     },
                     onNext:function(){
-                        resetHighlightElementByID('spatial_choice');
+                        resethelper.highlightElementByID('spatial_choice');
                     }
                 },
                 {
@@ -78,12 +78,12 @@ const webTour={
                     title: "Räumliche Analyseebene",
                     content: "Gliederung Deutschlands in einzelne Raumeinheiten. (Deren Verfügbarkeit ist vom Indikator abhängig.)",
                     onShow:function(){
-                        highlightElementByID('menu_raumgl');
+                        helper.highlightElementByID('menu_raumgl');
                         raeumliche_analyseebene.setSectionId('bld');
-                        indikatorJSON.init('bld');
+                        indikator_json.init('bld');
                     },
                     onNext: function(){
-                        resetHighlightElementByID('menu_raumgl');
+                        resethelper.highlightElementByID('menu_raumgl');
                     }
                 },
                 {
@@ -91,11 +91,11 @@ const webTour={
                     title: "Gebietsauswahl",
                     content: "Suchen und Wählen Sie bestimmte Gebiete, auch eine Mehrfachauswahl ist möglich.",
                     onShow:function(){
-                        highlightElementByID('dropdown_grenzen_container');
+                        helper.highlightElementByID('dropdown_grenzen_container');
                         $('#dropdown_grenzen_container').dropdown('set selected','12');
                     },
                     onNext: function(){
-                        resetHighlightElementByID('dropdown_grenzen_container');
+                        resethelper.highlightElementByID('dropdown_grenzen_container');
                     }
                 },
                 {
@@ -103,13 +103,13 @@ const webTour={
                     title: "Raumgliederung",
                     content:"Weitere räumliche Unterteilung der getroffenen Gebietsauswahl.",
                     onShow: function(){
-                        highlightElementByID('menu_raumgl_fein');
-                        indikatorJSON.init('krs');
+                        helper.highlightElementByID('menu_raumgl_fein');
+                        indikator_json.init('krs');
                         setTimeout(function(){raumgliederung.setSelectionId('krs')},2000);
                     },
                     onNext: function () {
-                        resetHighlightElementByID('menu_raumgl_fein');
-                        slideUpElementByID('dropdown_raumgl');
+                        resethelper.highlightElementByID('menu_raumgl_fein');
+                        helper.slideUpElementByID('dropdown_raumgl');
                     }
                 },
                 {
@@ -117,10 +117,10 @@ const webTour={
                     title: "Kartengestaltung",
                     content: "Passen Sie die Karte nach Ihren Vorstellungen an.",
                     onShow: function () {
-                        slideDownElementByID('dropdown_layer');
+                        helper.slideDownElementByID('dropdown_layer');
                     },
                     onNext: function () {
-                        slideUpElementByID('dropdown_layer');
+                        helper.slideUpElementByID('dropdown_layer');
                     }
                 },
                 {
@@ -128,10 +128,10 @@ const webTour={
                     title: "Werkzeuge",
                     content: "Tools zum Interagieren mit der Kartenansicht",
                     onShow: function () {
-                        slideDownElementByID('dropdown_werkzeug');
+                        helper.slideDownElementByID('dropdown_werkzeug');
                     },
                     onNext: function () {
-                        slideUpElementByID('dropdown_werkzeug');
+                        helper.slideUpElementByID('dropdown_werkzeug');
                     }
                 },
                 {
@@ -139,10 +139,10 @@ const webTour={
                     title: "Einbinden und Speichern",
                     content: "Binden Sie die Indikatorkarten als INSPIRE-konforme Dienste in Ihr GIS-System ein oder teilen bzw. speichern Sie die aktuell erstellte Karte.",
                     onShow: function () {
-                        slideDownElementByID('dropdown_ogc');
+                        helper.slideDownElementByID('dropdown_ogc');
                     },
                     onNext:function(){
-                        slideUpElementByID('dropdown_ogc');
+                        helper.slideUpElementByID('dropdown_ogc');
                     }
                 },
                 {
@@ -151,7 +151,7 @@ const webTour={
                     placement: "left",
                     content: "Klicken des seitlichen Buttons bewirkt Ein- oder Ausfahren der Tabelle.",
                     onNext:function(){
-                        rightView.open();
+                        right_view.open();
                     }
                 },
                 {
@@ -160,7 +160,7 @@ const webTour={
                     placement: "left",
                     content: "Erweitern Sie die Tabelle individuell um zusätzliche Daten- und Vergleichsspalten.",
                     onNext:function(){
-                        table_expand_panel.fill();
+                        expand_panel.fill();
                         $('#tabelle_erweitern').show("slow");
                     }
                 },
@@ -170,7 +170,7 @@ const webTour={
                     content: "Bestätigen Sie Ihre Auswahl durch Aktualisieren der Tabelle, oder setzen Sie die Auswahl zurück",
                     placement: "left",
                     onNext:function(){
-                        table_expand_panel.close();
+                        expand_panel.close();
                     }
                 },
                 {
@@ -179,10 +179,10 @@ const webTour={
                     content: "Werteübersicht dieser Gebietseinheit für alle Indikatoren (mit Vergleich zu übergeordneten Raumeinheiten und mittleren Grundaktualitäten)",
                     placement: "left",
                     onShown: function(){
-                        highlightElementByID("indikatoren_gebietsprofil12070");
+                        helper.highlightElementByID("indikatoren_gebietsprofil12070");
                     },
                     onNext: function () {
-                        resetHighlightElementByID("indikatoren_gebietsprofil12070")
+                        resethelper.highlightElementByID("indikatoren_gebietsprofil12070")
                     }
                 },
                 {
@@ -191,10 +191,10 @@ const webTour={
                     placement: "left",
                     content: "Lassen Sie sich zusätzliche statistische Kenngrößen zu der jeweiligen Gebietseinheit anzeigen.",
                     onShown: function(){
-                        highlightElementByID("diagramm_ags12070");
+                        helper.highlightElementByID("diagramm_ags12070");
                     },
                     onNext: function () {
-                        resetHighlightElementByID("diagramm_ags12070")
+                        resethelper.highlightElementByID("diagramm_ags12070")
                     }
                 },
                 {
@@ -203,10 +203,10 @@ const webTour={
                     placement: "left",
                     content: "Visualisierung der Indikatorwertentwicklung anhand eines Graphen über die Zeit",
                     onShown: function(){
-                        highlightElementByID("indikatoren_diagramm_ags12070");
+                        helper.highlightElementByID("indikatoren_diagramm_ags12070");
                     },
                     onNext: function () {
-                        resetHighlightElementByID("indikatoren_diagramm_ags12070")
+                        resethelper.highlightElementByID("indikatoren_diagramm_ags12070")
                     }
                 },
                 {
@@ -215,13 +215,13 @@ const webTour={
                     title: "Tabellenansicht verbergen",
                     content: "Schließen Sie die Tabelle um die Karte großflächig zu nutzen und Ladezeiten zu verkürzen.",
                     onShow: function () {
-                        highlightElementByID("close_checker");
+                        helper.highlightElementByID("close_checker");
                         //extent the layer c ontrol with an id to show this element with the tour
                         $('.leaflet-control-layers').attr('id','leaflet-control-layers');
                     },
                     onNext: function () {
-                        resetHighlightElementByID("close_checker");
-                        rightView.close();
+                        resethelper.highlightElementByID("close_checker");
+                        right_view.close();
                         legende.resize();
                     }
                 },

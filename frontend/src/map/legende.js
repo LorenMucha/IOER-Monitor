@@ -33,67 +33,49 @@ const legende = {
         $elem = $('#histogramm_pic');
         return $elem;
     },
-    getWidth:function(){
-      let width = function(){
-          return legende.getDOMObject().find(".legende_content").width();
-      };
-      if(width()==0){
-          this.resize();
-      }
-      return width();
-    },
     open: function(){
-        this.getShowButtonObject().hide();
         this.getDOMObject().show("slow",function(){});
+    },
+    getWidth:function(){
+        let width = 270;
+        if(main_view.getWidth()<=1024){
+            width=200;
+        }
+        return width;
     },
     resize: function(){
         let map_content = $('#mapwrap'),
-            table_container = rightView.getDOMObject(),
-            right_content = $('#rightPane'),
-            leaflet_right_controls = $('.leaflet-right'),
-            width = 270,
-            height = map_content.height()- leaflet_right_controls.height()-100,
+            width = this.getWidth(),
+            height = function(){
+                return map_content.height()*(1/2)
+            },
             close_icon = this.getCloseIconObject(),
-            show_button = this.getShowButtonObject(),
+            show_button_grp = $(".btn-group-map"),
             legende_container = this.getDOMObject();
         //only for Multiview
-        if(viewState.getViewState()==="mw"){
+        if(view_state.getViewState()==="mw"){
             if(table.isOpen()){
-                show_button.css("right", rightView.getWidth()+50);
-                legende_container.css("right",rightView.getWidth()+50);
-                close_icon.css("right",rightView.getWidth()+70);
+                show_button_grp.css("right", right_view.getWidth()+56);
+                legende_container.css("right",right_view.getWidth()+50);
+                close_icon.css("right",right_view.getWidth()+73);
             }else{
-                show_button.css("right", "0px");
+                show_button_grp.css("right", "0px");
                 legende_container.css("right","0px");
                 close_icon.css("right","30px");
                 close_icon.css("right","30px");
             }
-            height = map_content.height()- leaflet_right_controls.height()-180;
         }else{
-            if(mainView.getWidth()<=1024){
-                width=200;
-            }
-            show_button.css("right", "0px");
+            show_button_grp.css("right", "0px");
             legende_container.css("right","0px");
             close_icon.css("right","30px");
             close_icon.css("right","30px");
         }
-        legende_container.css({"max-height":height,"width":width});
+        legende_container.css({"max-height":height(),"width":width});
     },
-    init:function(open){
+    init:function(){
         const legende = this;
         this.resize();
         legende.getShowButtonObject().show();
-        if(legende.getDOMObject().is(':visible')){
-            legende.getShowButtonObject().hide();
-        }
-        if(viewState.getViewState()==="responsive"){
-            legende.getShowButtonObject().css("right","0px").show();
-        }else{
-            if(open) {
-                legende.open();
-            }
-        }
         //set the controller
         legende.controller.set();
     },
@@ -128,7 +110,7 @@ const legende = {
             atkis =  function(){
                 let val = parseInt(info_json['indicators'][indicator_id]["atkis"]);
                 if(val==1){
-                    return " © GeoBasis-DE / BKG ("+getCurrentYear()+")";
+                    return " © GeoBasis-DE / BKG ("+helper.getCurrentYear()+")";
                 }
             };
 
@@ -172,7 +154,7 @@ const legende = {
                         sign = '>';
 
                     if(i===grades.length){sign='';}
-                    legende_colors.append(`<div id="legende_${value_id}" class="legende_line"><i style="background:${farbe}"></i>${sign+ DotToComma(value.min)} - ${DotToComma(value.max)}</div>`);
+                    legende_colors.append(`<div id="legende_${value_id}" class="legende_line"><i style="background:${farbe}"></i>${sign+ helper.dotTocomma(value.min)} - ${helper.dotTocomma(value.max)}</div>`);
                     i +=1;
                 });
 
@@ -218,17 +200,17 @@ const legende = {
       return this.getDOMObject().is(":visible");
     },
     close: function(){
-        let show_button = this.getShowButtonObject(),
+        let show_button = $(".btn-group-map"),
             legende_container = this.getDOMObject();
         legende_container.hide('slow',function(){});
-        if(viewState.getViewState()==='responsive'){
-            show_button.css("right","0px").show();
-        }else{
+        if(view_state.getViewState()!=='responsive'){
             if($('.right_content').is(':visible')) {
-                show_button.css("right", $('#rightPane').width()).show();
+                show_button.css("right", $('#rightPane').width()+6);
             }else{
-                show_button.css("right","0px").show();
+                show_button.css("right","0px");
             }
+        }else{
+            show_button.css("right","0px");
         }
     },
     controller:{
@@ -265,7 +247,6 @@ const legende = {
                       };
                   console.log(legende_width);
                   legende.getDOMObject().css("width", margin());
-                  legende.getShowButtonObject().css("right", margin());
                   if(click_dd===0){
                       datenalter_dd.show();
                       ++click_dd;
@@ -283,18 +264,14 @@ const legende = {
     histogramm:{
         value_array:[],
         x_set:[],
-        getWidth:function(){
-          return legende.getHistogrammObject().width();
-        },
         setHistogrammGebiete:function(){
             //get the classes and color
-            const object = legende.histogramm;
             let grenzen = klassengrenzen.getKlassen(),
                 info_div = $('.hist_info'),
-                ioer_json = indikatorJSON.getJSONFile(),
+                ioer_json = indikator_json.getJSONFile(),
                 max_value = grenzen[(grenzen.length-1)]['max'],
                 min_value = grenzen[0]['min'],
-                diagramm_width = object.getWidth(),
+                diagramm_width = legende.getWidth(),
                 //norm max to zero
                 max_neu = max_value-min_value,
                 //extract the values out of the JSON
@@ -356,10 +333,9 @@ const legende = {
                                 return html;
                             },
                 values_svg = function(){
-                     const object = legende.histogramm;
                     let html = '',
                         diagramm_hoehe = 60,
-                        diagramm_width = object.getWidth(),
+                        diagramm_width = legende.getWidth(),
                         color = '#000000',
                         verteilung = function(){
                             let a = [],

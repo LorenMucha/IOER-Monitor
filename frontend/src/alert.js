@@ -81,7 +81,7 @@ function alertNotinSpatialRange(raumglTXT,selection){
                                 .then(raeumliche_analyseebene.updateParamter(selection))
                                 .then(gebietsauswahl.clear())
                                 .then(raumgliederung.hide())
-                                .then(indikatorJSON.init(selection));
+                                .then(indikator_json.init(selection));
                         }
                     }
                 );
@@ -115,8 +115,8 @@ function alertServerlast(choice){
                 if (isConfirm) {
                     $.when(raeumliche_analyseebene.updateParamter(choice))
                         .then($('#dropdown_datenalter').hide())
-                        .then(indikatorJSON.init())
-                        .then(rightView.close());
+                        .then(indikator_json.init())
+                        .then(right_view.close());
                 }else{
                     $('#'+raeumliche_analyseebene.getSelectionId()+"_raumgl").prop("selected",true);
                 }

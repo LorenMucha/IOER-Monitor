@@ -338,6 +338,20 @@
       "type":"."
     }
   },
+  "btn-group-map": {
+    "legende_button":{
+        "de": "Legende",
+        "en": "Legend",
+        "type": "#",
+        "selector": "span"
+    },
+    "map_button": {
+      "de": "Karten",
+      "en": "Maps",
+      "type": "#",
+      "selector": "span"
+    }
+  },
   "legende":{
       "legende_header":{
         "de":"Legende",

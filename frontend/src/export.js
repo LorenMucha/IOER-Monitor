@@ -2,7 +2,7 @@ var map,
     webatlas,
     satellite,
     layer;
-
+//TODO: umschreiben
 $(function() {
 	$("#kartenlink").click(function(){
 

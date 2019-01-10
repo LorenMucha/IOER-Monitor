@@ -1,7 +1,9 @@
 //init all essential functions
-$(document).ready(function() {
+// The code in this function runs when the page is loaded.
+
+function init() {
+
     //set the Unit test
-    if(!viewState.getUnitTestState()) {
         //load the config data
         $.when($.ajax({
             url:"frontend/data/config.json",
@@ -12,7 +14,7 @@ $(document).ready(function() {
                 config.checkVersion();
             }
         }))
-            //set the menu data
+        //set the menu data
         .then(navbar.init())
         .then(search.init())
         .then(raeumliche_visualisierung.init())
@@ -22,10 +24,11 @@ $(document).ready(function() {
         .then(opacity_slider.init())
         .then(klassifzierung.init())
         .then(klassenanzahl.init())
-        .then(farbliche_darstellungsart.init());
+        .then(farbliche_darstellungsart.init())
+        .then(layer_control.init());
         //set the Views
-        $.when(mainView.restoreView())
-            .then(leftView.setMapView())
+        $.when(main_view.restoreView())
+            .then(left_view.setMapView())
             .then(function () {
                 if (urlparamter.getUrlParameter('rid')) {
                     loadRID(urlparamter.getUrlParameter('rid'));
@@ -33,27 +36,9 @@ $(document).ready(function() {
                 }
                 else if (indikatorauswahl.getSelectedIndikator()) {
                     indikatorauswahl.setIndicator(indikatorauswahl.getSelectedIndikator());
-                    layer_control.init();
                 }
                 else {
-                    mainView.initializeFirstView();
+                    main_view.initializeFirstView();
                 }
             });
-
-    }else {
-        $.when($('body')
-            .append('<div id="qunit"></div>')
-            .find("#Modal")
-            .css("display", "none"))
-            .then($('head').append('<script src="frontend/lib/qunit/qunit-2.6.2.src"></script><link rel="stylesheet" href="frontend/lib/qunit/qunit-2.6.2.css">'))
-            .then(
-                QUnit.test("init map", function (assert) {
-                    assert.equal(raeumliche_visualisierung.init());
-                    assert.equal(farbschema.init());
-                    assert.equal(webTour.init());
-                    assert.equal(opacity_slider.init());
-                    assert.equal(mainView.restoreView());
-                    assert.equal(leftView.setMapView());
-                }));
-    }
-});
+}

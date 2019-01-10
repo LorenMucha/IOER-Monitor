@@ -1,6 +1,6 @@
 $(function(){
     //Tracking
-    if(!viewState.getProductionState()){
+    if(!view_state.getProductionState()){
         var script_google = `<!-- Global site tag (gtag.js) - Google Analytics -->
                                 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-112688592-1"></script>
                                 <script>

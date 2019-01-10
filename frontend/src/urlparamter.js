@@ -60,7 +60,7 @@ const urlparamter={
 
     },
     getURL_SVG:function(){
-        if(viewState.getProductionState()){
+        if(view_state.getProductionState()){
             return "https://monitor.ioer.de/monitor_test/";
         }else{
             return "https://monitor.ioer.de/";

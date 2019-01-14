@@ -9,12 +9,13 @@ const script_loader={
         "frontend/lib/jquery/plugin/jquery.splitter.js",
         "frontend/lib/jquery/plugin/jquery.tabletoCSV.js",
         "frontend/lib/jquery/plugin/he.js",
+        //spectrum
+        "frontend/lib/spectrum/spectrum.js",
         //Bootsrap
         "frontend/lib/bootstrap/bootstrap.min.js",
         "frontend/lib/bootstrap-tour/bootstrap-tour-standalone.js",
         "frontend/lib/bootstrap/bootstrapvalidator.min.js",
         //JQuery UI
-        "frontend/lib/jquery/jquery-ui.min.js",
         "frontend/lib/jquery/jquery.ui.touch-punch.js",
         "frontend/lib/jquery/jquery-ui-slider-pips.min.js",
         //underscore
@@ -22,7 +23,6 @@ const script_loader={
         //leaflet plugins
         "frontend/lib/leaflet/plugin/cloneLayer.js",
         "frontend/lib/leaflet/plugin/TileLayer.Grayscale.js",
-        "frontend/lib/leaflet/plugin/leaflet-measure.js",
         "frontend/lib/leaflet/plugin/L.Control.ZoomBox.js",
         "frontend/lib/leaflet/plugin/leaflet.magnifyingglass.js",
         "frontend/lib/leaflet/plugin/leaflet-side-by-side.js",
@@ -46,7 +46,9 @@ const script_loader={
         "frontend/lib/export/jspdf.min.js",
         "frontend/lib/export/html2canvas.js",
         "frontend/lib/export/html2pdf.bundle.min.js",
-        //monitor src
+        //monitor src--------------------------------
+        "frontend/src/language_manager.js",
+        "frontend/src/urlparamter.js",
         //view
         "frontend/src/view/panner.js",
         "frontend/src/view/progressbar.js",
@@ -58,7 +60,6 @@ const script_loader={
         "frontend/src/models/styles.js",
         "frontend/src/models/klassengrenzen.js",
         "frontend/src/models/error_code.js",
-        "frontend/src/models/farbschema.js",
         "frontend/src/models/pips.js",
         "frontend/src/models/view_state.js",
         //menu
@@ -72,20 +73,29 @@ const script_loader={
         "frontend/src/menu/klassenanzahl.js",
         "frontend/src/menu/farbliche_darstellungsart.js",
         "frontend/src/menu/navbar.js",
+        "frontend/src/menu/farbschema.js",
         //map
         "frontend/src/map/layer_control.js",
+        "frontend/src/map/map_controller.js",
         "frontend/src/map/indikator_json.js",
+        "frontend/src/map/indikator_raster.js",
         "frontend/src/map/indikator_json_group.js",
         "frontend/src/map/indikator_raster_group.js",
         "frontend/src/map/grundakt_layer.js",
         "frontend/src/map/start_map.js",
         "frontend/src/map/map_header.js",
-        "frontend/src/map/map.js",
         "frontend/src/map/legende.js",
         "frontend/src/map/map_reset.js",
         "frontend/src/map/map_infos.js",
-        "frontend/src/map/manipulate/glaetten.js",
-        "frontend/src/map/manipulate/raster_split.js",
+        //map tool
+        "frontend/src/map/tools/lupe.js",
+        "frontend/src/map/tools/measurement.js",
+        "frontend/src/map/tools/glaetten.js",
+        "frontend/src/map/tools/raster_split.js",
+        "frontend/src/map/tools/zoom_in.js",
+        "frontend/src/map/tools/zoom_out.js",
+        "frontend/src/map/tools/file_loader.js",
+        "frontend/src/map/tools/center_map.js",
         //table
         "frontend/src/table/table.js",
         "frontend/src/table/expand_panel.js",
@@ -104,8 +114,6 @@ const script_loader={
         //TODO: needs to be removed if Reini is finished
         "frontend/src/dialog/dialog.js",
         //other elements
-        "frontend/src/language_manager.js",
-        "frontend/src/urlparamter.js",
         "frontend/src/ajax.js",
         "frontend/src/config.js",
         "frontend/src/helper.js",
@@ -116,14 +124,87 @@ const script_loader={
     ],
     include:function() {
         const loader = this;
-        $.each(loader.scripts, function (key, value) {
+        $.getMultiScripts = function(arr) {
+            var _arr = $.map(arr, function(scr) {
+                return $.getScript(  scr );
+            });
 
-            var s = document.createElement("script");
-            s.type = "text/javascript";
-            s.src = value;
-            // Use any selector
-            $("body").append(s);
+            _arr.push($.Deferred(function( deferred ){
+                $( deferred.resolve );
+            }));
+
+            return $.when.apply($, _arr);
+        };
+
+        $.getMultiScripts(loader.scripts).done(function() {
+            try {
+                script_loader.init.call(this);
+            }catch(err){
+                console.log(err);
+                /*setTimeout(function(){
+                    history.go(0);
+                },500);*/
+            }
+
         });
-        init.call(this);
+    },
+    init:function() {
+        //set the Unit test
+        if(!view_state.getUnitTestState()) {
+            //load the config data
+            $.when($.ajax({
+                async:true,
+                url:"frontend/data/config.json",
+                dataType:"json",
+                cache:false,
+                success:function(data){
+                    config.setData(data);
+                    config.checkVersion();
+                }
+            }))
+            //set the menu data
+                .then(toolbar.init())
+                .then(map_controller.set())
+                .then(navbar.init())
+                .then(search.init())
+                .then(raeumliche_visualisierung.init())
+                .then(webTour.init())
+                .then(opacity_slider.init())
+                .then(klassifzierung.init())
+                .then(klassenanzahl.init())
+                .then(farbliche_darstellungsart.init());
+            //set the Views
+            $.when(main_view.restoreView())
+                .then(left_view.setMapView())
+                .then(function () {
+                    if (urlparamter.getUrlParameter('rid')) {
+                        loadRID(urlparamter.getUrlParameter('rid'));
+                        return false;
+                    }
+                    else if (indikatorauswahl.getSelectedIndikator()) {
+                        indikatorauswahl.setIndicator(indikatorauswahl.getSelectedIndikator());
+                        layer_control.init();
+                    }
+                    else {
+                        main_view.initializeFirstView();
+                    }
+                })
+                .then(farbschema.init());
+        }else{
+            $.when($('body')
+                .append('<div id="qunit"></div>')
+                .find("#Modal")
+                .css("display", "none"))
+                .then($('head').append('<script src="frontend/lib/qunit/qunit-2.6.2.js"></script><link rel="stylesheet" href="frontend/lib/qunit/qunit-2.6.2.css">'))
+                .then(
+                    QUnit.test("init map", function (assert) {
+                        assert.equal(raeumliche_visualisierung.init());
+                        assert.equal(farbschema.init());
+                        assert.equal(webTour.init());
+                        assert.equal(opacity_slider.init());
+                        assert.equal(main_view.restoreView());
+                        assert.equal(left_view.setMapView());
+                    }));
+        }
     }
 };

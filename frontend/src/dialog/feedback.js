@@ -146,6 +146,7 @@ const feedback={
                 url = 'https://monitor.ioer.de/monitor_api/email/';
 
             $.ajax({
+                async:true,
                 type: 'GET',
                 url: url,
                 data: {

@@ -106,16 +106,12 @@ const legende = {
                 }
                 return tag;
             },
-            datengrundlage = info_json['indicators'][indicator_id][("datengrundlage"+language_tag())],
-            atkis =  function(){
-                let val = parseInt(info_json['indicators'][indicator_id]["atkis"]);
-                if(val==1){
-                    return " © GeoBasis-DE / BKG ("+helper.getCurrentYear()+")";
-                }
-            };
+            datengrundlage = info_json['indicators'][indicator_id][("datengrundlage"+language_tag())];
 
-        indikator_info_container.text( info_json['indicators'][indicator_id][("info"+language_tag())]);
-        datengrundlage_container.html(datengrundlage + atkis());
+            indikator_info_container.text( info_json['indicators'][indicator_id][("info"+language_tag())]);
+            datengrundlage_container.html(`© GeoBasis-DE / BKG (${helper.getCurrentYear()})
+                                                    <br/>
+                                                ${datengrundlage}`);
         if (einheit.length<=0) {
             einheit_container.hide();
         } else {
@@ -395,6 +391,7 @@ const legende = {
         },
         setHistogrammRaster:function(){
             $.ajax({
+                async:true,
                 type:"GET",
                 url :urlparamter.getURL_RASTER() + "php/histogramm.php?Jahr=" + zeit_slider.getTimeSet() + "&Kategorie=" + indikatorauswahl.getSelectedIndikatorKategorie() + "&Indikator=" + indikatorauswahl.getSelectedIndikator() + "&Raumgliederung=" + raeumliche_analyseebene.getSelectionId() + "&Klassifizierung=" + klassifzierung.getSelectionId() + "&AnzKlassen=" + klassenanzahl.getSelection(),
                 success:function(data){

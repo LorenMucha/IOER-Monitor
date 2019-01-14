@@ -20,9 +20,9 @@ class SEARCH{
     }
     private function queryIndicator(){
         $JSON = '';
-        $sql="SELECT i.INDIKATOR_NAME as name, i.ID_INDIKATOR as id, i.EINHEIT as unit, i.ID_THEMA_KAT as id_cat, k.THEMA_KAT_NAME as cat_name,
+        $sql="SELECT i.INDIKATOR_NAME as name, i.INDIKATOR_NAME_EN as name_en, i.ID_INDIKATOR as id, i.EINHEIT as unit, i.ID_THEMA_KAT as id_cat, k.THEMA_KAT_NAME as cat_name,k.THEMA_KAT_NAME_EN as cat_name_en,
               i.METHODIK as methodik, i.BEDEUTUNG_INTERPRETATION as bedeutung, i.DATENGRUNDLAGE_ZEILE_1 as daten1,i.DATENGRUNDLAGE_ZEILE_2 as daten2,
-              i.INFO_VIEWER_ZEILE_1 as info1,i.INFO_VIEWER_ZEILE_2 as info2
+              i.INFO_VIEWER_ZEILE_1 as info1,i.INFO_VIEWER_ZEILE_2 as info2 
             FROM m_indikatoren i, m_indikator_freigabe f, m_thematische_kategorien k
             WHERE f.ID_INDIKATOR = i.ID_Indikator
             AND f.STATUS_INDIKATOR_FREIGABE =3
@@ -34,7 +34,9 @@ class SEARCH{
         foreach($indObject as $key=>$row){
             //search inside indicators
               if(strpos(strtolower($row->name),$q)!==false
-                  //or strpos(strtolower($row->cat_name),$q)!==false
+                  or strpos(strtolower($row->name_en),$q)!==false
+                  or strpos(strtolower($row->cat_name),$q)!==false
+                  or strpos(strtolower($row->cat_name_en),$q)!==false
                   or strpos(strtolower($row->methodik),$q)!==false
                   or strpos(strtolower($row->bedeutung),$q)!==false
                   or strpos(strtolower($row->daten1),$q)!==false

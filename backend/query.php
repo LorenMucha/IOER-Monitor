@@ -169,13 +169,6 @@ try{
             );
         echo json_encode($array);
     }
-    //get the color Range for a given count
-    else if ($query=="getcolorschema"){
-        $min = $colors->min;
-        $max = $colors->max;
-        $color_range = COLORS::get_instance()->buildColorPalette($klassenanzahl,$min,$max);
-        echo json_encode($color_range);
-    }
     //counte the amount of geometries, which will be generated
     else if($query=="countgeometries"){
         $count = POSTGRESQL_TASKRESPOSITORY::get_instance()->countGeometries($year,$raumgliederung,$ags_array);
@@ -219,16 +212,24 @@ try{
         $ags =$json_obj['ind']['ags'];
         $values=MYSQL_TASKREPOSITORY::get_instance()->getAllIndicatorValuesInAGS($year,$ags,true,true);
         $keys = array();
-        foreach(MYSQL_TASKREPOSITORY::get_instance()->getAllCategoriesGebiete() as $k){array_push($keys,$k->ID_THEMA_KAT);}
-        $result = array_fill_keys($keys,array());
-        //foreach($result as $value)
-        foreach($result as $key=>$value){
+        $result = array();
+        foreach(MYSQL_TASKREPOSITORY::get_instance()->getAllCategoriesGebiete() as $k){array_push($keys,array("cat_id"=>$k->ID_THEMA_KAT,"cat_name"=>$k->THEMA_KAT_NAME,"cat_name_en"=>$k->THEMA_KAT_NAME_EN));}
+        //create the cat keys
+        foreach($keys as $key=>$val){
+            $res = array();
             foreach($values as $v){
-                if($key==$v->category){
+                if($val["cat_id"]==$v->category){
                     unset($v->category);
-                    $result[$key][] = $v;
+                   array_push($res,$v);
                 }
             }
+            array_push($result,array(
+                $val["cat_id"]=>array(
+                    "cat_name"=>$val["cat_name"],
+                    "car_name_en"=>$val["cat_name_en"],
+                    "values"=>$res
+                )
+            ));
         }
         echo json_encode($result);
     }

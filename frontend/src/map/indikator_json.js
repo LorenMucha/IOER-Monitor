@@ -101,7 +101,7 @@ const indikator_json = {
         if($('.right_content').is(":hidden")){
             progressbar.remove();
         }
-        if(layer_control.zusatzlayer.getState()){layer_control.zusatzlayer.setForward()};
+        if(layer_control.zusatzlayer.getState()){layer_control.zusatzlayer.setForward()}
     },
     setPopUp:function(e){
         let text={

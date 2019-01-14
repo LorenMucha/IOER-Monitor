@@ -8,28 +8,29 @@ const layer_control={
           grund:"Grundkarten",
           extra:"Zusatzkarten",
           empty:"kein Hintergrund",
-          laender:"Ländergrenzen",
-          kreis:"Kreisgrenzen",
-          gemeinde:"Gemeindegrenzen",
+          laendergrenzen:"Ländergrenzen",
+          kreisgrenzen:"Kreisgrenzen",
+          gemeindegrenzen:"Gemeindegrenzen",
           autobahn:"Autobahnnetz (Stand 2015)",
-          bahn:"Fernbahnnetz (Stand 2016)",
-          wasser:"Gewässer"
+          fernbahnnetz:"Fernbahnnetz (Stand 2016)",
+          gewaesser:"Gewässer"
       },
       en:{
           title:"Maps",
           grund:"Base Maps",
           extra:"Extra Maps",
           empty:"no Background",
-          laender:"National borders",
-          kreis:"District boundaries",
-          gemeinde:"Municipal boundaries",
+          laendergrenzen:"National borders",
+          kreisgrenzen:"District boundaries",
+          gemeindegrenzen:"Municipal boundaries",
           autobahn:"Autobahn network (as of 2015)",
-          bahn:"Long-distance railway network (as of 2016)",
-          wasser:"Waters"
+          fernbahnnetz:"Long-distance railway network (as of 2016)",
+          gewaesser:"Waters"
       }
     },
     baselayer:{
         paramter:'baselayer',
+        layer_set: "",
         baselayer_sw:{
             topplus:L.tileLayer.wms('https://sgx.geodatenzentrum.de/wms_topplus_web_open', {
                 layers: 'web_grau',
@@ -128,7 +129,10 @@ const layer_control={
         getAllBaseLayers:function(){
             return $.extend({},this.baselayer_sw,this.baselayer_rgb);
         },
-        getBaseLayers_set:function(){
+        getBaseLayer:function(){
+            return this.layer_set;
+        },
+        getBaseLayerGroup_set:function(){
             if(opacity_slider.getOpacity()==0){
                 layer_control.state='rgb';
                 return this.getBaseLayers_rgb();
@@ -266,29 +270,29 @@ const layer_control={
                         <div class="float-left">
                             <div id="laendergrenzen" class="image-content cursor overlay" data-id="laendergrenzen">
                                 <div class="pic extra-image"></div>
-                                <div class="name">Ländergrenzen</div>
+                                <div class="name">${this.text[lan].laendergrenzen}</div>
                             </div>
                             <div id="kreisgrenzen" class="image-content cursor overlay" data-id="kreisgrenzen">
                                 <div class="pic extra-image"></div>
-                                <div class="name">Kreisgrenzen</div>
+                                <div class="name">${this.text[lan].kreisgrenzen}</div>
                             </div>
                             <div id="gemeindegrenzen" class="image-content cursor overlay" data-id="gemeindegrenzen">
                                 <div class="pic extra-image"></div>
-                                <div class="name">Gemeindegrenzen</div>
+                                <div class="name">${this.text[lan].gemeindegrenzen}</div>
                             </div>
                         </div>
                         <div class="float-right">
                             <div id="autobahn" class="image-content overlay cursor" data-id="autobahn">
                                 <div class="pic extra-image"></div>
-                                <div class="name">Autobahnnetz (Stand 2015)</div>
+                                <div class="name">${this.text[lan].autobahn}</div>
                             </div>
                              <div id="fernbahnnetz" class="image-content overlay cursor" data-id="fernbahnnetz">
                                 <div class="pic extra-image"></div>
-                                <div class="name">Fernbahnnetz (Stand 2016)</div>
+                                <div class="name">${this.text[lan].fernbahnnetz}</div>
                             </div>
                             <div id="gewaesser" class="image-content overlay cursor" data-id="gewaesser">
                                 <div class="pic extra-image"></div>
-                                <div class="name">Gewässer</div>
+                                <div class="name">${this.text[lan].gewaesser}</div>
                             </div>
                         </div>
                     </div>
@@ -317,8 +321,9 @@ const layer_control={
         this.controller.set();
         //set the baselayer
         if (controller.baselayer.getParameter()) {
-            $.each(controller.baselayer.getBaseLayers_set(), function (key, value) {
+            $.each(controller.baselayer.getBaseLayerGroup_set(), function (key, value) {
                 if (controller.baselayer.getParameter().indexOf(value.options.name) >= 0) {
+                    controller.baselayer.layer_set = value;
                     value.addTo(map);
                 }
             });
@@ -358,8 +363,9 @@ const layer_control={
                 });
         },
         setBaselayer:function(_id){
-            $.each(layer_control.baselayer.getBaseLayers_set(), function (key, value) {
+            $.each(layer_control.baselayer.getBaseLayerGroup_set(), function (key, value) {
                 if (_id.indexOf(value.options.name) >= 0) {
+                    layer_control.baselayer.layer_set = value;
                     value.addTo(map);
                     value.bringToBack();
                     layer_control.baselayer.updateParamter(_id);
@@ -375,27 +381,23 @@ const layer_control={
             if(time >= 2016){
                 time = 2015;
             }
-
+            dialog_manager.close();
             progressbar.init();
-            progressbar.setHeaderText("Lade layer");
+            progressbar.setHeaderText("Lade Layer");
 
             $.when(request_manager.getZusatzlayer(_id)).done(function(json){
                 let layer = control.zusatzlayer[_id],
-                    name = function(){
-                        $('.overlay').each(function(){
-                           if($(this).data("id")===_id){
-                               return $(this).find(".name").text();
-                           }
-                        });
-                    };
+                    lan= language_manager.getLanguage(),
+                    name = control.text[lan][_id];
                 layer.addData(json);
                 layer.setStyle(style[_id]);
-                legende.getLegendeColorsObject().append('<div class="zusatzlayer"><div style="border-bottom: 3px solid '+style[_id].color+';"></div>'+name()+'</div>');
+                //add a legend entry
+                legende.getLegendeColorsObject().append(`<div class="zusatzlayer" id="zusatz_${_id}"><div style="border-bottom: 3px solid ${style[_id].color};"></div>${name}</div>`);
                 control.zusatzlayer.getLayerGroup_set().addLayer(layer);
                 control.zusatzlayer.setParameter();
                 layer.addTo(map);
                 control.zusatzlayer.setForward();
-                progressbar.remove(dialog_manager.close());
+                progressbar.remove();
             });
         },
         removeOverlay:function(_id){
@@ -406,6 +408,8 @@ const layer_control={
                    layer_control.zusatzlayer.overlays_set.removeLayer(layer);
                    dialog_manager.close();
                    layer_control.zusatzlayer.updateParamter();
+                   //remove from elend
+                   $(`#zusatz_${_id}`).remove();
                }
             });
         }

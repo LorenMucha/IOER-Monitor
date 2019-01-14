@@ -13,6 +13,7 @@ function openGebietsprofil(ags,name){
             $detachedChildren.appendTo($dialogContainer);
             $('.ui-widget-overlay').addClass('custom-overlay');
             $.ajax({
+                async:true,
                 url: "backend/dialog/gebietsprofil.php",
                 type: "GET",
                 dataType: "html",

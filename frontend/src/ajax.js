@@ -1,4 +1,3 @@
-let url_backend = urlparamter.getURL_SVG()+"backend";
 const request_manager={
     call:false,
     url_backend:urlparamter.getURL_SVG()+"backend/query.php",
@@ -58,15 +57,6 @@ const request_manager={
             '"},"query":"getSpatialExtend"}');
         return this.makeRequest({"file":json,"query":"getRaumgliederung","type":"POST","debug":false});
     },
-    //get colors to give the user the possibility to manipulate the color of the indicator map
-     getColorSchema:function(color_array){
-        const manager = this;
-        let json = JSON.parse('{"ind":{"klassenzahl":"'+klassenanzahl.getSelection()+
-                                    '","colors":{"max":"'+color_array[0]+
-                                        '","min":"'+color_array[1]+
-                                        '"}},"query":"getColorSchema"}');
-         return manager.makeRequest({"file":json,"query":"getColorSchema","type":"POST","debug":false});
-    },
     //get the sum of geometries to show them inside the loading bar
     getCountGeometries:function(raumgliederung){
         let json = JSON.parse('{"ind":{"klassenzahl":"'+klassenanzahl.getSelection()+'","time":"'+zeit_slider.getTimeSet()+
@@ -90,8 +80,6 @@ const request_manager={
         }
         let json = JSON.parse('{"ind":{"id":"'+indikatorauswahl.getSelectedIndikator()+'","time":"'+zeit_slider.getTimeSet()+
             '","raumgliederung":"'+raumgliederung_set+'"},"expand_values":'+JSON.stringify(expand_values)+',"ags_array":'+JSON.stringify(ags_set)+',"query":"getTableExpandValues"}');
-        console.log('{"ind":{"id":"'+indikatorauswahl.getSelectedIndikator()+'","time":"'+zeit_slider.getTimeSet()+
-            '","raumgliederung":"'+raumgliederung_set+'"},"expand_values":'+JSON.stringify(expand_values)+',"ags_array":'+JSON.stringify(ags_set)+',"query":"getTableExpandValues"}');
         return this.makeRequest({"file":json,"query":"getTableExpandValues","type":"POST","debug":false});
     },
     getTrendValues:function(indicator_id,ags,settings){
@@ -102,6 +90,7 @@ const request_manager={
     makeRequest:function(json){
         const manager = this;
         this.call= $.ajax({
+            async: true,
             type: json.type,
             url: manager.url_backend,
             data: {
@@ -133,6 +122,7 @@ const request_manager={
 //Todo noch umschreiben auf den neuen Mapserver
 function getRasterMap(time,ind,_raumgliederung,klassifizierung,klassenanzahl,darstellung_map,_seite){
     return $.ajax({
+        async:true,
         type: "GET",
         url: urlparamter.getURL_RASTER()+"php/map/create_raster.php",
         cache: false,
@@ -157,7 +147,8 @@ function getStatistik(ags, name, wert){
         raumgliederung_txt = raumgliederung.getSelectionText();
     }
     return $.ajax({
-        url: url_backend+"/dialog/statistik.php",
+        async:true,
+        url: urlparamter.getURL_SVG()+"backend/dialog/statistik.php",
         type: "POST",
         data: {
             ags: ags,

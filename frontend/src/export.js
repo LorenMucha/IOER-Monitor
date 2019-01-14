@@ -15,6 +15,7 @@ $(function() {
 	    var parameters = urlparamter.getAllUrlParameter();
 
 		$.ajax({
+            async:true,
 			type: 'GET',
 			url:  'backend/link.php',
 			data: {
@@ -57,6 +58,7 @@ $(function() {
 function loadRID(rid){
     var link = rid;
     $.ajax({
+        async:true,
         type: 'GET',
         url: 'backend/link.php',
         data: {
@@ -284,6 +286,7 @@ $(function map_export(){
                                         let image = $(this);
                                         let src = image.attr("src");
                                         $.ajax({
+                                            async:true,
                                             url: urlparamter.getURL_RASTER() + "backend/export_image.php",
                                             data: {
                                                 path: src

@@ -1,3 +1,10 @@
+//leave function
+function alertLeafveFunction(){
+    swal({
+        title: "Verlassen Sie die Funktion mit ESC",
+        timer: 1000
+    });
+}
 //no indicator chosen
 function alertUpdate(version){
     swal({

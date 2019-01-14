@@ -1,6 +1,6 @@
 const main_view = {
     splitter:'',
-    splitter_width:null,
+    splitter_width:false,
     initializeFirstView:function(){
         map_infos.hide();
         start_map.set();
@@ -22,9 +22,8 @@ const main_view = {
 
     },
     setSplitter:function(){
-        const object = this;
         //QUELLLE: https://github.com/jcubic/jquery.splitter
-        object.splitter = $('#mapwrap')
+        this.splitter = $('#mapwrap')
             .height('100%')
             .split({
                 orientation: 'vertical',
@@ -42,15 +41,14 @@ const main_view = {
             });
     },
     resizeSplitter:function(_width){
-        const object = this;
         if(view_state.getViewState()==='mw') {
-            let width = (object.getWidth()-_width),
-                min_width = (object.getWidth()-450);
+            let width = (this.getWidth()-_width),
+                min_width = (this.getWidth()-450);
 
             if(width >= min_width){
                 width= min_width;
             }
-            object.splitter.position(width);
+            this.splitter.position(width);
             if(table.isExpand()){
                 legende.close();
             }
@@ -69,21 +67,21 @@ const main_view = {
             //divider
             object.setSplitter();
             //set the splitter position
-            if(object.splitter_width==null) {
+            if(!this.splitter_width || this.splitter_width.indexOf('undefined')) {
                 if (width <= 1024) {
-                    object.splitter.position(width / 2);
+                    this.splitter.position(width / 2);
                     $('.indikator_header').css("right", "20%");
                     $('#legende').css({"right": $('#rightPane').width() + 10, 'display': ''}).hide();
                     $('#legende_close').css("right", $('#rightPane').width() + 30);
                     $('#legende_button').css("right", $('#rightPane').width()).show();
                 }
                 else {
-                    object.splitter.position(45 + width / 100 + "%");
+                    this.splitter.position(45 + width / 100 + "%");
                     $('#legende').css({"right": $('#rightPane').width() + 10, 'display': ''});
                     $('#legende_close').css("right", $('#rightPane').width() + 30);
                 }
             }else{
-                object.splitter.position(splitter_width);
+                this.splitter.position(splitter_width);
             }
 
             object.splitter_width = $('.vsplitter').css('left');

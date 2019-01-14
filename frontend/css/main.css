@@ -14,7 +14,7 @@
 @import url("../lib/semanticUi/semantic.min.css");
 @import url("../lib/d3/animate.min.css");
 @import url("../lib/sweetalert/sweetalert.css");
-@import url("../lib/qunit/qunit-2.6.2.css");
+@import url("../lib/spectrum/spectrum.css");
 
 :root{
     --main-color:#4E60AA;
@@ -40,6 +40,9 @@ body {
 }
 .cursor{
     cursor:pointer;
+}
+.float-right{
+    float: right !important;
 }
 /*JQuery Dialog*/
 .ui-widget-overlay.custom-overlay
@@ -608,11 +611,12 @@ Toolbar.js
     transform: rotate(45deg);
     color: #8CB91B;
 }
-#content .btn-primary {
+#content .btn-primary:not(.secondary) {
     width: 100%;
     color: white;
     margin-bottom: 1em;
 }
+
 #content .dropdown_menu .dropdown_menu-toggle {
     background-color: white;
     color:grey;

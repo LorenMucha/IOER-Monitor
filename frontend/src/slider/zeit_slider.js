@@ -49,7 +49,6 @@ const zeit_slider={
 
         //initializeFirstView the slider by given values
         slider
-            .unbind()
             .slider({
                 orientation: "horizontal",
                 min: 0,

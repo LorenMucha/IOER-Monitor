@@ -11,6 +11,12 @@ const klassengrenzen = {
         return Math.min.apply(Math, this.klassen.map(function (o) {
             return o.min;}));
     },
+    getMinColor:function(){
+        return this.klassen[0].color;
+    },
+    getMaxColor:function(){
+        return this.klassen[(this.klassen.length-1)].color;
+    },
     getColor:function(layer_value){
         let klassenJson = this.getKlassen(),
             obergrenze_max = this.getMax(),

@@ -234,6 +234,7 @@ const table = {
     append:function(html_string){
         this.getScrollableAreaDOMObject().append(html_string);
     },
+    /*This function creates the table export*/
     expand:function(){
         const table = this;
         let grey_border = 'grey_border',
@@ -246,7 +247,7 @@ const table = {
             footer_brd = $('#tfoot_99'),
             def = $.Deferred();
 
-        //reset the colspa
+        //reset the colspan to originial
         if(!indikatorauswahl.getSelectedIndiktorGrundaktState()){table.setColspanHeader(4);}
 
         function defCalls(){
@@ -368,28 +369,28 @@ const table = {
                         td_diff ='<th class="'+class_expand+' header">Differenz ('+time_set+' bis '+zeit_slider.getTimeSet()+')</th>';
                     }
                     //append the header
-                    first_header_row.append('<th colspan="'+(colspan+x)+'" class="'+grey_border+' '+class_expand+' sorter-false expand">'+name+'</th>');
-                    second_header_row.append('<th class="'+grey_border+' '+class_expand+' header">'+$('#tabel_header_raumgl').text()+'</th>'+td_grund+td_diff);
+                    first_header_row.append(`<th colspan="${(colspan+x)}" class="${grey_border} ${class_expand} sorter-false expand">${name}</th>`);
+                    second_header_row.append(`<th class="${grey_border} ${class_expand} header">${$('#tabel_header_raumgl').text()}</th>${td_grund+td_diff}`);
 
                     //append the body
                     $.each(values_expand.values,function(key,value_json) {
                         table_body.find('tr').each(function () {
                             let grundakt_val = '';
                             if($(this).attr("id")===key){
-                                $(this).append('<td class="val-ags '+grey_border+' '+class_expand+'">'+value_json.value_round+'</td>');
+                                $(this).append(`<td class="val-ags ${grey_border} ${class_expand}">${value_json.value_round}</td>`);
                                 //if possible append the grundakt
                                 if(indikatorauswahl.getSelectedIndiktorGrundaktState()) {
                                     grundakt_val = value_json.grundakt;
                                     let values_set = grundakt_val.split("/");
                                     let values_ind = $(this).find('.val-grundakt').text().split("/");
-                                    $(this).append('<td class="val-grundakt '+class_expand+'">'+grundakt_val+'</td><td class="val-grundakt '+class_expand+'">'+getDiff_Grundakt(values_ind,values_set)+'</td>');
+                                    $(this).append(`<td class="val-grundakt ${class_expand}">${grundakt_val}</td><td class="val-grundakt ${class_expand}">${getDiff_Grundakt(values_ind,values_set)}</td>`);
                                 }
                                 //apend the differences if set
                                 if(expand_panel.getDifferenceState()){
                                     //create the difference view
                                     let value_ind = parseFloat((value_json.value_round).replace(',', '.'));
                                     let value_ags = parseFloat($(this).find('.val-ags').find('b').text().replace(',', '.'));
-                                    $(this).append('<td class="'+class_expand+'" data-sort-value="'+getDifferenceValue(value_ind,value_ags)+'">'+getDifferenceDiv(value_ind,value_ags)+'</td>');
+                                    $(this).append(`<td class="${class_expand}" data-sort-value="${getDifferenceValue(value_ind,value_ags)}">${getDifferenceDiv(value_ind,value_ags)}</td>`);
                                 }
                             }
                         });
@@ -414,7 +415,7 @@ const table = {
                             let grundakt = data_array['values']['99']['grundakt'];
                             let value_brd_set = grundakt.split("/");
                             $('#expand_grundakt_footer_99').text(grundakt);
-                            $('#expand_grundakt_footer_diff_99').text(getDiff_Grundakt(value_ind_brd,value_brd_set));
+                            $('#expand_grundakt_footer_diff_99').html(getDiff_Grundakt(value_ind_brd,value_brd_set));
                         }
                         if(expand_panel.getDifferenceState()){
                             //create the difference view
@@ -449,7 +450,7 @@ const table = {
                                     let value_brd_set = grundakt.split("/");
                                     //add the data to the appended value
                                     $('#expand_grundakt_footer'+value).text(grundakt);
-                                    $('#expand_grundakt_footer_diff'+value).text(getDiff_Grundakt(value_ind_bld,value_brd_set));
+                                    $('#expand_grundakt_footer_diff'+value).html(getDiff_Grundakt(value_ind_bld,value_brd_set));
                                 }
                                 if(expand_panel.getDifferenceState()){
                                     //create the difference view
@@ -560,7 +561,7 @@ const table = {
         }
         //get only the difference Value for data sorting
         function getDifferenceValue(value_ind,value_ags){
-            return (value_ags-value_ind).toFixed(2);
+               return (value_ags-value_ind).toFixed(2);
         }
         //function to create the difference div, value ind = expand value
         function getDifferenceDiv(value_ind,value_ags){
@@ -576,13 +577,15 @@ const table = {
         }
         //get the dufference between the year's
         function getDiff_Grundakt(values_ind,values_set){
-            let date_set = new Date(parseFloat(values_set[1]),parseFloat(values_set[0])),
-                date_ind = new Date(parseFloat(values_ind[1]),parseFloat(values_ind[0])),
+            //create the Date object Date(year,months)
+            let date_set = new Date(parseFloat(values_set[0]),parseFloat(values_set[1])),
+                date_ind = new Date(parseFloat(values_ind[0]),parseFloat(values_ind[1])),
                 //solution to calc the difference from http://www.splessons.com/how-do-i-find-the-difference-between-two-dates-using-jquery/
                 diff_date = date_ind - date_set,
                 years = Math.floor(diff_date/31536000000),
                 months = Math.floor((diff_date % 31536000000)/2628000000);
-            return (years-(months/12)).toFixed(1).toString().replace('.',',');
+            return `${years} <b>Jahr(e)</b><br/>${months} <b>Monat(e)</b>`;
+            //return (years-(months/12)).toFixed(1).toString().replace('.',',');
         }
     },
     setExpandState:function(_state){

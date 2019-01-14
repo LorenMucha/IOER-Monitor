@@ -59,6 +59,7 @@ const grundakt_layer = {
             } else if(raeumliche_visualisierung.getRaeumlicheGliederung()==='raster'){
                 helper.enableElement('#datenalter', 'Zeige die Karte des Datenalters an.');
                 $.ajax({
+                    async:true,
                     type: "GET",
                     url: urlparamter.getURL_RASTER() + 'php/datenalter.php',
                     data: {

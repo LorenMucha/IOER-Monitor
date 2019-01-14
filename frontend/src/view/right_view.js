@@ -9,6 +9,7 @@ const right_view = {
     },
     open:function(){
         const view = this;
+        let btn_group_map = $('#btn-group-map');
         //show only the table view, if the user set a indicator
         if(typeof indikatorauswahl.getSelectedIndikator() !== 'undefined') {
             //set the mobile view
@@ -19,12 +20,14 @@ const right_view = {
                     view.getCloseIconObject().hide();
                     legende.close();
                     panner.setMapBackground();
+                    btn_group_map.hide();
                 } else {
                     view.hide();
                     left_view.show();
                     legende.getShowButtonObject().show();
                     panner.setTableBackground();
                     panner.init();
+                    btn_group_map.show();
                 }
             } else {
                 $('#mapwrap').addClass('splitter_panel');

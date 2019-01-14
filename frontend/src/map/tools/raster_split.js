@@ -24,10 +24,9 @@ const raster_split={
                 return $elem;
             },
             openDialog:function(){
-                const dialog = this,
-                    controller = raster_split;
+                const dialog = this;
                 let dialog_container = dialog.getContainerObject(),
-                    button_map = controller.getButtonObject(),
+                    button_map = raster_split.getButtonObject(),
                     dropdown_ind =  dialog.getDropdownDOMObject(),
                     close_container = $('.close_vergleich');
 
@@ -41,7 +40,7 @@ const raster_split={
 
                 dropdown_ind.dropdown({
                     onChange: function (value, text, $choice) {
-                        dialog.initElements(value);
+                        dialog.createGUIElements(value);
                         $('.ind_content').slideDown();
                     }
                 });
@@ -93,7 +92,8 @@ const raster_split={
                     kennblatt.open();
                 });
             },
-            initElements:function(indikator_id){
+            //Adds the essential Elements
+            createGUIElements:function(indikator_id){
                 const dialog = this;
                 let def = $.Deferred();
                 function defCalls(){
@@ -159,17 +159,19 @@ const raster_split={
                     kat = settings[0].kat,
                     raumgl_set = settings[0].raumgl,
                     klassifizierung = settings[0].klassifizierung,
-                    klassenanzahl = settings[0].klassenanzahl;
+                    klassenanzahl = settings[0].klassenanzahl,
+                    indicator_id = indikatorauswahl.getSelectedIndikator();
 
                 $.when(getRasterMap(time, ind, raumgl_set, klassifizierung, klassenanzahl, farbliche_darstellungsart.getSelectionId()))
                     .done(function (data) {
-                        let txt = data;
-                        let x = txt.split('##');
+                        //TODO umschreiben auf den neuen Mapserver
+                        let txt = data,
+                            x = txt.split('##'),
+                            info_json = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()],
+                            legende = x[1],
+                            legende_schraffur ="https://maps.ioer.de/cgi-bin/mapserv_dv?map=/mapsrv_daten/detailviewer/mapfiles/mapserv_raster.map&MODE=legend&layer=schraffur&IMGSIZE=150+30",
+                            einheit = x[10];
 
-                        let legende = x[1];
-                        let legende_schraffur ="https://maps.ioer.de/cgi-bin/mapserv_dv?map=/mapsrv_daten/detailviewer/mapfiles/mapserv_raster.map&MODE=legend&layer=schraffur&IMGSIZE=150+30";
-
-                        let einheit = x[10];
                         if(einheit==='proz'){einheit='%'}
 
                         $('#legende_vergleich_i').empty().load(legende, function () {
@@ -195,6 +197,7 @@ const raster_split={
                         }
 
                         $.ajax({
+                            async:true,
                             type:"GET",
                             url :urlparamter.getURL_RASTER() + "php/histogramm.php?Jahr=" + time + "&Kategorie=" + kat + "&Indikator=" + ind + "&Raumgliederung=" + raumgl_set + "&Klassifizierung=" + klassifizierung + "&AnzKlassen=" + klassenanzahl,
                             success:function(data){
@@ -202,15 +205,22 @@ const raster_split={
                             }
                         });
 
-                        $.when(request_manager.getIndZusatzinformationen(ind,time)).done(function(data){
-                            let datengrundlage = data[0]["datengrundlage"];
-                            if (datengrundlage.length >= 3) {
-                                datengrundlage = datengrundlage + "</br>";
+                        let language_tag = function(){
+                            let tag = '';
+                            if(language_manager.getLanguage()==="en"){
+                                tag = '_en';
                             }
-                            let atkis = data[0]["atkis"];
-                            $('#indikator_info_text_vergleich').text(data[0]["info"]);
-                            $('#datengrundlage_content_vergleich').html(datengrundlage + atkis);
-                        });
+                            return tag;
+                            },
+                        datengrundlage = info_json['indicators'][indicator_id][("datengrundlage"+language_tag())],
+                        atkis =  function(){
+                                let val = parseInt(info_json['indicators'][indicator_id]["atkis"]);
+                                if(val==1){
+                                    return " © GeoBasis-DE / BKG ("+helper.getCurrentYear()+")";
+                                }
+                            };
+                        $('#indikator_info_text_vergleich').text(info_json['indicators'][indicator_id][("info"+language_tag())]);
+                        $('#datengrundlage_content_vergleich').html(datengrundlage + atkis());
                     });
             },
             getSettings:function(){

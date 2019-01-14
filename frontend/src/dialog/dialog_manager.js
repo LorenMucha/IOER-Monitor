@@ -54,7 +54,7 @@ const dialog_manager={
             hide: 'blind',
             show: 'blind',
             width: manager.calculateWidth(),
-            height: manager.calculateWidth(),
+            height: manager.calculateHeight(),
             modal: manager.instructions.modal,
             open: function (ev, ui) {
                 $(this)

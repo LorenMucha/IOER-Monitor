@@ -328,6 +328,9 @@ const indikatorauswahl ={
                             dev_chart.chart.controller.clearChartArray();
                             expand_panel.close();
                         }
+                        if(view_state.getViewState()==="responsive"){
+                            toolbar.close();
+                        }
                     },
                     onHide: function () {
                         helper.resetHighlightElementByID('indicator_ddm');

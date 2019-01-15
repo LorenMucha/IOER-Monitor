@@ -55,7 +55,9 @@ const measurement={
         }catch(err){}
     },
     remove:function(){
-        this.surveyElement.remove();
+        try {
+            this.surveyElement.remove();
+        }catch(err){}
         this.getDOMContainer().css('background-color','#4E60AA;');
         this.set=false;
         indikator_json.hover=true;

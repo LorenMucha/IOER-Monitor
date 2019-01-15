@@ -23,7 +23,7 @@ const navbar={
                                  title="unternehmen Sie eine Tour durch die Funktionalitäten des IÖR-Monitors">IÖR-Monitor
                               Tour</a></li>
                           <li><a id="feedback_a" onclick="feedback.open();">Feedback</a></li>
-                          <li><a id="language" data-value="en"><i class="gb uk flag"></i></a></li>
+                          <!--<li><a id="language" data-value="en"><i class="gb uk flag"></i></a></li>-->
                       </ul>
                   </div>
               </nav>

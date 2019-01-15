@@ -86,11 +86,21 @@ const raster_split={
                         .show();
                     $('#header_rechts').text(settings[0].ind_text+" ("+settings[0].time+")");
                     $('#header_raumgl_rechts').text(settings[0].raumgl);
+                    alertLeafveFunction();
+                    //leave the function with escape
+                    $(document)
+                        .keyup(function(e) {
+                        if (e.keyCode === 27) {
+                            raster_split.remove();
+                        }
+                    });
                 });
 
                 $("#kennblatt_vergleich").click(function(){
                     kennblatt.open();
                 });
+
+
             },
             //Adds the essential Elements
             createGUIElements:function(indikator_id){
@@ -314,6 +324,7 @@ const raster_split={
         }else{
             map.removeControl(object.getButton());
         }
+        this.getButtonObject().css("background-color",farbschema.getColorMain());
     },
     getState:function(){
         return this.getSplitterContainer().length >= 1;

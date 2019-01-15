@@ -2,7 +2,8 @@
 function alertLeafveFunction(){
     swal({
         title: "Verlassen Sie die Funktion mit ESC",
-        timer: 1000
+        timer: 1000,
+        showConfirmButton: false
     });
 }
 //no indicator chosen

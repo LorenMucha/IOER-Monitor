@@ -34,6 +34,7 @@ const request_manager={
     getAllAvaliableIndicators:function(){
         const manager = this;
         let json = JSON.parse('{"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+'"},"query":"getAllIndicators"}');
+        console.log(JSON.stringify(json));
         return manager.makeRequest({"file":json,"query":"getAllAvaliableIndicators","type":"POST","debug":false});
     },
     //get the possible time`s

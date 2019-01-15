@@ -21,6 +21,7 @@ const script_loader={
         //underscore
         "frontend/lib/underscore/underscore-min.js",
         //leaflet plugins
+        "frontend/lib/leaflet/plugin/leaflet-measure.js",
         "frontend/lib/leaflet/plugin/cloneLayer.js",
         "frontend/lib/leaflet/plugin/TileLayer.Grayscale.js",
         "frontend/lib/leaflet/plugin/L.Control.ZoomBox.js",

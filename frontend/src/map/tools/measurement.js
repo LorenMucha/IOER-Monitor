@@ -5,17 +5,7 @@ const measurement={
         return $elem;
     },
     set:false,
-    surveyElement: L.control.measure({
-        primaryLengthUnit: 'kilometers',
-        secondaryLengthUnit: 'meters',
-        captureZIndex: 10000,
-        primaryAreaUnit: 'hectares',
-        activeColor: farbschema.getColorActive(),
-        completedColor: farbschema.getColorMain(),
-        position: 'topleft',
-        localization: 'de',
-        collapsed: false
-    }),
+    surveyElement: "",
     init:function(){
         measurement.controller.set();
     },
@@ -38,20 +28,36 @@ const measurement={
         }
     },
     show:function(){
-        alertLeafveFunction();
-        $('.toolbar').toggleClass("toolbar_close",500);
-        this.getDOMContainer().css('background-color',farbschema.getColorActive());
-        this.surveyElement.addTo(map);
-        $('.leaflet-control-measure-toggle ')
-            .animate({"width":"80px","height":"80px"},1000,
-                function(){
-                    $(this).css({"width":"40px","height":"40px"})
-                });
-        this.set=true;
+        try {
+            let elementM = L.control.measure({
+                primaryLengthUnit: 'kilometers',
+                secondaryLengthUnit: 'meters',
+                captureZIndex: 10000,
+                primaryAreaUnit: 'hectares',
+                activeColor: farbschema.getColorActive(),
+                completedColor: farbschema.getColorMain(),
+                position: 'topleft',
+                localization: 'de',
+                collapsed: false
+            });
+            alertLeafveFunction();
+            $('.toolbar').toggleClass("toolbar_close", 500);
+            this.getDOMContainer().css('background-color', farbschema.getColorActive());
+            elementM.addTo(map);
+            $('.leaflet-control-measure-toggle ')
+                .animate({"width": "80px", "height": "80px"}, 1000,
+                    function () {
+                        $(this).css({"width": "40px", "height": "40px"})
+                    });
+            this.set = true;
+            this.surveyElement = elementM;
+            indikator_json.hover=false;
+        }catch(err){}
     },
     remove:function(){
         this.surveyElement.remove();
         this.getDOMContainer().css('background-color','#4E60AA;');
         this.set=false;
+        indikator_json.hover=true;
     }
 };

@@ -1211,12 +1211,14 @@ Solution fixed headers: https://stackoverflow.com/questions/673153/html-table-wi
     right: 0;
     top: 0;
     bottom: 0;
-    margin: 60px 20px 5px;
+    margin: 60px 10px 10px;
     overflow: hidden;
     background-color: white;
 }
+.right_content .table_page{
+    width:100%;
+}
 .right_content .table_page .table_page_header{
-    position: absolute;
     height: 15%;
     width: 100%;
 }
@@ -1266,8 +1268,11 @@ Solution fixed headers: https://stackoverflow.com/questions/673153/html-table-wi
     position: absolute;
     overflow: auto;
     bottom: 10px;
-    height:85%;
-    width:98%;
+    height:100%;
+    top:15%;
+    /*width:100%;*/
+    margin-left: 5px;
+    margin-right: 5px;
 }
 .right_content .scrollable-area #table_ags{
     background: #FFF;

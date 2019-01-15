@@ -55,8 +55,8 @@ const legende = {
         //only for Multiview
         if(view_state.getViewState()==="mw"){
             if(table.isOpen()){
-                show_button_grp.css("right", right_view.getWidth()+56);
-                legende_container.css("right",right_view.getWidth()+50);
+                show_button_grp.css("right", right_view.getWidth()+35);
+                legende_container.css("right",right_view.getWidth()+30);
                 close_icon.css("right",right_view.getWidth()+73);
             }else{
                 show_button_grp.css("right", "0px");
@@ -201,7 +201,7 @@ const legende = {
         legende_container.hide('slow',function(){});
         if(view_state.getViewState()!=='responsive'){
             if($('.right_content').is(':visible')) {
-                show_button.css("right", $('#rightPane').width()+6);
+                show_button.css("right", $('#rightPane').width()+7);
             }else{
                 show_button.css("right","0px");
             }
@@ -307,16 +307,23 @@ const legende = {
                                         let percent = ((value.max-min_value) * 100) / max_neu,
                                             pixel_width = (diagramm_width / 100) * percent,
                                             x=function(){
-                                                try {
-                                                    return _x_set[(i - 1)]['width'];
-                                                }catch(err){
-                                                    return 0;
-                                                }
+                                                let x = 0;
+                                                try{
+                                                     let val = _x_set[(i - 1)]['width'];
+                                                     if(!isNaN(val)){
+                                                         x=val;
+                                                     }
+                                                }catch(err){}
+
+                                                return x;
                                             },
                                             width = function(){
                                                 let width = pixel_width-x();
                                                 if(!width){
                                                     width=pixel_width;
+                                                }
+                                                if(width<0) {
+                                                    width = width*-1;
                                                 }
                                                 return width;
                                             };

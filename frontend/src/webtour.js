@@ -36,13 +36,13 @@ const webTour={
                 {
                     element: "#search_input_field",
                     title: "Die Suchfunktion",
-                    content: "Suchen Sie nach passenden Indikatoren und Orten.",
+                    content: "Suchen Sie nach passenden Indikatoren, Kategorien, Daten,Orten und vielen Schlagwörtern mehr.",
                     onShow:function(){
                         toolbar.open();
-                        helper.highlightElementByID('search');
+                        helper.highlightElementByID(this.element.replace("#",""));
                     },
                     onNext: function(){
-                        resethelper.highlightElementByID('search');
+                        helper.resetHighlightElementByID(this.element.replace("#",""))
                         helper.slideDownElementByID('drop_kat');
                     }
                 },
@@ -66,11 +66,11 @@ const webTour={
                     title:"Darstellungsmodus",
                     content: "Wählen Sie den gewünschten Darstellungsmodus der Indikatoren aus.",
                     onShow:function(){
-                        helper.highlightElementByID('spatial_choice');
+                        helper.highlightElementByID(this.element.replace(".",""));
 
                     },
                     onNext:function(){
-                        resethelper.highlightElementByID('spatial_choice');
+                        helper.resetHighlightElementByID(this.element.replace(".",""))
                     }
                 },
                 {
@@ -78,12 +78,12 @@ const webTour={
                     title: "Räumliche Analyseebene",
                     content: "Gliederung Deutschlands in einzelne Raumeinheiten. (Deren Verfügbarkeit ist vom Indikator abhängig.)",
                     onShow:function(){
-                        helper.highlightElementByID('menu_raumgl');
+                        helper.highlightElementByID(this.element.replace("#",""));
                         raeumliche_analyseebene.setSectionId('bld');
                         indikator_json.init('bld');
                     },
                     onNext: function(){
-                        resethelper.highlightElementByID('menu_raumgl');
+                        helper.resetHighlightElementByID(this.element.replace("#",""))
                     }
                 },
                 {
@@ -91,11 +91,11 @@ const webTour={
                     title: "Gebietsauswahl",
                     content: "Suchen und Wählen Sie bestimmte Gebiete, auch eine Mehrfachauswahl ist möglich.",
                     onShow:function(){
-                        helper.highlightElementByID('dropdown_grenzen_container');
+                        helper.highlightElementByID(this.element.replace("#",""));
                         $('#dropdown_grenzen_container').dropdown('set selected','12');
                     },
                     onNext: function(){
-                        resethelper.highlightElementByID('dropdown_grenzen_container');
+                        helper.resetHighlightElementByID(this.element.replace("#",""))
                     }
                 },
                 {
@@ -108,7 +108,7 @@ const webTour={
                         setTimeout(function(){raumgliederung.setSelectionId('krs')},2000);
                     },
                     onNext: function () {
-                        resethelper.highlightElementByID('menu_raumgl_fein');
+                        helper.resetHighlightElementByID(this.element.replace("#",""))
                         helper.slideUpElementByID('dropdown_raumgl');
                     }
                 },
@@ -146,6 +146,18 @@ const webTour={
                     }
                 },
                 {
+                    element: "#zeit_slider",
+                    title: "Time-Slider",
+                    content: "Stellen Sie den gewünschten Zeitschnitt anhand des Sliders ein.",
+                    placement: "auto",
+                    onShow: function () {
+
+                    },
+                    onNext:function(){
+
+                    }
+                },
+                {
                     element: "#panRight",
                     title: "Tabellenansicht",
                     placement: "left",
@@ -174,39 +186,39 @@ const webTour={
                     }
                 },
                 {
-                    element:"#indikatoren_gebietsprofil12070",
+                    element:"#indikatoren_gebietsprofil12060",
                     title: "Gebietsprofil",
                     content: "Werteübersicht dieser Gebietseinheit für alle Indikatoren (mit Vergleich zu übergeordneten Raumeinheiten und mittleren Grundaktualitäten)",
                     placement: "left",
                     onShown: function(){
-                        helper.highlightElementByID("indikatoren_gebietsprofil12070");
+                        helper.highlightElementByID(this.element.replace("#",""));
                     },
                     onNext: function () {
-                        resethelper.highlightElementByID("indikatoren_gebietsprofil12070")
+                        helper.highlightElementByID(this.element.replace("#",""));
                     }
                 },
                 {
-                    element: "#diagramm_ags12070",
+                    element: "#diagramm_ags12060",
                     title: "Erweiterte Statistik",
                     placement: "left",
                     content: "Lassen Sie sich zusätzliche statistische Kenngrößen zu der jeweiligen Gebietseinheit anzeigen.",
                     onShown: function(){
-                        helper.highlightElementByID("diagramm_ags12070");
+                        helper.highlightElementByID(this.element.replace("#",""));
                     },
                     onNext: function () {
-                        resethelper.highlightElementByID("diagramm_ags12070")
+                        helper.resetHighlightElementByID(this.element.replace("#",""))
                     }
                 },
                 {
-                    element: "#indikatoren_diagramm_ags12070",
+                    element: "#indikatoren_diagramm_ags12060",
                     title: "Entwicklungsdiagramm",
                     placement: "left",
                     content: "Visualisierung der Indikatorwertentwicklung anhand eines Graphen über die Zeit",
                     onShown: function(){
-                        helper.highlightElementByID("indikatoren_diagramm_ags12070");
+                        helper.highlightElementByID(this.element.replace("#",""));
                     },
                     onNext: function () {
-                        resethelper.highlightElementByID("indikatoren_diagramm_ags12070")
+                        helper.resetHighlightElementByID(this.element.replace("#",""))
                     }
                 },
                 {
@@ -220,22 +232,9 @@ const webTour={
                         $('.leaflet-control-layers').attr('id','leaflet-control-layers');
                     },
                     onNext: function () {
-                        resethelper.highlightElementByID("close_checker");
+                        helper.highlightElementByID("close_checker");
                         right_view.close();
                         legende.resize();
-                    }
-                },
-                {
-                    element: "#leaflet-control-layers",
-                    title: "Kartenebenen",
-                    content: "Ändern Sie die Hintergrundkarte oder fügen Sie zusätzliche topographische Kartenelemente hinzu.",
-                    placement: "left",
-                    onShow: function(){
-                        $('.leaflet-control-layers').addClass('leaflet-control-layers-expanded');
-                    },
-                    onNext: function(){
-                        $.when($('.leaflet-control-layers').removeClass('leaflet-control-layers-expanded'))
-                            .then(legende.open());
                     }
                 },
                 {
@@ -251,7 +250,6 @@ const webTour={
                     content: "Nebenkarte mit Datenalter der einzelnen Gebietseinheiten gegenüber dem gewählten Zeitschnitts (nur für Indikatoren mit mittlerer Grundaktualität.)",
                     onShow: function () {
                         legende.getDOMObject().css("width", "300px");
-                        legende.getShowButtonObject().css("right", "300px");
                         $('#dropdown_datenalter').show();
                         $('#histogramm_pic').css("margin-left", "10px");
                         //scroll down to view full viewport
@@ -259,7 +257,6 @@ const webTour={
                     },
                     onNext: function () {
                         $('#legende').css("width", "250px");
-                        $('#legende_button').css("right", "250px");
                         $('#dropdown_datenalter').hide();
                         $('#histogramm_pic').css("margin-left", "0px");
                         $('#spatial_choice_checkbox_container')

@@ -1,6 +1,7 @@
 const indikator_json = {
     json_layer : '',
     json_file:'',
+    hover:true,
     setJSONLayer:function(_layer){
         this.json_layer = _layer;
     },
@@ -239,21 +240,23 @@ const indikator_json = {
         }
     },
     highlightFeatureOnmouseover:function(e) {
-        const object = this;
-        let layer = e.target;
-        layer.setStyle(style.getActive());
-        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-            layer.bringToFront();
-        }
-        //highlight element in legend
-        try {
-            let fillcolor = layer.options.fillColor.replace('#', '');
-            $('#legende_' + fillcolor + " i").css({
-                "width": "20px",
-                "height": "15px",
-                "border": "2px solid " + farbschema.getColorActive()
-            });
-        }catch(err){}
+            let layer = e.target;
+            if(indikator_json.hover) {
+                layer.setStyle(style.getActive());
+                if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                    layer.bringToFront();
+                }
+            }
+            //highlight element in legend
+            try {
+                let fillcolor = layer.options.fillColor.replace('#', '');
+                $('#legende_' + fillcolor + " i").css({
+                    "width": "20px",
+                    "height": "15px",
+                    "border": "2px solid " + farbschema.getColorActive()
+                });
+            } catch (err) {
+            }
     },
     resetHighlight: function(e) {
         let layer = e.target;

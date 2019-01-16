@@ -55,7 +55,7 @@ const legende = {
         //only for Multiview
         if(view_state.getViewState()==="mw"){
             if(table.isOpen()){
-                show_button_grp.css("right", right_view.getWidth()+35);
+                show_button_grp.css("right", right_view.getWidth()+30);
                 legende_container.css("right",right_view.getWidth()+30);
                 close_icon.css("right",right_view.getWidth()+73);
             }else{

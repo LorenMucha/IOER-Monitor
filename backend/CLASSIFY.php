@@ -9,9 +9,11 @@ class CLASSIFY
     public function __construct($json,$classes,$colors, $indicator_id,$klassifizierung) {
         $this->json = $json;
         $this->classes = $classes;
-        if(!$colors) {
-            $this->colors = MY_SQL_TASKREPOSITORY::get_instance()->getIndicatorColors($indicator_id);
+        //if no color is set, get the predefined colors
+        if(!(array)$colors or $indicator_id==="Z00AG") {
+            $this->colors = MYSQL_TASKREPOSITORY::get_instance()->getIndicatorColors($indicator_id);
         }else{
+            //cast because it needs to be an object
             $this->colors=$colors;
         }
         $this->klassifizierung=$klassifizierung;
@@ -28,8 +30,8 @@ class CLASSIFY
     }
     private function getColors($classes){
         //craete the color array
-        $max_color = $this->colors[0]->max;
-        $min_color = $this->colors[0]->min;
+        $max_color = $this->colors->max;
+        $min_color = $this->colors->min;
         if(!$max_color){
             $max_color = "66CC99";
         }
@@ -77,6 +79,7 @@ class CLASSIFY
         sort($this->ags_values);
 
         $colors = $this->getColors($this->classes);
+
         //set the quantile
         $counter = round(count($this->ags_values)/$this->classes);
         $i = 0;

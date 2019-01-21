@@ -12,7 +12,7 @@ class HELPER
         return self::$instance;
     }
 
-    function remove_duplicateKeys($key, $data)
+    public function remove_duplicateKeys($key, $data)
     {
 
         $_data = array();
@@ -29,8 +29,7 @@ class HELPER
         $data = array_values($_data);
         return $data;
     }
-
-    function in_array_r($needle, $haystack, $strict = false)
+    public function in_array_r($needle, $haystack, $strict = false)
     {
         foreach ($haystack as $item) {
             if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && in_array_r($needle, $item, $strict))) {
@@ -40,13 +39,19 @@ class HELPER
 
         return false;
     }
-
-    function escapeJsonString($value)
+    public function escapeJsonString($value)
     {
         $escapers = array("\\", "/", "\"", "\n", "\r", "\t", "\x08", "\x0c", "\r", "\n", "\t", "\u00b2", "\u00c4", "\u00e4", "u00d6", "u00f6", "u00dc", "u00fc", "\u00df", ",,", "Ã¤", "Ã„", "Ã¶", "Ã–", "Ã¼", "Ãœ", "ÃŸ");
         $replacements = array("\\\\", "\\/", "\\\"", "\\n", "\\r", "\\t", "\\f", "\\b", "", "", "", "2", "Ä", "ä", "Ö", "ö", "Ü", "ü", "ß", ",", "ä", "Ä", "ö", "Ö", "ü", "Ü", "ß");
         $result = str_replace($escapers, $replacements, $value);
         return stripcslashes($result);
+    }
+    public function extractBoolen($string){
+        if($string==="true"){
+            return true;
+        }else{
+            return  false;
+        }
     }
 }
 ?>

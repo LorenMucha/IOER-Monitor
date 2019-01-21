@@ -1,0 +1,418 @@
+{
+  "toolbar": {
+      "menu_name": {
+        "de": "Menü",
+        "en": "Menu",
+        "type":"#"
+      },
+      "search_input_field":{
+        "de":"Suche nach Indikatoren, Orten...",
+        "en":"Search for indicators, places...",
+        "attr":"placeholder",
+        "type":"#"
+      },
+      "indikator_auswahl":{
+        "de":"Indikator",
+        "en":"Indicator",
+        "type":"#",
+        "selector":"span",
+        "callback":["indikatorauswahl.fill()"]
+      },
+      "ind_choice_info":{
+        "de":"Bitte wählen Sie einen Indikator",
+        "en":"Please choose an indicator",
+        "type":"#"
+      },
+      "kennblatt":{
+        "de":"Kennblatt",
+        "en":"Datasheet",
+        "type":"."
+      },
+      "raumgl_auswahl":{
+        "de":"Räumliche Gliederung",
+        "en":"Spatial unit",
+        "selector":"span",
+        "type":"#"
+      },
+      "gebiete_label":{
+        "de":"Gebiete",
+        "en":"District",
+        "type":"#"
+      },
+      "raster_label":{
+        "de":"Raster",
+        "en":"Raster",
+        "type":"#"
+      },
+      "spatial_range_gebiete":{
+        "de":"Räumliche Analyseebene",
+        "en":"Spatial analysis level",
+        "selector":"span",
+        "type":"#",
+        "callback":["raeumliche_analyseebene.fill()","indikator_map_header.set()"]
+      },
+      "default_text_ddm_grob":{
+        "de":"Bitte Wählen..",
+        "en":"Please choose..",
+        "type":"#"
+      },
+      "user_choice":{
+        "de":"Raumgliederung:",
+        "en":"Spatial units:",
+        "selector":"span",
+        "type":"#",
+        "callback":["raumgliederung.fill()","indikator_map_header.set()"]
+      },
+      "spatial_range_raster":{
+        "de":"Rasterweite in m",
+        "en":"Grid dimensions in m:",
+        "selector":"span",
+        "type":"#"
+      },
+      "dropdown_choice":{
+        "de":"Rasterweite in m",
+        "en":"Grid dimensions in m:",
+        "selector":"span",
+        "type":"#"
+      },
+      "kartengestaltung":{
+        "de":"Kartengestaltung",
+        "en":"Map design",
+        "type":"#",
+        "selector":"span"
+      },
+      "layer_conainer":{
+        "de":"Sichtbarkeit Indikator",
+        "en":"Visibility indicator",
+        "selector":"span",
+        "type":"#"
+      },
+      "farbwahl":{
+        "de":"Farbschema",
+        "en":"Color scheme",
+        "selector":"span",
+        "type":"#"
+      },
+      "farbwahl_btn":{
+        "de":"Bitte Wählen..",
+        "en":"Please choose..",
+        "type":"#"
+      },
+      "klassenbesetzung":{
+        "de":"Klassenanzahl",
+        "en":"Class number",
+        "selector":"span",
+        "type":"#"
+      },
+      "klassifizierung":{
+        "de":"Klassifizierung",
+        "en":"Classification",
+        "type":"#"
+      },
+      "haeufigkeit_label":{
+        "de":"Gleiche Klassenbesetzung",
+        "en":"Same class instrumentation",
+        "selector":"span",
+        "type":"#"
+      },
+      "gleich_label":{
+        "de":"Gleiche Klassenbreite",
+        "en":"Same class width",
+        "selector":"span",
+        "type":"#"
+      },
+      "setting_klassifizierung":{
+        "de":"Art der Darstellung",
+        "en":"Type of presentation",
+        "selector":"span",
+        "type":"#"
+      },
+      "classify_auto":{
+        "de":"Farbreihe automatisch",
+        "en":"Color series automatically",
+        "selector":"span",
+        "type":"#"
+      },
+      "keep_settings":{
+        "de":"Einstellungen beibehalten",
+        "en":"Keep settings",
+        "selector":"span",
+        "type":"#"
+      },
+      "tools":{
+        "de":"Werkzeuge",
+        "en":"Tools",
+        "selector":"span",
+        "type":"#"
+      },
+      "measure_btn":{
+        "de":"Messen",
+        "en":"Measure",
+        "type":"#"
+      },
+      "lupe_btn":{
+        "de":"Lupe",
+        "en":"Magni- fying glass",
+        "type":"#"
+      },
+      "import_btn":{
+        "de":"Import",
+        "en":"Import",
+        "type":"#"
+      },
+      "dropdown_ogc":{
+        "de":"Einbinden in eigenes GIS als",
+        "en":"Integration into own GIS as",
+        "type":"#",
+        "selector":"b"
+      },
+      "export_map_display":{
+        "de":"Export der Kartendarstellung als",
+        "en":"Export of map display as",
+        "type":"#",
+        "selector":"b"
+      },
+      "save_map_link":{
+        "de":"Dauerhaftes Speichern der Karte auf dem IÖR-Server",
+        "en":"Permanently save the card to the IÖR-Server",
+        "type":"#",
+        "selector":"b"
+      },
+      "kartenlink":{
+        "de":"Kartenlink erzeugen",
+        "en":"Create map link",
+        "type":"#"
+      },
+      "load_map_link":{
+        "de":"Kartenlink laden",
+        "en":"Load map link",
+        "type":"#",
+        "selector":"b"
+      },
+      "btn_reset":{
+        "de":"Viewer zurücksetzen",
+        "en":"Reset viewer",
+        "type":"#",
+        "selector":"span"
+      },
+      "impressum_a":{
+        "de":"Impressum",
+        "en":"Imprint",
+        "type":"#"
+      },
+      "data_protection":{
+        "de":"Datenschutz",
+        "en":"Data protection",
+        "type":"#"
+      }
+  },
+  "table_page":{
+    "btn_table":{
+      "de":"Tabelle erweitern",
+      "en":"Expand table",
+      "type":"#",
+      "selector":"span",
+      "callback":["setTimeout(function(){table_expand_panel.fill();},1000)"]
+    }
+  },
+  "tabelle_erweitern":{
+    "note":{
+      "de":"Hinweis:",
+      "en":"Note:",
+      "type":"."
+    },
+    "hinweis_time_expand_linear":{
+      "de":" Anzeige von zusätzlichen Zeitschnitten und weiteren Kenngrößen nur bei Deaktivierung der Trendfortschreibung.",
+      "en":" Display of additional time cuts and other parameters only if the trend update is deactivated.",
+      "type":"#",
+      "selector":"span"
+    },
+    "ind_expand_container":{
+      "de":"Indikator zum Vergleich anfügen",
+      "en":"Add indicator for comparison",
+      "type":"#",
+      "selector":"b"
+    },
+    "indicator_ddm_table":{
+      "de":"Bitte wählen.....",
+      "en":"Please choose....",
+      "type":"#",
+      "selector":".default"
+    },
+    "time_expand_conatier":{
+      "de":"Zeitschnitte anfügen",
+      "en":"Add time cuts",
+      "type":"#",
+      "selector":"b"
+    },
+    "zeitschnitt_ddm_table":{
+      "de":"Bitte wählen.....",
+      "en":"Please choose....",
+      "type":"#",
+      "selector":".default"
+    },
+    "differences_div":{
+      "de":"Differenzen anzeigen",
+      "en":"Show differences",
+      "type":"#",
+      "selector":"span"
+    },
+    "hinweis_time":{
+      "de":" Für Vergleiche können nur frühere Zeitschnitte angezeigt werden.",
+      "en":" For comparisons, only earlier time cuts can be displayed.",
+      "type":"#",
+      "selector":"span"
+    },
+    "hinweis_time_expand_null":{
+      "de":" Es ist nur ein Zeitschnitt verfügbar.",
+      "en":" There is only one time cut available.",
+      "type":"#",
+      "selector":"span"
+    },
+    "kenngroessen_expand_container":{
+      "de":"Weitere Kenngrößen zum Vergleich",
+      "en":"Further parameters for comparison",
+      "type":"#",
+      "selector":"b"
+    },
+    "kenngroessen_ddm_table_header":{
+      "de":"Bitte wählen.....",
+      "en":"Please choose....",
+      "type":"#"
+    },
+    "expand_abs":{
+      "de":"Absoluter Indikatorwert",
+      "en":"Absolute indicator value",
+      "type":"#"
+    },
+    "area_size":{
+      "de":"Gebietsfläche",
+      "en":"Territorial area",
+      "type":"#"
+    },
+    "expand_b00ag":{
+      "de":"Einwohnerzahl",
+      "en":"Population",
+      "type":"#"
+    },
+    "expand_kenngroessen":{
+      "de":"Übergeordnete Raumeinheiten",
+      "en":"Higher-level spatial units",
+      "type":"#",
+      "selector":"span"
+    },
+    "lineare_trend_expand_container":{
+      "de":"Lineare Trendfortschreibung",
+      "en":"Linear trend update",
+      "type":"#",
+      "selector":"b"
+    },
+    "trend_ddm_table":{
+      "de":"Bitte wählen.....",
+      "en":"Please choose....",
+      "type":"#",
+      "selector":".default"
+    },
+    "trend_hinweis_expand":{
+      "de":" Anzeige von Trendwerten nur für ausgewählte Indikatoren.",
+      "en":" Display of trend values only for selected indicators.",
+      "type":"#",
+      "selector":"span"
+    },
+    "btn_table_load_expand":{
+      "de":"Tabelle aktualisieren",
+      "en":"Update table",
+      "type":"#"
+    },
+    "btn_table_clear_expand":{
+      "de":"Tabelle aktualisieren",
+      "en":"Reset",
+      "type":"#",
+      "selector":"span"
+    }
+  },
+  "filter_div":{
+    "title_filter_table":{
+      "de":"Tabelle filtern",
+      "en":"Filter table",
+      "type":"."
+    }
+  },
+  "btn-group-map": {
+    "legende_button":{
+        "de": "Legende",
+        "en": "Legend",
+        "type": "#",
+        "selector": "span"
+    },
+    "map_button": {
+      "de": "Karten",
+      "en": "Maps",
+      "type": "#",
+      "selector": "span"
+    }
+  },
+  "legende":{
+      "legende_header":{
+        "de":"Legende",
+        "en":"Map legend",
+        "type":"#"
+      },
+      "einheit_container":{
+        "de":"Einheit:",
+        "en":"Unit:",
+        "type":"#",
+        "selector":"span"
+      },
+      "Klassifikationsmethode_legende":{
+        "de":"Klassifikationsmethode",
+        "en":"Classification method",
+        "type":"#",
+        "selector":"b"
+      },
+      "indicator_info":{
+        "de":"Informationen zum Indikator",
+        "en":"Information about the indicator",
+        "type":"#",
+        "selector":"b"
+      },
+      "legende_kennblatt":{
+        "de":"Kennblatt",
+        "en":"Datasheet",
+        "type":"#"
+      },
+      "legende_datangrundlage":{
+        "de":"Datengrundlage",
+        "en":"Data basis",
+        "type":"#",
+        "selector":"b"
+      },
+      "legende_map_projection":{
+        "de":"Kartenprojektion",
+        "en":"Map projection",
+        "type":"#",
+        "selector":"b"
+      },
+      "legende_histogramm":{
+        "de":"Histogramm",
+        "en":"Histogram",
+        "type":"#",
+        "selector":"b"
+      },
+      "datenalter":{
+        "de":"Datenalter",
+        "en":"Statistics age",
+        "type":"#",
+        "selector":"span"
+      },
+      "hover_info_grundaktmap":{
+        "de":"Ein und Ausblenden der Grundaktualität im Kartenfenster (hier klicken)",
+        "en":"On and hide the basic update in the map window (click here)",
+        "type":"#",
+        "callback":["setTimeout(function(){legende.fillContent();},1000)"]
+      }
+  },
+  "wms_text":{
+
+  }
+}

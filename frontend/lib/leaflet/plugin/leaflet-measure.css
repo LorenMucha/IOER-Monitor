@@ -54,7 +54,7 @@
     display: block;
     width: 40px;
     height: 40px;
-    background: #4E60AA url(../../../images/icon/ruler.png) no-repeat 50% 50%;
+    background: #4E60AA url(../../../assets/icon/ruler.png) no-repeat 50% 50%;
     border-radius: 50%;
     border: 2px solid #4E60AA;
     box-shadow: 0 0 3px gray;
@@ -64,7 +64,7 @@
 }
 .leaflet-retina .leaflet-control-measure .leaflet-control-measure-toggle,
 .leaflet-retina .leaflet-control-measure .leaflet-control-measure-toggle:hover {
-    background-image: url(../../../images/icon/ruler_blue.png);
+    background-image: url(../../../assets/icon/ruler_blue.png);
     background-size: 32px 32px
 }
 .leaflet-touch .leaflet-control-measure .leaflet-control-measure-toggle,

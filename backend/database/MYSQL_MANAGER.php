@@ -4,7 +4,7 @@ require_once('DB_SETTINGS.php');
 class MYSQL_MANAGER extends DB_SETTINGS {
 
     protected static $instance = NULL;
-
+    public $berechtigung = 3;
     public function __construct() {
 
         $settings = DB_SETTINGS::getSettings_mysql();
@@ -14,7 +14,7 @@ class MYSQL_MANAGER extends DB_SETTINGS {
         $this->database = $settings['dbname'];
         $this->host = $settings['dbhost'];
     }
-
+    
     public static function get_instance()
     {
         if ( NULL === self::$instance )
@@ -25,6 +25,12 @@ class MYSQL_MANAGER extends DB_SETTINGS {
 
     protected function connect() {
         return new mysqli($this->host, $this->user, $this->password, $this->database);
+    }
+    public function setBerechtigung($_berechtigung){
+        $this->berechtigung=$_berechtigung;
+    }
+    public function getBerechtigung(){
+        return $this->berechtigung;
     }
     public function query($query) {
         $db = $this->connect();

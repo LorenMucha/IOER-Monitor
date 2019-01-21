@@ -1,13 +1,14 @@
 const lupe={
     selector:"#lupe",
-   getDOMContainer:function(){
+    info_leave:0,
+    getDOMContainer:function(){
      $elem = $(`${this.selector}`);
      return $elem;
    },
     set:false,
     magnifyingGlass: L.magnifyingGlass({
         layers: [
-            layer = layer_control.baselayer.getBaseLayers_sw()["WebAtlas_DE"]
+            layer = layer_control.baselayer.getBaseLayers_rgb()["TopPlus-Web-Open"]
         ]
     }),
     init:function(){
@@ -34,7 +35,10 @@ const lupe={
         }
     },
     show:function(){
-        alertLeafveFunction();
+        if(this.info_leave==0){
+            alert_manager.leaveESCInfo();
+            this.info_leave=1;
+        }
         $('.toolbar').toggleClass("toolbar_close",500);
         this.getDOMContainer().css('background-color',farbschema.getColorActive());
         this.magnifyingGlass.addTo(map);

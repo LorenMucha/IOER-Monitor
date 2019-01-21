@@ -47,7 +47,7 @@ const ogc_export={
                 dialog_manager.create();
                 this.controller.set();
             }else{
-                alertNoIndicatorChosen();
+                alert_manager.alertNoIndicatorChosen();
             }
         },
         controller:{
@@ -139,7 +139,7 @@ const ogc_export={
                 dialog_manager.create();
                 this.controller.set();
             }else{
-                alertNoIndicatorChosen();
+                alert_manager.alertNoIndicatorChosen();
             }
         },
         controller:{
@@ -231,7 +231,7 @@ const ogc_export={
                 dialog_manager.create();
                 this.controller.set();
             }else{
-                alertNoIndicatorChosen();
+                alert_manager.alertNoIndicatorChosen();
             }
         },
         controller:{
@@ -239,7 +239,7 @@ const ogc_export={
                 const object = ogc_export.wfs;
                 let indikator = indikatorauswahl.getSelectedIndikator(),
                     endpoint = $(`#${object.endpoint_id}`),
-                    wfs_link = 'http://maps.ioer.de/cgi-bin/wfs?MAP=' + indikator,
+                    wfs_link = 'http://monitor.ioer.de/cgi-bin/wfs?MAP=' + indikator,
                     checkbox = endpoint.find("#checkbox_wfs"),
                     allow=endpoint.find('#wfs_allow');
 

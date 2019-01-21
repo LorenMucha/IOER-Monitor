@@ -81,7 +81,7 @@ const raeumliche_analyseebene = {
             else {
                 selected = menu.range[0];
                 indikator_json_group.clean();
-                alertNotinSpatialRange($('#Raumgliederung option:selected').text(), selected);
+                alert_manager.alertNotinSpatialRange($('#Raumgliederung option:selected').text(), selected);
                 return false;
             }
 
@@ -113,7 +113,7 @@ const raeumliche_analyseebene = {
                                     indikator_json.init(selection_fein);
                                 } else {
                                     indikator_json_group.clean();
-                                    alertNotinSpatialRange($('#Raumgliederung option:selected').text(), $('#Raumgliederung option:selected').val());
+                                    alert_manager.alertNotinSpatialRange($('#Raumgliederung option:selected').text(), $('#Raumgliederung option:selected').val());
                                     if (menu.range.length < 1) {
                                         raumgliederung.hide();
                                     }
@@ -155,7 +155,7 @@ const raeumliche_analyseebene = {
                     gebietsauswahl.removeParamter();
                     //save the user setted spatial extent
                     if (choice === "gem") {
-                        alertServerlast(choice);
+                        alert_manager.alertServerlast(choice);
                     } else {
                         raeumliche_analyseebene.updateParamter(choice);
                         indikator_json.init();

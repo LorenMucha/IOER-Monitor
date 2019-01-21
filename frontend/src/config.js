@@ -14,11 +14,9 @@ const config ={
   checkVersion:function(){
       let cache = parseFloat(localStorage.getItem("v")),
           version = parseFloat(this.data.version);
-      console.log("Version-Cache: "+cache);
-      console.log("Version-Config: "+this.data.version);
       if(cache){
           if(cache < version){
-            alertUpdate(version);
+            alert_manager.alertUpdate(version);
           }
       }else{
             localStorage.setItem("v",version);

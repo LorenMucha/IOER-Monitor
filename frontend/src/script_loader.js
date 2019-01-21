@@ -118,7 +118,7 @@ const script_loader={
         "frontend/src/ajax.js",
         "frontend/src/config.js",
         "frontend/src/helper.js",
-        "frontend/src/alert.js",
+        "frontend/src/alert_manager.js",
         "frontend/src/export.js",
         "frontend/src/search.js",
         "frontend/src/webtour.js"

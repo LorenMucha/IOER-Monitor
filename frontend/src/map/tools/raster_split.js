@@ -7,6 +7,7 @@ const raster_split={
             raumgliederung:'',
             jahre_set:'',
             raumgliederung_set:'',
+            info_leave:0,
             getContainerObject:function(){
                 $elem=  $('#vergleich_dialog');
                 return $elem;
@@ -86,8 +87,11 @@ const raster_split={
                         .show();
                     $('#header_rechts').text(settings[0].ind_text+" ("+settings[0].time+")");
                     $('#header_raumgl_rechts').text(settings[0].raumgl);
-                    alertLeafveFunction();
-                    //leave the function with escape
+                    //Bind the leaver function
+                    if(dialog.info_leave===0){
+                        alert_manager.leaveESCInfo();
+                        dialog.info_leave=1;
+                    }
                     $(document)
                         .keyup(function(e) {
                         if (e.keyCode === 27) {

@@ -37,7 +37,7 @@ const right_view = {
                 main_view.resizeSplitter(table.getWidth());
             }
         }else{
-            alertNoIndicatorChosen();
+            alert_manager.alertNoIndicatorChosen();
         }
         //bind the close icon
 

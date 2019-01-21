@@ -233,7 +233,7 @@ const expand_panel = {
                         try {
                             table.expand();
                         } catch (err) {
-                            alertError();
+                            alert_manager.alertError();
                         }
                         setTimeout(function () {
                             progressbar.init();

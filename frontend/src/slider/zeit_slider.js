@@ -32,7 +32,7 @@ const zeit_slider={
         else{
             if(jahre.length == 1){
                 object.updateParam(jahre[value_set]);
-                alertOneTimeShift();
+                alert_manager.alertOneTimeShift();
                 object.hide();
             }
             else if($.inArray(parseInt(time_param),jahre)!= -1){
@@ -42,7 +42,7 @@ const zeit_slider={
             else{
                 if($.inArray(parseInt(time_param),jahre) == -1){
                     object.updateParam(jahre[value_set]);
-                    alertNotInTimeShift();
+                    alert_manager.alertNotInTimeShift();
                 }
             }
         }

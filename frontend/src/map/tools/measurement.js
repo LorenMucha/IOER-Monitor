@@ -1,5 +1,6 @@
 const measurement={
     selector:"#measure",
+    info_leave:0,
     getDOMContainer:function(){
         $elem = $(`${this.selector}`);
         return $elem;
@@ -40,7 +41,10 @@ const measurement={
                 localization: 'de',
                 collapsed: false
             });
-            alertLeafveFunction();
+            if(this.info_leave==0){
+                alert_manager.leaveESCInfo();
+                this.info_leave=1;
+            }
             $('.toolbar').toggleClass("toolbar_close", 500);
             this.getDOMContainer().css('background-color', farbschema.getColorActive());
             elementM.addTo(map);

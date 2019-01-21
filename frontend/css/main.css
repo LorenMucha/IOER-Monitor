@@ -307,6 +307,7 @@ Feedack
     margin-bottom: 50px;
     height: 50px;
     right: -28px;
+    border:1px solid white;
 }
 .btn-group-map .legende_button{
     display: none;

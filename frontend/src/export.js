@@ -307,7 +307,7 @@ $(function map_export(){
                     }
                 });
             }else{
-                alertNoIndicatorChosen();
+                alert_manager.alertNoIndicatorChosen();
             }
         });
 });

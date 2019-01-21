@@ -149,7 +149,7 @@ const indikatorauswahl ={
             $.each(data,function(key,value) {
                 if(value.ind === ind) {
                     if(value.avability==false){
-                        alertNotAsRaster();
+                        alert_manager.alertNotAsRaster();
                         $('.raster_export').hide();
                         return false;
                     }else{

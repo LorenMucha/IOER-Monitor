@@ -393,7 +393,7 @@ Layer Control
 #layer_control .extra-maps #gewaesser .pic{
     background-image: url("../assets/icon/water.png");
 }
-.active{
+#layer_control .active{
     border: 3px solid green;
     padding: 5px;
 }

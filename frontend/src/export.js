@@ -1,11 +1,6 @@
-var map,
-    webatlas,
-    satellite,
-    layer;
 //TODO: umschreiben
 $(function() {
-	$("#kartenlink").click(function(){
-
+	$(document).on("click","#kartenlink",function(){
 	    if(raeumliche_visualisierung.getRaeumlicheGliederung()==="raster"){
             urlparamter.setUrlParameter('raster_save',true);
         }else{
@@ -112,7 +107,7 @@ $(function map_export(){
     //print
     let pdf_dialog_container = $("#print_container");
     let print_map;
-        $('.print_button').click(function () {
+        $(document).on("click",'.print_button',function () {
             if(typeof indikatorauswahl.getSelectedIndikator() !=='undefined') {
                 let format = $(this).data("format");
 

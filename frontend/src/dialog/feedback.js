@@ -145,34 +145,9 @@ const feedback={
                 message = selector.find("#message").val(),
                 url = 'https://monitor.ioer.de/monitor_api/email/';
 
-            $.ajax({
-                async:true,
-                type: 'GET',
-                url: url,
-                data: {
-                    name:name,
-                    sender:email,
-                    message:message
-                },
-                error:function(xhr, ajaxOptions, thrownError){
-                    console.log(thrownError);
-                    console.log(this.data);
-                    swal({
-                        title: 'Fehler!',
-                        text: 'Ihre Nachricht konnte nicht zugestellt werden. Bitte kontaktieren Sie uns unter: <a id="mail_to" href="mailto:l.mucha@ioer.de" target="_blank">Email</a>',
-                        type: 'error',
-                        html: true
-                    });
-                },
-                success:function(data){
-                    dialog_manager.content.remove();
-                    swal(
-                        'Vielen Dank!',
-                        'Ihre Nachricht wurde zugestellt.',
-                        'success'
-                    );
-                }
-            });
+            request_manager.sendMail(name,email,message);
+            //close the dialog
+            dialog_manager.content.remove();
         }
     }
 };

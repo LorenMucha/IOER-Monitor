@@ -147,7 +147,7 @@ const ogc_export={
                 const object = ogc_export.wcs;
                 let indikator = indikatorauswahl.getSelectedIndikator(),
                     endpoint = $(`#${object.endpoint_id}`),
-                    wcs_link = 'http://maps.ioer.de/cgi-bin/wcs?MAP=' + indikator + '_wcs',
+                    wcs_link = 'http://monitor.ioer.de/cgi-bin/wcs?MAP=' + indikator + '_wcs',
                     checkbox = endpoint.find("#checkbox_wcs"),
                     allow=endpoint.find('#wcs_allow');
 
@@ -162,7 +162,7 @@ const ogc_export={
                         endpoint
                             .find('.link_container')
                             .find('a')
-                            .attr("href",wcs_link+"&SERVICE=WCS&VERSION=1.0.0&REQUEST=GetCapabilities");
+                            .attr("href",wcs_link+"&SERVICE=WCS&VERSION=2.0.0&REQUEST=GetCapabilities");
                     } else {
                         allow.hide();
                     }
@@ -254,7 +254,7 @@ const ogc_export={
                         endpoint
                             .find('.link_container')
                             .find('a')
-                            .attr("href",wfs_link+"&SERVICE=WFS&VERSION=1.0.0&REQUEST=GetCapabilities");
+                            .attr("href",wfs_link+"&SERVICE=WFS&VERSION=2.0.0&REQUEST=GetCapabilities");
                     } else {
                         allow.hide();
                     }

@@ -121,5 +121,17 @@ const alert_manager= {
 
             )
         },500);
+    },
+    alertIE:function() {
+        $('#Modal').remove();
+        $('head').append('<style>.swal-overlay{background-color: lightgray}</style>')
+        swal({
+            title: '<img src="frontend/assets/icon/worldwide.png"/>',
+            text: 'Ihr Browser wird nicht unterstützt, bitte verwendet Sie einen aktuellen Browser wie <b><a href="https://www.mozilla.org/de/firefox/new/" target="_blank">' +
+                  'Firefox</a></b> oder <b><a href="https://www.google.com/intl/de_ALL/chrome/" target="_blank">Chrome</a></b>',
+            html:true,
+            showCancelButton: false,
+            showConfirmButton: false
+        });
     }
 };

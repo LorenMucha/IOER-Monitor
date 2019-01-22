@@ -115,9 +115,8 @@ const script_loader={
         //TODO: needs to be removed if Reini is finished
         "frontend/src/dialog/dialog.js",
         //other elements
-        "frontend/src/ajax.js",
+        "frontend/src/request_manager.js",
         "frontend/src/config.js",
-        "frontend/src/helper.js",
         "frontend/src/alert_manager.js",
         "frontend/src/export.js",
         "frontend/src/search.js",
@@ -141,10 +140,17 @@ const script_loader={
             try {
                 script_loader.init.call(this);
             }catch(err){
-                console.log(err);
-                /*setTimeout(function(){
-                    history.go(0);
-                },500);*/
+                //IE is not supportet, otherwise there is an real error
+                if(helper.checkIE()){
+                    alert_manager.alertIE();
+                }else{
+                    let url= window.location.href,
+                        message=`in der folgenden URL: ${url} trat ein Fehler auf, mit dem Browser: ${window.navigator.userAgent}`,
+                        sender="Error im Monitor",
+                        name="IÖR-Monitor";
+                    alert_manager.alertError();
+                    request_manager.sendMail(name,sender,message);
+                }
             }
 
         });

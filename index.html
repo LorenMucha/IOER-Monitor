@@ -345,10 +345,12 @@
 <script src="frontend/lib/leaflet/leaflet.js" type="text/javascript"></script>
 <script src="frontend/lib/leaflet/plugin/leaflet.pattern-src.js" type="text/javascript"></script>
 
-<!-- Page js-->
+<!--
+Scriptloader imports all Scripts into the DOM, the others are needed for IE
+-->
 <script src="frontend/src/script_loader.js" type="text/javascript"></script>
-<script src="frontend/src/track.js" type="text/javascript"></script>
 <script src="frontend/src/helper.js" type="text/javascript"></script>
+<script src="frontend/src/alert_manager.js" type="text/javascript"></script>
 <script>
     script_loader.include();
 </script>

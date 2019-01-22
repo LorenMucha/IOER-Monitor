@@ -21,6 +21,7 @@ const request_manager={
                 colors()+
                 '},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+
                 '"},"query":"getJSON"}');
+
         return this.sendRequestPHP({"file":json,"query":"getGeoJSON","type":"POST","debug":false});
     },
     //check if a indicator is possible to view in the the given kind of visualization (gebiete/raster)
@@ -146,11 +147,13 @@ const request_manager={
         this.call.abort();
     },
     onError:function( thrownError,function_name,url){
-        console.log("Error in: "+function_name);
-        progressbar.remove();
-        console.log(url);
-        console.log(thrownError);
-        alert_manager.alertError();
+        if(thrownError !=="abort") {
+            console.log("Error in: " + function_name);
+            progressbar.remove();
+            console.log(url);
+            console.log(thrownError);
+            alert_manager.alertError();
+        }
     }
 };
 //Todo noch umschreiben auf den neuen Mapserver

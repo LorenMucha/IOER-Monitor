@@ -117,10 +117,10 @@ const script_loader={
         //other elements
         "frontend/src/request_manager.js",
         "frontend/src/config.js",
-        "frontend/src/alert_manager.js",
         "frontend/src/export.js",
         "frontend/src/search.js",
-        "frontend/src/webtour.js"
+        "frontend/src/webtour.js",
+        "frontend/src/track.js"
     ],
     include:function() {
         const loader = this;
@@ -145,8 +145,8 @@ const script_loader={
                     alert_manager.alertIE();
                 }else{
                     let url= window.location.href,
-                        message=`in der folgenden URL: ${url} trat ein Fehler auf, mit dem Browser: ${window.navigator.userAgent}`,
-                        sender="Error im Monitor",
+                        message="in der folgenden URL: "+url+" trat ein Fehler auf, mit dem Browser: "+window.navigator.userAgent,
+                        sender="ErrorImMonitor",
                         name="IÖR-Monitor";
                     alert_manager.alertError();
                     request_manager.sendMail(name,sender,message);

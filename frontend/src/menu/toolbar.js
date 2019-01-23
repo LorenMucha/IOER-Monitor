@@ -152,9 +152,6 @@ const toolbar = {
                             <div id="farbwahl">
                                 <span class="span">Farbschema</span>
                                 <hr class="hr"/>
-                                <!--<div id="farbwahl_btn" class="btn btn-primary" type="button">Bitte Wählen..<span class="caret"></span></div>
-                                <div id="color_schema">
-                                </div>-->
                                 <div class="form-inline">
                                     <div class="form-group">
                                           <input type='text' name='triggerSet' id="triggerSet_min" placeholder="Min Farbwert"/>
@@ -330,7 +327,7 @@ const toolbar = {
                     //set the height og the overflow content inside the menu bar
                     if(main_view.getHeight() <= 1000 && view_state.getViewState() ==='mw') {
                         let height = toolbar.getHeight() - $('#no_overflow').height() - 60;
-                        $('#overflow_content').css("height",height+50);
+                        $('#overflow_content').css("max-height",height+50);
                     }
                 });
 

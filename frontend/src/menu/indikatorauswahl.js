@@ -1,6 +1,6 @@
 //Indikatorauswahl
 const indikatorauswahl ={
-    possebilities:'',
+    possebilities:false,
     all_possible_years:'',
     filtered_years:'',
     paramter:'ind',
@@ -97,14 +97,15 @@ const indikatorauswahl ={
                 }else{
                     icon_set=icon;
                 }
-
+                //create the cat choices
                 if(main_view.getWidth()>=500) {
-                    html += '<div id="kat_item_'+cat_id+'" class="ui left pointing dropdown link item link_kat" value="' + cat_id + '" style="'+background_color+'">'+icon_set+'<i class="dropdown icon"></i>' + cat_name() + '<div id="submenu' + cat_id + '" class="menu submenu upward">';
+                    html += `<div id="kat_item_${cat_id}" class="ui left pointing dropdown link item link_kat" value="${cat_id}" style="${background_color}">${icon_set}<i class="dropdown icon"></i>${cat_name()}<div id="submenu${cat_id}" class="menu submenu upward">`;
                 }else{
-                    html += '<div class="header">' +
-                        '      <i class="tags icon"></i>'+cat_name()+'</div>' +
-                        '    <div class="divider"></div>'
+                    html += `<div class="header">
+                                <i class="tags icon"></i>${cat_name()}</div>
+                            <div class="divider"></div>`
                 }
+                //create the supselection
                 $.each(cat_value.indicators, function (key, value) {
                     let ind_id = key,
                         ind_name=function(){
@@ -117,12 +118,16 @@ const indikatorauswahl ={
                         markierung = value.significant,
                         grundakt_state = value.basic_actuality_state,
                         einheit = value.unit,
-                        times = value.times;
-                    if (markierung === 'true') {
-                        html += '<div class="indicator_ddm_item_bold item link_sub" id="' + ind_id + '_item' + '" data-times="'+times+'" data-einheit="'+einheit+'" data-value="' + ind_id + '" value="' + ind_id + '" data-kat="' + cat_id + '" data-name="' + ind_name() + '" data-sort="1" data-actuality="'+grundakt_state+'">';
-                    } else {
-                        html += '<div class="item link_sub" id="' + ind_id + '_item' + '" data-times="'+times+'" data-einheit="'+einheit+'" data-value="' + ind_id + '" value="' + ind_id + '" data-kat="' + cat_id + '" data-name="' + ind_name() + '" data-sort="0" data-actuality="'+grundakt_state+'">';
-                    }
+                        times = value.times,
+                        markierung_class=function(){
+                            let set="";
+                            if(markierung==="true"){
+                                set= "indicator_ddm_item_bold";
+                            }
+                            return set;
+                        };
+
+                    html += `<div class="${markierung_class()} item link_sub" id="${ind_id}_item" data-times="${times}" data-einheit="${einheit}" data-value="${ind_id}" value="${ind_id}" data-kat="${cat_id}" data-name="${ind_name()}" data-sort="1" data-actuality="${grundakt_state}">`;
                     html += ind_name() + "</div>";
                 });
                 html +='</div></div>';
@@ -185,7 +190,7 @@ const indikatorauswahl ={
         }
         farbschema.reset();
         //reset error code
-        error_code.setErrorCode(false);
+        error.setErrorCode(false);
         legende.init(true);
         $.when(request_manager.getJahre(indicator_id)).done(function(data_time){
             menu.all_possible_years = data_time;

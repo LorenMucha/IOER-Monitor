@@ -49,6 +49,7 @@ const helper={
     },
     disableElement:function(elem,text) {
         $(elem)
+            .addClass('disabled')
             .prop('title', text)
             .prop('disabled', true)
             .css('cursor', 'not-allowed');

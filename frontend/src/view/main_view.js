@@ -36,7 +36,7 @@ const main_view = {
                     table.reinitializeStickyTableHeader();
                     map_infos.resize();
                     legende.resize();
-                    //map._onResize();
+                    map.invalidateSize()
                 }
             });
     },
@@ -55,6 +55,7 @@ const main_view = {
             legende.resize();
             table.reinitializeStickyTableHeader();
             map_infos.resize();
+            map.invalidateSize();
         }
     },
     initSplitterView:function(){

@@ -22,7 +22,7 @@ const indikator_raster = {
         }
 
         $.when(getRasterMap(_time, _ind, _raumgliederung_set, _klassifizierung, _klassenanzahl, _darstellung_map, _seite))
-            .then(function (data) {
+            .done(function (data) {
                 let txt = data,
                     x = txt.split('##'),
                     pfad_mapfile = x[0],
@@ -73,8 +73,15 @@ const indikator_raster = {
                 object.raster_layer.bringToFront();
                 object.raster_layer.setOpacity(opacity_slider.getOpacity());
                 map.on('click', object.onClick);
-                if (!_seite) {
-                    legende.fillContent();
+                if (!_seite){
+                    var interval = setInterval(function () {
+                        if (indikatorauswahl.getPossebilities()) {
+                            clearInterval(interval);
+                            legende.fillContent();
+                            //add the farbschema
+                            farbschema.init();
+                        }
+                    }, 100)
                 }
                 if (callback) callback();
                 map_header.set();

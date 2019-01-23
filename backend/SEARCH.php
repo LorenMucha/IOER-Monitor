@@ -33,7 +33,8 @@ class SEARCH{
         //seach for the suitable results inside the object
         foreach($indObject as $key=>$row){
             //search inside indicators
-              if(strpos(strtolower($row->name),$q)!==false
+              if(strpos(strtolower($row->id),$q)!==false
+                  or strpos(strtolower($row->name),$q)!==false
                   or strpos(strtolower($row->name_en),$q)!==false
                   or strpos(strtolower($row->cat_name),$q)!==false
                   or strpos(strtolower($row->cat_name_en),$q)!==false
@@ -78,22 +79,22 @@ class SEARCH{
             }
         }
 
-        $query_krs = "select gid, ags, gen, ST_AsText(ST_centroid(transform(" . pg_escape_string($geom) . ",4326))) AS CENTER from  vg250_krs_" . $year_pg . "_grob where LOWER(gen) LIKE LOWER('%".$searchTerm."%')";
+        $query_krs = "select gid, ags, gen,des, ST_AsText(ST_centroid(transform(" . pg_escape_string($geom) . ",4326))) AS CENTER from  vg250_krs_" . $year_pg . "_grob where LOWER(gen) LIKE LOWER('%".$searchTerm."%')";
         $erg_krs = POSTGRESQL_MANAGER::get_instance()->query($query_krs);
         if (empty((array)$erg_bld)) {
             foreach($erg_krs as $row){
                 $coordinates = str_replace(array('POINT(',')'),array('',''),$row->center);
                 $array = explode(" ",$coordinates);
-                $JSON .= '{"titel": "' . $row->gen. '","value":["' . $array[0]. '","'.$array[1].'"],"category":"Orte","description":"Kreis"},';
+                $JSON .= '{"titel": "' . $row->gen. '","value":["' . $array[0]. '","'.$array[1].'"],"category":"Orte","description":"'.$row->des.'"},';
             }
         }
-        $query_g50 = "select gid, ags, gen, ST_AsText(ST_centroid(transform(" . pg_escape_string($geom) . ",4326))) AS CENTER from  vg250_g50_" . $year_pg . "_grob where LOWER(gen) LIKE LOWER('%".$searchTerm."%')";
+        $query_g50 = "select gid, ags, gen,des, ST_AsText(ST_centroid(transform(" . pg_escape_string($geom) . ",4326))) AS CENTER from  vg250_g50_" . $year_pg . "_grob where LOWER(gen) LIKE LOWER('%".$searchTerm."%')";
         $erg_g50 = POSTGRESQL_MANAGER::get_instance()->query($query_g50);
         if (empty((array)$erg_krs)) {
             foreach($erg_g50 as $row){
                 $coordinates = str_replace(array('POINT(',')'),array('',''),$row->center);
                 $array = explode(" ",$coordinates);
-                $JSON .= '{"titel": "' . $row->gen. '","value":["' . $array[0]. '","'.$array[1].'"],"category":"Orte","description":"Stadt"},';
+                $JSON .= '{"titel": "' . $row->gen. '","value":["' . $array[0]. '","'.$array[1].'"],"category":"Orte","description":"'.$row->des.'"},';
             }
         }
         $query_stt = "select gid, ags, gen, ST_AsText(ST_centroid(transform(" . pg_escape_string($geom) . ",4326))) AS CENTER from  vg250_stt_" . $year_pg . "_grob where LOWER(gen) LIKE LOWER('%".$searchTerm."%')";

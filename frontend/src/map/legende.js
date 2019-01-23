@@ -82,7 +82,7 @@ const legende = {
     fillContent:function() {
         const object = this;
         let einheit = indikatorauswahl.getIndikatorEinheit(),
-            errorcode = error_code.getErrorCode(),
+            errorcode = error.getErrorCode(),
             legende_colors = this.getLegendeColorsObject(),
             datengrundlage_container = this.getDatengrundlageObject(),
             indikator_info_container = this.getIndikatorInfoObject(),

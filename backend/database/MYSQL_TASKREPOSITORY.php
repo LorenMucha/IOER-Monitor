@@ -87,19 +87,21 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
     /*Get all possible Indicators in a Indicator Category for 'gebiete' or 'raster'-------*/
     public function getAllIndicatorsByCategoryGebiete($kat, $modus){
         $sql = "SELECT * 
-            FROM m_indikatoren, m_indikator_freigabe
+            FROM m_indikatoren, m_indikator_freigabe, m_zeichenvorschrift
             WHERE m_indikatoren.ID_THEMA_KAT =  '" . $kat . "'
             AND m_indikatoren.ID_INDIKATOR = m_indikator_freigabe.ID_INDIKATOR
             AND m_indikator_freigabe.STATUS_INDIKATOR_FREIGABE =  '".$this->berechtigung."'
+            And m_zeichenvorschrift.ID_INDIKATOR = m_indikatoren.ID_INDIKATOR
             GROUP BY m_indikatoren.INDIKATOR_NAME_KURZ
             ORDER BY  m_indikatoren.MARKIERUNG DESC, m_indikatoren.SORTIERUNG ASC";
 
         if($modus==="raster"){
             $sql = "SELECT * 
-                FROM m_indikatoren, d_raster
+                FROM m_indikatoren, d_raster, m_zeichenvorschrift 
                 WHERE ID_THEMA_KAT =  '".$kat."'
                 AND m_indikatoren.ID_INDIKATOR = d_raster.INDIKATOR
                 AND d_raster.Freigabe_AUSSEN >=  '".$this->berechtigung."'
+                And m_zeichenvorschrift.ID_INDIKATOR = m_indikatoren.ID_INDIKATOR
                 GROUP BY m_indikatoren.INDIKATOR_NAME_KURZ
                 ORDER BY m_indikatoren.INDIKATOR_NAME_KURZ ASC";
         }

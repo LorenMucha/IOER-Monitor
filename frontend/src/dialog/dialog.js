@@ -5,7 +5,7 @@ function openGebietsprofil(ags,name){
         $detachedChildren = $dialogContainer.children().detach();
 
     $( "#gebietsprofil_content").dialog({
-        title: 'Gebietscharakteristik',
+        title: 'Indikatorwertübersicht',
         width: "80%",
         height: calculateHeight(),
         open: function(ev, ui){
@@ -41,7 +41,7 @@ function openGebietsprofil(ags,name){
 function openStatistik(ags, name, wert){
     let dialogContainer = $('#objektinformationen_content');
     dialogContainer.dialog({
-        title: 'Statistik Gebietseinheit',
+        title: 'Statistik',
         width: calculateWidth(),
         height: calculateHeight(),
         open: function(ev, ui){

@@ -60,7 +60,7 @@ const script_loader={
         //models
         "frontend/src/models/styles.js",
         "frontend/src/models/klassengrenzen.js",
-        "frontend/src/models/error_code.js",
+        "frontend/src/models/error.js",
         "frontend/src/models/pips.js",
         "frontend/src/models/view_state.js",
         //menu
@@ -120,7 +120,8 @@ const script_loader={
         "frontend/src/export.js",
         "frontend/src/search.js",
         "frontend/src/webtour.js",
-        "frontend/src/track.js"
+        "frontend/src/track.js",
+        "frontend/src/main.js"
     ],
     include:function() {
         const loader = this;
@@ -138,80 +139,18 @@ const script_loader={
 
         $.getMultiScripts(loader.scripts).done(function() {
             try {
-                script_loader.init.call(this);
+                main.call(this);
             }catch(err){
                 //IE is not supportet, otherwise there is an real error
                 if(helper.checkIE()){
                     alert_manager.alertIE();
                 }else{
-                    let url= window.location.href,
-                        message="in der folgenden URL: "+url+" trat ein Fehler auf, mit dem Browser: "+window.navigator.userAgent,
-                        sender="ErrorImMonitor",
-                        name="IÖR-Monitor";
+                    let message=error.getErrorMessage("script Loading");
                     alert_manager.alertError();
-                    request_manager.sendMail(name,sender,message);
+                    request_manager.sendMail(message.name,message.sender,message.message);
                 }
             }
 
         });
-    },
-    init:function() {
-        //set the Unit test
-        if(!view_state.getUnitTestState()) {
-            //load the config data
-            $.when($.ajax({
-                async:true,
-                url:"frontend/data/config.json",
-                dataType:"json",
-                cache:false,
-                success:function(data){
-                    config.setData(data);
-                    config.checkVersion();
-                }
-            }))
-            //set the menu data
-                .then(toolbar.init())
-                .then(map_controller.set())
-                .then(navbar.init())
-                .then(search.init())
-                .then(raeumliche_visualisierung.init())
-                .then(webTour.init())
-                .then(opacity_slider.init())
-                .then(klassifzierung.init())
-                .then(klassenanzahl.init())
-                .then(farbliche_darstellungsart.init());
-            //set the Views
-            $.when(main_view.restoreView())
-                .then(left_view.setMapView())
-                .then(function () {
-                    if (urlparamter.getUrlParameter('rid')) {
-                        loadRID(urlparamter.getUrlParameter('rid'));
-                        return false;
-                    }
-                    else if (indikatorauswahl.getSelectedIndikator()) {
-                        indikatorauswahl.setIndicator(indikatorauswahl.getSelectedIndikator());
-                        layer_control.init();
-                    }
-                    else {
-                        main_view.initializeFirstView();
-                    }
-                })
-                .then(farbschema.init());
-        }else{
-            $.when($('body')
-                .append('<div id="qunit"></div>')
-                .find("#Modal")
-                .css("display", "none"))
-                .then($('head').append('<script src="frontend/lib/qunit/qunit-2.6.2.js"></script><link rel="stylesheet" href="frontend/lib/qunit/qunit-2.6.2.css">'))
-                .then(
-                    QUnit.test("init map", function (assert) {
-                        assert.equal(raeumliche_visualisierung.init());
-                        assert.equal(farbschema.init());
-                        assert.equal(webTour.init());
-                        assert.equal(opacity_slider.init());
-                        assert.equal(main_view.restoreView());
-                        assert.equal(left_view.setMapView());
-                    }));
-        }
     }
 };

@@ -148,11 +148,10 @@ const request_manager={
     },
     onError:function( thrownError,function_name,url){
         if(thrownError !=="abort") {
-            console.log("Error in: " + function_name);
+            let message= error.getErrorMessage(`${thrownError} in function: ${function_name}`);
             progressbar.remove();
-            console.log(url);
-            console.log(thrownError);
             alert_manager.alertError();
+            this.sendMail(message.name,message.sender,message.message);
         }
     }
 };

@@ -9,7 +9,7 @@ const center_map={
         center_map.centerElement.onAdd = function (map) {
             var div = L.DomUtil.create('div');
             div.title = "In die Karte hineinzoomen";
-            div.innerHTML = `<div id="${center_map.selector}" class="germany btn_map"></div>`;
+            div.innerHTML = `<div id="${center_map.selector}" class="germany btn_map cursor"></div>`;
 
             L.DomEvent
                 .on(div, 'dblclick', L.DomEvent.stop)

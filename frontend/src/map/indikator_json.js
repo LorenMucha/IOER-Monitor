@@ -103,21 +103,23 @@ const indikator_json = {
             progressbar.remove();
         }
         if(layer_control.zusatzlayer.getState()){layer_control.zusatzlayer.setForward()}
+        //add the farbschema
+        farbschema.init();
     },
     setPopUp:function(e){
         let text={
                 de:{
-                    profil:"Gebietsprofil",
+                    profil:"Indikatorwertübersicht",
                     profil_title:"Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren",
                     stat:"Statistik",
                     stat_title:"Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators",
-                    trend:"Indikatorwertentwicklung",
+                    trend:dev_chart.text[language_manager.getLanguage()].title[false],
                     trend_title:"Veränderung der Indikatorwerte für die Gebietseinheit",
-                    compare:"Entwicklungsvergleich",
+                    compare:dev_chart.text[language_manager.getLanguage()].title[true],
                     compare_title:"Veränderung der Indikatorwerte für die Gebietseinheit"
                 },
                 en:{
-                    profil:"Area profile",
+                    profil:"Indicator value overview",
                     profil_title:"Area profile: Characteristic of this room unit with value overview of all indicators",
                     stat:"Statistics",
                     stat_title:"Indicator value of the territorial unit in relation to statistical characteristics of the spatial selection and the selected indicator",
@@ -141,9 +143,10 @@ const indikator_json = {
             id_popup = ags.toString().replace(".",""),
             gebietsprofil = `<div><img id="pop_up_gebietsprofil_${id_popup}" title="${text[lan].profil_title}" src="frontend/assets/icon/indikatoren.png"/><b> ${text[lan].profil}</b></div>`,
             statistik = `<div><img title="${text[lan].stat_title}" id="pop_up_diagramm_ags_${id_popup}" src="frontend/assets/icon/histogramm.png"/><b>  ${text[lan].stat}</b></div>`,
-            indikatorwertentwicklung = `<div><img id="pop_up_diagramm_ind_ags_${id_popup}" title="${text[lan].trend_title}" src="frontend/assets/icon/indikatoren_verlauf.png"/><b>  ${text[lan].trend}</b></div>`,
-            entwicklungsdiagramm = `<div><img id="pop_up_diagramm_entwicklung_ags_${id_popup}" title="${text[lan].compare}" src="frontend/assets/icon/indikatoren_diagr.png"/><b>  ${text[lan].compare}</b></div>`;
+            indikatorwertentwicklung = `<div><img class="dev_chart_trend" id="pop_up_diagramm_ind_ags_${id_popup}" title="${text[lan].trend_title}" src="frontend/assets/icon/indikatoren_verlauf.png"/><b class="dev_chart_trend">  ${text[lan].trend}</b></div>`,
+            entwicklungsdiagramm = `<div><img class="dev_chart_compare" id="pop_up_diagramm_entwicklung_ags_${id_popup}" title="${text[lan].compare}" src="frontend/assets/icon/indikatoren_diagr.png"/><b class="dev_chart_compare">  ${text[lan].compare}</b></div>`;
 
+        //remove chart on mobile phones to save space
         if(main_view.getMobileState()) {
             entwicklungsdiagramm = '';
             indikatorwertentwicklung = '';
@@ -213,6 +216,12 @@ const indikator_json = {
             dev_chart.chart.settings.ind_vergleich=false;
             dev_chart.open();
         });
+
+        //disable charts for community level
+        if(raumgliederung.getSelectedId()==='gem' || gebietsauswahl.getSelection()==="gem"){
+            helper.disableElement(".dev_chart_compare","Steht für die Gemeindeebene nicht zur Verfügung");
+            helper.disableElement(".dev_chart_trend","Steht für die Gemeindeebene nicht zur Verfügung");
+        }
     },
     /*/
     Set a Marker on the map with Lat Lon and Title f.eg. used inside the geographic search to tick the result inside the map
@@ -235,7 +244,7 @@ const indikator_json = {
         } else {
             let arr = fc.split("||"),
                 text = arr[2];
-            error_code.setErrorCode(text);
+            error.setErrorCode(text);
             return style.getErrorStyle();
         }
     },

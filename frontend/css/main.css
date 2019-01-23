@@ -41,6 +41,11 @@ body {
 .cursor{
     cursor:pointer;
 }
+.disabled{
+    -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+    filter: grayscale(100%);
+    opacity: 0.5;
+}
 .float-right{
     float: right !important;
 }
@@ -301,13 +306,18 @@ Feedack
     display: inline-block;
     bottom: 20px;
 }
+.btn-group-map .map-btn:hover{
+    border:1px solid var(--active-color);
+}
 .btn-group-map .map-btn{
     background-color: #4E60AA;
     transform: rotate(270deg);
     margin-bottom: 50px;
     height: 50px;
     right: -28px;
-    border:1px solid white;
+}
+.btn-group-map #legende_button{
+    border-right: 1px solid white !important;
 }
 .btn-group-map .legende_button{
     display: none;

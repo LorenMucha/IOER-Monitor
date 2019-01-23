@@ -60,6 +60,13 @@ const table = {
         //init the panels to filter or expand the table
         expand_panel.init();
         filter_panel.init();
+
+        //disable charts for community level
+        if(raumgliederung.getSelectedId()==='gem' || gebietsauswahl.getSelection()==="gem"){
+            helper.disableElement(".dev_chart_compare","Steht für die Gemeindeebene nicht zur Verfügung");
+            helper.disableElement(".dev_chart_trend","Steht für die Gemeindeebene nicht zur Verfügung");
+        }
+
         //create the main Table header
         function createTableHeader(){
             let value_text = indikatorauswahl.getSelectedIndikator().toUpperCase()+" ("+indikatorauswahl.getIndikatorEinheit()+")",
@@ -105,13 +112,8 @@ const table = {
                     ind = indikatorauswahl.getSelectedIndikator(),
                     einheit = indikatorauswahl.getIndikatorEinheit(),
                     //'icon container' for trend and indicator-comparing inside a digramm
-                    img_trend = '<img data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" title="Veränderung der Indikatorwerte für die Gebietseinheit" class="indsingle_entwicklungsdiagr" id="indikatoren_diagramm_ags' + ags + '" src="frontend/assets/icon/indikatoren_diagr.png"/>',
-                    img_trend_ind = '<img data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" title="Veränderung des Indikatorwertes für die Gebietseinheit" class="ind_entwicklungsdiagr" id="indikatoren_diagramm_ags_ind' + ags + '" src="frontend/assets/icon/indikatoren_verlauf.png"/>';
-
-                //set the raumgl as id if raumgliederung is set
-                if(typeof raumgliederung.getSelectedId()!=='undefined'){
-                    raumgl= raumgliederung.getSelectedId();
-                }
+                    img_trend = '<img class="dev_chart_compare" data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" title="Veränderung der Indikatorwerte für die Gebietseinheit" class="indsingle_entwicklungsdiagr" id="indikatoren_diagramm_ags' + ags + '" src="frontend/assets/icon/indikatoren_diagr.png"/>',
+                    img_trend_ind = '<img class="dev_chart_trend" data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" title="Veränderung des Indikatorwertes für die Gebietseinheit" class="ind_entwicklungsdiagr" id="indikatoren_diagramm_ags_ind' + ags + '" src="frontend/assets/icon/indikatoren_verlauf.png"/>';
 
                 if(name === layer_array[i].gen){
                     if(value.krs){
@@ -234,7 +236,6 @@ const table = {
     append:function(html_string){
         this.getScrollableAreaDOMObject().append(html_string);
     },
-    /*This function creates the table export*/
     expand:function(){
         const table = this;
         let grey_border = 'grey_border',
@@ -671,25 +672,21 @@ const table = {
     },
     onScroll:function(){
         if(view_state.getViewState()==='responsive') {
-            let scrollTimeout = null;
-            let scrollendDelay = 500; // ms
+            let scrollTimeout = null,
+                scrollendDelay = 500, // ms
+                scrollbeginHandler=function(){
+                    panner.hide();
+                },
+                scrollendHandler=function(){
+                    panner.show();
+                    scrollTimeout = null;
+                };
             if (scrollTimeout === null) {
                 scrollbeginHandler();
             } else {
                 clearTimeout(scrollTimeout);
             }
             scrollTimeout = setTimeout(scrollendHandler, scrollendDelay);
-
-            function scrollbeginHandler() {
-                // this code executes on "scrollbegin"
-                panner.hide();
-            }
-
-            function scrollendHandler() {
-                // this code executes on "scrollend"
-                panner.show();
-                scrollTimeout = null;
-            }
         }
     },
     getWidth:function(){

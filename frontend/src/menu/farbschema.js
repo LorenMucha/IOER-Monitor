@@ -68,20 +68,15 @@ const farbschema = {
     controller: {
         set:function() {
             const object = this;
-            let min_color="yellow",
-                max_color="red",
+            let colors = indikatorauswahl.getIndikatorInfo(indikatorauswahl.getSelectedIndikator(),"colors"),
+                min_color=colors.min,
+                max_color=colors.max,
                 trigger_min = $("#triggerSet_min"),
                 trigger_max = $("#triggerSet_max"),
                 picker_min = $("#color_min_user"),
                 picker_max = $("#color_max_user"),
                 btn_create = $("#create_color_schema"),
                 btn_remove=$("#clear_farbwahl");
-            //try to set the standard color by indicator colors
-            try{
-                min_color=klassengrenzen.getMinColor();
-                max_color=klassengrenzen.getMaxColor();
-            }catch(err){}
-
 
             //documentation: https://bgrins.github.io/spectrum/
             picker_min.spectrum({

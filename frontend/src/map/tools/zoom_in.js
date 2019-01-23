@@ -9,7 +9,7 @@ const zoom_in={
         zoom_in.zoomElement.onAdd = function (map) {
             var div = L.DomUtil.create('div');
             div.title = "In die Karte hineinzoomen";
-            div.innerHTML = `<div id="${zoom_in.selector}" class="zoomIn btn_map"></div>`;
+            div.innerHTML = `<div id="${zoom_in.selector}" class="zoomIn btn_map cursor"></div>`;
 
             L.DomEvent
                 .on(div, 'dblclick', L.DomEvent.stop)

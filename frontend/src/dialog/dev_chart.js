@@ -2,7 +2,10 @@ const dev_chart={
     endpoint_id:"entwicklungsdiagramm_content",
     text:{
         de:{
-            title:"Entwicklungsvergleich",
+            title:{
+                false:"Indikatorwertentwicklung",
+                true:"Indikatorvergleich"
+            },
             info:"Dieses Diagramm stellt die Entwicklung der Indikatoren dar.",
             indicator:"verfügbare Indikatoren",
             choice:"Bitte wählen.....",
@@ -86,7 +89,7 @@ const dev_chart={
         //settings for the manager
         dialog_manager.instructions.endpoint = `${this.endpoint_id}`;
         dialog_manager.instructions.html= html;
-        dialog_manager.instructions.title=dev_chart.text[lan].title;
+        dialog_manager.instructions.title=dev_chart.text[lan].title[this.chart.settings.ind_vergleich];
         dialog_manager.instructions.modal=false;
         dialog_manager.create();
         this.chart.create();
@@ -168,6 +171,7 @@ const dev_chart={
             }
 
             defCalls().done(function (arr) {
+                console.log(arr);
                 chart.merge_data = [];
                 let i = 0;
                 $.each(array, function (key, val) {

@@ -124,7 +124,10 @@ try{
                             '","stt":"' . $row_ind->RAUMEBENE_STT .
                             '","ror":"' . $row_ind->RAUMEBENE_ROR .
                         '"},"literatur":"' . preg_replace('/\s+/', ' ',str_replace('"',"'",htmlentities($row_ind->LITERATUR))) .
-                        '","verweise":"' . preg_replace('/\s+/', ' ',str_replace('"',"'",htmlentities($row_ind->VERWEISE))) .
+                        '","colors":{' .
+                            '"min":"'.$row_ind->FARBWERT_MIN.
+                            '","max":"'.$row_ind->FARBWERT_MAX.
+                        '"},"verweise":"' . preg_replace('/\s+/', ' ',str_replace('"',"'",htmlentities($row_ind->VERWEISE))) .
                         '","verweise_en":"' . preg_replace('/\s+/', ' ',str_replace('"',"'",htmlentities($row_ind->VERWEISE_EN))) .
                         '","interpretation":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->BEDEUTUNG_INTERPRETATION))) .
                         '","interpretation_en":"' . trim(preg_replace('/\s+/', ' ', str_replace('"', "'", $row_ind->BEDEUTUNG_INTERPRETATION_EN))) .

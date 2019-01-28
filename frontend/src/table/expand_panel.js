@@ -109,6 +109,7 @@ const expand_panel = {
         //DDM Indikatoren
         indikatorauswahl.cloneMenu('kat_auswahl_table','link_kat_table','left',false,true);
         panel.getIndikatorauswahlDDMObject().addClass('indicator_ddm');
+        panel.getIndikatorauswahlDDMObject().find(`#${indikatorauswahl.getSelectedIndikator()}_item`).addClass("disabled");
         //if table was expand
         //DDM Time
         if($.inArray(indikatorauswahl.getSelectedIndikator(),ind_differences_hide)!== -1){
@@ -312,6 +313,35 @@ const expand_panel = {
                         }
                     }
                 });
+            //select all times
+            expand_panel
+                .getZeitschnittAuswahlContainer()
+                .find(".ui.toggle.checkbox")
+                .unbind()
+                .checkbox({
+                    onChecked() {
+                        let selections = function(){
+                            let values_set = [];
+                            expand_panel
+                            .getZeitschnittauswahlDDMObject()
+                            .find('.item')
+                            .each(function(){
+                                let val = $(this).data("value");
+                                values_set.push(val.toString());
+                            });
+                            return values_set;
+                        };
+                        expand_panel
+                            .getZeitschnittauswahlDDMObject()
+                            .dropdown("set selected",selections());
+                    },
+                    onUnchecked() {
+                        expand_panel
+                            .getZeitschnittauswahlDDMObject()
+                            .dropdown("clear");
+                    },
+                });
+
             //kenngrößen-------------------------------------------------------
             expand_panel.getKenngroessenauswahlDDMObject()
                 .unbind()

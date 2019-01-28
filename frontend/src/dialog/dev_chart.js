@@ -171,7 +171,6 @@ const dev_chart={
             }
 
             defCalls().done(function (arr) {
-                console.log(arr);
                 chart.merge_data = [];
                 let i = 0;
                 $.each(array, function (key, val) {

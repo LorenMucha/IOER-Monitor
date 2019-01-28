@@ -1,0 +1,58 @@
+:root{
+    --main-color:#4E60AA;
+    --active-color:#8CB91B
+}
+.clearfix:before,
+.clearfix:after {
+    content: " ";
+    display: table;
+}
+.clearfix:after {
+    clear: both;
+}
+.clearfix {
+    *zoom: 0;
+    text-decoration: none;
+}
+.cursor{
+    cursor:pointer;
+}
+.disabled{
+    -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+    filter: grayscale(100%);
+    opacity: 0.5;
+}
+.float-right{
+    float: right !important;
+}
+/*JQuery Dialog*/
+.ui-widget-overlay.custom-overlay
+{
+    background-color: black;
+    background-image: none;
+    opacity: 0.9;
+    z-index: 1040;
+}
+/*width*/
+.w-100{
+    width:100%;
+}
+.w-75{
+    width:75%;
+}
+.w-50{
+    width:50%;
+}
+.w-25{
+    width:25%;
+}
+/*Buttons*/
+.btn-outline-dark{
+    border: 1px solid black;
+    background-color: white;
+}
+/*search*/
+.prompt {
+    border-radius: 0 !important;
+    border:1px solid black !important;
+}

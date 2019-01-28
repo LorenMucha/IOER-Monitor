@@ -2,6 +2,7 @@ const language_manager={
     language:"de",
     language_data : null,
     paramter:"language",
+    language_json: null,
     setLanguage:function(_language){
         this.language = _language;
     },
@@ -16,6 +17,7 @@ const language_manager={
             dataType:"json",
             cache:false,
             success:function(_data){
+                manager.language_json=data;
                 manager.language_data = _data;
                 $.each(_data,function(key,value){
                     let id = key;
@@ -46,5 +48,8 @@ const language_manager={
                 });
             }
         }))
+    },
+    getLanguageJson:function(){
+        return this.language_json;
     }
 };

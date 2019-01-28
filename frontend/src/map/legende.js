@@ -55,7 +55,7 @@ const legende = {
         //only for Multiview
         if(view_state.getViewState()==="mw"){
             if(table.isOpen()){
-                show_button_grp.css("right", right_view.getWidth()+30);
+                show_button_grp.css("right", right_view.getWidth()+35);
                 legende_container.css("right",right_view.getWidth()+30);
                 close_icon.css("right",right_view.getWidth()+73);
             }else{
@@ -74,10 +74,57 @@ const legende = {
     },
     init:function(){
         const legende = this;
+        this.create();
         this.resize();
         legende.getShowButtonObject().show();
         //set the controller
         legende.controller.set();
+    },
+    create:function(){
+      let html =`
+        <div class="legende_content">
+            <div id="legende_close"><span class="glyphicon glyphicon-remove"></span></div>
+            <div class="legende_map">
+                <div><h3 id="legende_header">Legende</h3></div>
+                <hr class="hr"/>
+                <div class="einheit_container" id="einheit_container">
+                    <span>Einheit:</span>
+                    <b id="legende_einheit"></b>
+                </div>
+                <div id="legende_i" class="legende_i"></div>
+            </div>
+            <hr class="hr"/>
+            <div id="Klassifikationsmethode_legende"><b>Klassifikationsmethode</b></div>
+            <div class="histogramm_klasseneinteilung" id="histogramm_klasseneinteilung"></div>
+            <hr class="hr"/>
+            <div id="indicator_info"><b>Informationen zum Indikator</b></div>
+            <div id="indikator_info_text"></div>
+            <button class="btn btn-primary btn_dropdown kennblatt" id="legende_kennblatt" onclick="kennblatt.open();">Kennblatt</button>
+            <hr class="hr"/>
+            <div id="legende_datangrundlage"><b>Datengrundlage</b></div>
+            <div id="datengrundlage_content"></div>
+            <div id="legende_map_projection"><b>Kartenprojektion</b></div>
+            <div>ETRS89 / UTM Zone 32N</div>
+            <hr class="hr"/>
+            <div id="legende_histogramm"><b>Histogramm</b></div>
+            <div id="histogramm_pic"></div>
+            <div class="hist_info"></div>
+            <div id="datenalter_container">
+                <button class="btn btn-primary btn_dropdown" id="datenalter">
+                    <i class="glyphicon glyphicon-chevron-down drop_arrow"></i>
+                    <span>Datenalter</span>
+                </button>
+                <div id="dropdown_datenalter">
+                    <div id="grundakt_titel">&#160;</div>
+                    <div id="grundakt_legende"></div>
+                    <div id="grundaktmap" class="grundaktmap_click"></div>
+                    <div id="hover_info_grundaktmap" class="grundaktmap_click">Ein und Ausblenden der Grundaktualität im Kartenfenster (hier klicken)</div>
+                </div>
+            </div>
+        </div>
+      `;
+        this.getDOMObject().html(html);
+        //diable or enable datenalter BTN if not avaliable
     },
     fillContent:function() {
         const object = this;
@@ -91,9 +138,13 @@ const legende = {
             info_json = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()];
 
         //close datenalter
-        if(indikatorauswahl.getSelectedIndiktorGrundaktState() && object.getDatenalterContainerObject().find('#dropdown_datenalter').is(":visible")){
-            object.getDatenalterContainerObject().find('#dropdown_datenalter').show();
+        if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
+            helper.enableElement("#datenalter","Zeige die Karte des Datenalters.");
+            if( object.getDatenalterContainerObject().find('#dropdown_datenalter').is(":visible")){
+                object.getDatenalterContainerObject().find('#dropdown_datenalter').show();
+            }
         }else{
+            helper.disableElement("#datenalter","Für die Auswahl nicht verfügbar.");
             object.getDatenalterContainerObject().find('#dropdown_datenalter').hide();
         }
 
@@ -201,7 +252,7 @@ const legende = {
         legende_container.hide('slow',function(){});
         if(view_state.getViewState()!=='responsive'){
             if($('.right_content').is(':visible')) {
-                show_button.css("right", $('#rightPane').width()+7);
+                show_button.css("right", $('#rightPane').width()+10);
             }else{
                 show_button.css("right","0px");
             }
@@ -241,7 +292,6 @@ const legende = {
                           }
                           return margin;
                       };
-                  console.log(legende_width);
                   legende.getDOMObject().css("width", margin());
                   if(click_dd===0){
                       datenalter_dd.show();

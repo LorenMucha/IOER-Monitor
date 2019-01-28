@@ -3,9 +3,7 @@
 const alert_manager= {
     leaveESCInfo: function () {
         swal({
-            title: "Verlassen Sie die Funktion mit ESC",
-            timer: 1000,
-            showConfirmButton: false
+            title: "Verlassen Sie die Funktion mit ESC"
         });
     },
     alertUpdate: function (version) {
@@ -91,9 +89,6 @@ const alert_manager= {
                     type: "warning",
                     cancelButtonText: "Abbrechen",
                     showCancelButton: false,
-                },
-                function(){
-                    raeumliche_visualisierung.getDOMObject().checkbox('uncheck');
                 }
             );
         },500));

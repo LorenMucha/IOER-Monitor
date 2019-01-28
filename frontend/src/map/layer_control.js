@@ -343,7 +343,9 @@ const layer_control={
     controller:{
         set:function(){
             const control = layer_control;
-            $('#map_button').click(function(){
+            $('#map_button')
+                .unbind()
+                .click(function(){
                 layer_control.open();
             });
             //on click baselayer

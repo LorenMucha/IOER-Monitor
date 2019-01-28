@@ -152,15 +152,15 @@ const toolbar = {
                             <div id="farbwahl">
                                 <span class="span">Farbschema</span>
                                 <hr class="hr"/>
-                                <div class="form-inline">
-                                    <div class="form-group">
-                                          <input type='text' name='triggerSet' id="triggerSet_min" placeholder="Min Farbwert"/>
-                                          <input type="color" class="form-control" id="color_min_user"/>
-                                           <span class="glyphicon glyphicon-trash fa-2x destroy float-right cursor" title="Auswahl leeren" id="clear_farbwahl"></span>
-                                          <input type='text' name='triggerSet' id="triggerSet_max" placeholder="Max Farbwert"/>
-                                          <input type="color" class="form-control" id="color_max_user" placeholder="Farbname oder HEX-Wert"/>
-                                           <span class="glyphicon glyphicon-plus fa-2x destroy float-right cursor" title="Farbschema erstellen" id="create_color_schema"></span>
-                                    </div>
+                                <div class="form-group-inline">
+                                      <input type='text' name='triggerSet' id="triggerSet_min" title="Min Farbwert in Hex" placeholder="#"/>
+                                      <input type="color" class="form-control" id="color_min_user"/>
+                                       <span class="glyphicon glyphicon-trash fa-2x destroy float-right cursor" title="Auswahl leeren" id="clear_farbwahl"></span>
+                                </div>
+                                <div class="form-group">
+                                      <input type='text' name='triggerSet' id="triggerSet_max" title="Max Farbwert in Hex" placeholder="#"/>
+                                      <input type="color" class="form-control" id="color_max_user" placeholder="Farbname oder HEX-Wert"/>
+                                      <button type="button" class="btn btn-secondary btn-sm float-right btn-outline-dark" id="create_color_schema">Erstellen</button>
                                 </div>
                             </div>
                             <div class="klassenbesetzung" id="klassenbesetzung">
@@ -211,6 +211,9 @@ const toolbar = {
                                         </label>
                                     </div>
                                 </form>
+                            </div>
+                            <div class="w-100" id="map-selection">
+                                <button type="button" class="btn btn-outline-dark w-100" id="map_button">Kartenergänzungen</button>
                             </div>
                         </div>
                         <!--Tools-------------------------->

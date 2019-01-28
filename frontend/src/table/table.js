@@ -62,14 +62,14 @@ const table = {
         filter_panel.init();
 
         //disable charts for community level
-        if(raumgliederung.getSelectedId()==='gem' || gebietsauswahl.getSelection()==="gem"){
+        if(raumgliederung.getSelectedId()==='gem' || raeumliche_analyseebene.getSelectionId()==="gem"){
             helper.disableElement(".dev_chart_compare","Steht für die Gemeindeebene nicht zur Verfügung");
             helper.disableElement(".dev_chart_trend","Steht für die Gemeindeebene nicht zur Verfügung");
         }
 
         //create the main Table header
         function createTableHeader(){
-            let value_text = indikatorauswahl.getSelectedIndikator().toUpperCase()+" ("+indikatorauswahl.getIndikatorEinheit()+")",
+            let value_text = `Wert (${indikatorauswahl.getIndikatorEinheit()})`,
                 colspan = 4;
             if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
                 colspan=5;
@@ -112,8 +112,8 @@ const table = {
                     ind = indikatorauswahl.getSelectedIndikator(),
                     einheit = indikatorauswahl.getIndikatorEinheit(),
                     //'icon container' for trend and indicator-comparing inside a digramm
-                    img_trend = '<img class="dev_chart_compare" data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" title="Veränderung der Indikatorwerte für die Gebietseinheit" class="indsingle_entwicklungsdiagr" id="indikatoren_diagramm_ags' + ags + '" src="frontend/assets/icon/indikatoren_diagr.png"/>',
-                    img_trend_ind = '<img class="dev_chart_trend" data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" title="Veränderung des Indikatorwertes für die Gebietseinheit" class="ind_entwicklungsdiagr" id="indikatoren_diagramm_ags_ind' + ags + '" src="frontend/assets/icon/indikatoren_verlauf.png"/>';
+                    img_trend = '<img class="indsingle_entwicklungsdiagr dev_chart_compare" data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" title="Veränderung der Indikatorwerte für die Gebietseinheit" class="indsingle_entwicklungsdiagr" id="indikatoren_diagramm_ags' + ags + '" src="frontend/assets/icon/indikatoren_diagr.png"/>',
+                    img_trend_ind = '<img class="ind_entwicklungsdiagr dev_chart_trend" data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" title="Veränderung des Indikatorwertes für die Gebietseinheit" class="ind_entwicklungsdiagr" id="indikatoren_diagramm_ags_ind' + ags + '" src="frontend/assets/icon/indikatoren_verlauf.png"/>';
 
                 if(name === layer_array[i].gen){
                     if(value.krs){
@@ -155,7 +155,7 @@ const table = {
                     html += '<td class="count_ags_table"></td><td class="td_ags">' +ags+ '</td><td class="td_name" data-des="'+des+'">' +name+'</td><td  style="text-align: right;">' +fc_name+'</td>';
                 }
                 if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
-                    html +='<td class="val-grundakt">'+grundakt_value+'</td>';
+                    html +='<td class="val-grundakt indicator_main">'+grundakt_value+'</td>';
                 }
 
                 html +='</tr>';
@@ -203,7 +203,7 @@ const table = {
                                 '<th class="td_name"><img data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + indikatorauswahl.getSelectedIndikator() + '" title="Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren" class="indikatoren_gebietsprofil" src="frontend/assets/icon/indikatoren.png"/> <b>' + name + '</b></th>' +
                                 '<th class="val-ags" data-name="' + value.gen + '" data-val="' + value_g + '" data-ind="' + indikatorauswahl.getSelectedIndikator() + '"><b>' + value_set + '</b><img data-name="Bundesrepublik" data-ags="' + ags + '" data-ind="' + indikatorauswahl.getSelectedIndikator() + '" data-wert="' + value_set + '" data-einheit="' + indikatorauswahl.getIndikatorEinheit() + '" title="Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators" class="indikatoren_diagramm_ags" class="histogramm_ags" id="diagramm_ags_' + ags + '" src="frontend/assets/icon/histogramm.png"/>' + img_trend + img_trend_ind + '</th>';
                             if (indikatorauswahl.getSelectedIndiktorGrundaktState()) {
-                                tfoot_ags += '<th class="td_akt">' + grundakt_val + '</th>';
+                                tfoot_ags += '<th class="td_akt indicator_main">' + grundakt_val + '</th>';
                             }
                         });
                     });
@@ -222,7 +222,7 @@ const table = {
                     '<th class="val-ags" data-name="Bundesrepublik" data-val="' + value_g + '" data-ind="' + indikatorauswahl.getSelectedIndikator() + '"><b>' + value_g + '</b><img data-name="Bundesrepublik" data-ags="99" data-ind="' + indikatorauswahl.getSelectedIndikator() + '" data-wert="' + value_g + '" data-einheit="' + indikatorauswahl.getIndikatorEinheit() + '" title="Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators" class="indikatoren_diagramm_ags" class="histogramm_ags" id="diagramm_ags_99" src="frontend/assets/icon/histogramm.png"/>' + img_trend + img_trend_ind + '</th>';
 
                 if (indikatorauswahl.getSelectedIndiktorGrundaktState()) {
-                    tfoot_brd += '<th class="td_akt">' + grundakt_val + '</th>';
+                    tfoot_brd += '<th class="td_akt indicator_main">' + grundakt_val + '</th>';
                 }
                 return tfoot_brd;
             }
@@ -272,6 +272,7 @@ const table = {
             }
             //sort by count
             results =  results.sort(function(obj1, obj2) {return obj1.count - obj2.count;});
+
             //expand the table---------------------------------------------------------------
             $.each(results,function(key,values_expand){
                 let id = values_expand.id,
@@ -383,7 +384,7 @@ const table = {
                                 if(indikatorauswahl.getSelectedIndiktorGrundaktState()) {
                                     grundakt_val = value_json.grundakt;
                                     let values_set = grundakt_val.split("/");
-                                    let values_ind = $(this).find('.val-grundakt').text().split("/");
+                                    let values_ind = $(this).find('.val-grundakt.indicator_main').text().split("/");
                                     $(this).append(`<td class="val-grundakt ${class_expand}">${grundakt_val}</td><td class="val-grundakt ${class_expand}">${getDiff_Grundakt(values_ind,values_set)}</td>`);
                                 }
                                 //apend the differences if set
@@ -402,27 +403,27 @@ const table = {
                         key_time_shift = id.replace("|","_");
                     footer_brd.append('<th id="99_expand_'+key_time_shift+'" class="val-ags '+grey_border+' '+class_expand+'"></th>');
                     if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
-                        footer_brd.append('<th id="expand_grundakt_footer_99" class="val-grundakt '+class_expand+'"></th><th id="expand_grundakt_footer_diff_99" class="val-grundakt '+class_expand+'"></th>');
+                        footer_brd.append('<th id="expand_grundakt_footer_99'+key_time_shift+'" class="val-grundakt '+class_expand+'"></th><th id="expand_grundakt_footer_diff_99'+key_time_shift+'" class="val-grundakt '+class_expand+'"></th>');
                     }
                     if(expand_panel.getDifferenceState()){
-                        footer_brd.append('<th id="expand_diff_footer_99" class="'+class_expand+'"></th>');
+                        footer_brd.append('<th id="expand_diff_footer_99'+key_time_shift+'" class="'+class_expand+'"></th>');
                     }
                     $.when(request_manager.getTableExpandValues(obj_brd,obj_ags)).done(function(data){
                         let data_array = data;
                         let value_brd = data_array['values']['99']['value_round'];
                         $('#99_expand_'+key_time_shift).text(value_brd);
                         if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
-                            let value_ind_brd = $('#tfoot_99 .td_akt').text().split("/");
+                            let value_ind_brd = $('#tfoot_99 .td_akt.indicator_main').text().split("/");
                             let grundakt = data_array['values']['99']['grundakt'];
                             let value_brd_set = grundakt.split("/");
-                            $('#expand_grundakt_footer_99').text(grundakt);
-                            $('#expand_grundakt_footer_diff_99').html(getDiff_Grundakt(value_ind_brd,value_brd_set));
+                            $('#expand_grundakt_footer_99'+key_time_shift).text(grundakt);
+                            $('#expand_grundakt_footer_diff_99'+key_time_shift).html(getDiff_Grundakt(value_ind_brd,value_brd_set));
                         }
                         if(expand_panel.getDifferenceState()){
                             //create the difference view
                             let value_ind = parseFloat((value_brd).replace(',', '.'));
                             let value_ags = parseFloat(footer_brd.find('.val-ags').find('b').text().replace(',', '.'));
-                            $('#expand_diff_footer_99').html(getDifferenceDiv(value_ind,value_ags));
+                            $('#expand_diff_footer_99'+key_time_shift).html(getDifferenceDiv(value_ind,value_ags));
                         }
                     });
                     //if finer spatial choice -> expand the table footer above the brd part

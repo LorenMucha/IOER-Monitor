@@ -15,7 +15,6 @@ const grundakt_layer = {
         return this.json_file;
     },
     init:function(raumgl){
-        helper.disableElement('#datenalter','Nicht verfügbar');
         //hole JSON
         const object = this;
         let grundaktmap = $("#grundaktmap");
@@ -26,7 +25,7 @@ const grundakt_layer = {
                 && raumgliederung.getSelectedId() !== 'gem'
                 && raeumliche_analyseebene.getSelectionId()!=='gem'
                 && zeit_slider.getTimeSet() > 2000) {
-                helper.enableElement('#datenalter', 'Zeige die Karte des Datenalters an.');
+
                 let def = $.Deferred(),
                     raumgliederung_set = raeumliche_analyseebene.getSelectionId();
 
@@ -57,7 +56,6 @@ const grundakt_layer = {
                     }
                 });
             } else if(raeumliche_visualisierung.getRaeumlicheGliederung()==='raster'){
-                helper.enableElement('#datenalter', 'Zeige die Karte des Datenalters an.');
                 $.ajax({
                     async:true,
                     type: "GET",
@@ -133,7 +131,7 @@ const grundakt_layer = {
                                 } else {
                                     indikator_raster_group.clean();
                                     map.removeLayer(grundaktlayer_set);
-                                    raster.addTo(map);
+                                    indikator_raster.init();
                                     click = 0;
                                 }
                             }

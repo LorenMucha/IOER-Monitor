@@ -39,10 +39,10 @@ const webTour={
                     content: "Suchen Sie nach passenden Indikatoren, Kategorien, Daten,Orten und vielen Schlagwörtern mehr.",
                     onShow:function(){
                         toolbar.open();
-                        helper.highlightElementByID(this.element.replace("#",""));
+                        helper.highlightElementByID("search");
                     },
                     onNext: function(){
-                        helper.resetHighlightElementByID(this.element.replace("#",""))
+                        helper.resetHighlightElementByID("search");
                         helper.slideDownElementByID('drop_kat');
                     }
                 },
@@ -234,6 +234,7 @@ const webTour={
                     onNext: function () {
                         helper.highlightElementByID("close_checker");
                         right_view.close();
+                        legende.open();
                         legende.resize();
                     }
                 },
@@ -259,46 +260,7 @@ const webTour={
                         $('#legende').css("width", "250px");
                         $('#dropdown_datenalter').hide();
                         $('#histogramm_pic').css("margin-left", "0px");
-                        $('#spatial_choice_checkbox_container')
-                            .checkbox('check');
-                        setTimeout(function(){
-                            $('#vergleich_btn').click();
-                        },1500);
                     }
-                },
-                {
-                    element: '#vergleich_btn',
-                    title: "Vergleichsmodus",
-                    placement: "left",
-                    content: "Im Rastermodus haben Sie die Möglichkeit, zwei Karten miteinander zu vergleichen",
-                    onNext:function(){
-                        raster_split.dialogObject.openDialog();
-                        setTimeout(function() {
-                            raster_split.dialogObject.getDropdownDOMObject().dropdown('set selected', 'F01RG');
-                        },2000);
-                    }
-                },
-                {
-                    element: "#create_vergleichskarte_button",
-                    title: "Fügen Sie die Karte hinzu",
-                    placement: "left",
-                    onNext:function(){
-                        setTimeout(function() {
-                            indikator_raster.init(null,null,"rechts",raster_split.dialogObject.getSettings());
-                            setTimeout(function(){
-                                raster_split.dialogObject.openDialog();
-                            },2000);
-                        },500);
-                    }
-                },
-                {
-                    element: "#close_vergleich .destroy",
-                    title: "Entfernen Sie den Erweiterungsmodus wieder",
-                    placement:"left",
-                    onNext:function(){
-                        $('#close_vergleich').find('.destroy').click();
-                    }
-
                 },
                 {
                     element: "#feedback_a",

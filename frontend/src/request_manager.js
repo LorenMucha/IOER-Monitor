@@ -84,7 +84,6 @@ const request_manager={
         return this.sendRequestPHP({"file":json,"query":"getTableExpandValues","type":"POST","debug":false});
     },
     getTrendValues:function(indicator_id,ags,settings){
-        console.log('{"ind":{"id":"'+indicator_id+'","ags_array":"'+ags+'"},"set":'+JSON.stringify(settings)+',"query":"getTrend"}');
         let json = JSON.parse('{"ind":{"id":"'+indicator_id+'","ags_array":"'+ags+'"},"set":'+JSON.stringify(settings)+',"query":"getTrend"}');
         return this.sendRequestPHP({"file":json,"query":"getTrend","type":"POST","debug":false});
     },
@@ -151,7 +150,9 @@ const request_manager={
             let message= error.getErrorMessage(`${thrownError} in function: ${function_name}`);
             progressbar.remove();
             alert_manager.alertError();
-            this.sendMail(message.name,message.sender,message.message);
+            if(!window.location.href.includes("monitor_test")) {
+                this.sendMail(message.name, message.sender, message.message);
+            }
         }
     }
 };

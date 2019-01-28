@@ -55,7 +55,7 @@ const ogc_export={
                 const object = ogc_export.wms;
                 let indikator = indikatorauswahl.getSelectedIndikator(),
                     endpoint = $(`#${object.endpoint_id}`),
-                    wms_link = 'http://maps.ioer.de/cgi-bin/wms?MAP=' + indikator + '_100',
+                    wms_link = 'http://monitor.ioer.de/cgi-bin/wms?MAP=' + indikator + '_wms',
                     checkbox = endpoint.find("#checkbox_wms"),
                     allow =endpoint.find('#wms_allow');
 

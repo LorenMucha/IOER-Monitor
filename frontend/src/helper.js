@@ -43,6 +43,7 @@ const helper={
     },
     enableElement:function(elem,title){
         $(elem)
+            .removeClass('disabled')
             .prop('title',title)
             .prop('disabled',false)
             .css('cursor','pointer');

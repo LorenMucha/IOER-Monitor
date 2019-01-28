@@ -48,6 +48,10 @@ const main_view = {
             if(width >= min_width){
                 width= min_width;
             }
+            //set max width to prevent overflow the map content
+            else if((this.getWidth()-_width)<=470){
+                width= 470;
+            }
             this.splitter.position(width);
             if(table.isExpand()){
                 legende.close();

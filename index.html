@@ -44,7 +44,7 @@
                             <div title="Tabelle filtern" id="filter_table" class="filter"></div>
                             <div title="Tabelle als CSV exportieren" id="csv_export"></div>
                         </div>
-                        <input id="search_input_table" placeholder="Suche nach Orten.." type="text" class="form-control search_input" />
+                        <input id="search_input_table" placeholder="Suche nach Orten.." type="text" class="form-control search_input prompt" />
                     </div>
                     <!--Tabelle-->
                     <div id="scrollable-area" class="scrollable-area">
@@ -54,7 +54,7 @@
                 <!-- Tabelle erweitern Panel------------------------------------------------------------->
                 <div id="tabelle_erweitern" class="choice_panel">
                     <div id="panel_close" class="close_table">
-                        <span title="Tabelle schließen" class="glyphicon glyphicon-remove checker"></span>
+                        <span title="Tabelle schließen" class="glyphicon glyphicon-remove checker float-right cursor"></span>
                     </div>
                     <div id="hinweis_time_expand_linear" class="hinweis">
                         <b style="color:red;" class="note">Hinweis:</b>
@@ -82,6 +82,10 @@
                                 <div class="default text">Bitte wählen.....</div>
                                 <div  id="zeit_auswahl_table" class="menu"></div>
                             </div>
+                            <div class="ui toggle checkbox">
+                                <input type="checkbox" id="selectall">
+                                <label>Alle Zeiten auswählen</label>
+                            </div>
                             <div class="checkbox" id="differences_div">
                                 <label><input id="differences" type="checkbox" value=""/><span>Differenzen anzeigen</span></label>
                             </div>
@@ -98,9 +102,9 @@
                                 <i class="dropdown icon"></i>
                                 <div id="kenngroessen_ddm_table_header" class="default text">Bitte wählen.....</div>
                                 <div  id="kenngroessen_auswahl_table" class="menu">
-                                    <div id="expand_abs" class="item" data-value="ABS" value="ABS">Absoluter Indikatorwert</div>
-                                    <div id="area_size" class="item" data-value="S00AG" value="S00AG">Gebietsfläche</div>
-                                    <div id="expand_b00ag" class="item" data-value="B00AG" value="B00AG">Einwohnerzahl</div>
+                                    <div id="expand_abs" class="item" data-value="ABS">Absoluter Indikatorwert</div>
+                                    <div id="area_size" class="item" data-value="S00AG">Gebietsfläche</div>
+                                    <div id="expand_b00ag" class="item" data-value="B00AG">Einwohnerzahl</div>
                                     <div id="expand_kenngroessen" class="item" data-value="UE_RaumSum">
                                         <i class="dropdown icon left"></i>
                                         <span>Übergeordnete Raumeinheiten</span>
@@ -151,52 +155,10 @@
     <!--Arrow for responsive approach-->
     <span id="panRight" title="Zeige Tabelle" class="panner tablebackground checker cursor" data-scroll-modifier='1'></span>
     <div class="btn-group-vertical btn-group-map" id="btn-group-map">
-        <button id="map_button" class="map-btn checker bottom_elements btn btn-primary" title="Kartenergänzungen">Hintergrund</button>
         <button id="legende_button" title="Öffne Legende" class="map-btn checker bottom_elements btn btn-primary">Legende</button>
     </div>
     <!--Legende Container------------->
-    <div id="legende" class="legende bottom_elements">
-        <div class="legende_content">
-            <div id="legende_close"><span class="glyphicon glyphicon-remove"></span></div>
-            <div class="legende_map">
-                <div><h3 id="legende_header">Legende</h3></div>
-                <hr class="hr"/>
-                <div class="einheit_container" id="einheit_container">
-                    <span>Einheit:</span>
-                    <b id="legende_einheit"></b>
-                </div>
-                <div id="legende_i" class="legende_i"></div>
-            </div>
-            <hr class="hr"/>
-            <div id="Klassifikationsmethode_legende"><b>Klassifikationsmethode</b></div>
-            <div class="histogramm_klasseneinteilung" id="histogramm_klasseneinteilung"></div>
-            <hr class="hr"/>
-            <div id="indicator_info"><b>Informationen zum Indikator</b></div>
-            <div id="indikator_info_text"></div>
-            <button class="btn btn-primary btn_dropdown kennblatt" id="legende_kennblatt" onclick="kennblatt.open();">Kennblatt</button>
-            <hr class="hr"/>
-            <div id="legende_datangrundlage"><b>Datengrundlage</b></div>
-            <div id="datengrundlage_content"></div>
-            <div id="legende_map_projection"><b>Kartenprojektion</b></div>
-            <div>ETRS89 / UTM Zone 32N</div>
-            <hr class="hr"/>
-            <div id="legende_histogramm"><b>Histogramm</b></div>
-            <div id="histogramm_pic"></div>
-            <div class="hist_info"></div>
-            <div id="datenalter_container">
-                <button class="btn btn-primary btn_dropdown" id="datenalter">
-                    <i class="glyphicon glyphicon-chevron-down drop_arrow"></i>
-                    <span>Datenalter</span>
-                </button>
-                <div id="dropdown_datenalter">
-                    <div id="grundakt_titel">&#160;</div>
-                    <div id="grundakt_legende"></div>
-                    <div id="grundaktmap" class="grundaktmap_click"></div>
-                    <div id="hover_info_grundaktmap" class="grundaktmap_click">Ein und Ausblenden der Grundaktualität im Kartenfenster (hier klicken)</div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div id="legende" class="legende bottom_elements"></div>
 
     <!--LINK-->
     <div id="link_text" style="display : none;">

@@ -15,47 +15,12 @@
 @import url("../lib/d3/animate.min.css");
 @import url("../lib/sweetalert/sweetalert.css");
 @import url("../lib/spectrum/spectrum.css");
+@import url("styles.css");
 
-:root{
-    --main-color:#4E60AA;
-    --active-color:#8CB91B
-}
-.clearfix:before,
-.clearfix:after {
-    content: " ";
-    display: table;
-}
-.clearfix:after {
-    clear: both;
-}
-.clearfix {
-    *zoom: 0;
-    text-decoration: none;
-}
 body {
     padding: 0;
     margin: 0;
-    //font-family: 'Roboto', sans-serif;
     overflow: hidden;
-}
-.cursor{
-    cursor:pointer;
-}
-.disabled{
-    -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
-    filter: grayscale(100%);
-    opacity: 0.5;
-}
-.float-right{
-    float: right !important;
-}
-/*JQuery Dialog*/
-.ui-widget-overlay.custom-overlay
-{
-    background-color: black;
-    background-image: none;
-    opacity: 0.9;
-    z-index: 1040;
 }
 /* navbar */
 .navbar {
@@ -208,10 +173,6 @@ Slider
     font-weight: bold;
     color:black !important;
 }
-.ui.search .prompt {
-    border-radius: 0 !important;
-    border:1px solid black;
-}
 
 /*Dialog*/
 .hr_dialog {
@@ -305,22 +266,18 @@ Feedack
     z-index: 1000;
     display: inline-block;
     bottom: 20px;
+    right: 0;
+    filter: blur(0);
 }
 .btn-group-map .map-btn:hover{
     border:1px solid var(--active-color);
 }
 .btn-group-map .map-btn{
-    background-color: #4E60AA;
+    background-color: var(--main-color);
     transform: rotate(270deg);
     margin-bottom: 50px;
     height: 50px;
-    right: -28px;
-}
-.btn-group-map #legende_button{
-    border-right: 1px solid white !important;
-}
-.btn-group-map .legende_button{
-    display: none;
+    right: -20px;
 }
 /*
 Layer Control
@@ -640,6 +597,14 @@ Toolbar.js
     display: none;
     margin-bottom: 5px;
     margin-top: 5px;
+}
+.toolbar #map-selection{
+    padding-right: 5px;
+}
+.toolbar #map-selection .btn{
+    margin:5px;
+    border: 1px solid black;
+    background-color: white !important;
 }
 /*Indicator choices also for the cloned ones*/
 .indicator_ddm{
@@ -1281,7 +1246,7 @@ Solution fixed headers: https://stackoverflow.com/questions/673153/html-table-wi
     bottom: 10px;
     height:100%;
     top:15%;
-    /*width:100%;*/
+    width:100%;
     margin-left: 5px;
     margin-right: 5px;
 }
@@ -1354,7 +1319,7 @@ Solution fixed headers: https://stackoverflow.com/questions/673153/html-table-wi
     text-align: right;
 }
 .right_content .scrollable-area #table_ags .tfoot tr{
-    background-color: lightgray;
+    background-color: lightgray !important;
 }
 .right_content .scrollable-area #table_ags .tfoot tr td{
     border: 1px solid black;
@@ -1363,7 +1328,7 @@ Solution fixed headers: https://stackoverflow.com/questions/673153/html-table-wi
     border-top: 2px solid black;
 }
 /*
-expand table
+table
  */
 .right_content .scrollable-area #table_ags tr .dif_val_div{
     margin-left: 1vh;
@@ -1501,6 +1466,9 @@ tabelle filtern
 }
 .right_content #tabelle_erweitern #btn_table{
     pointer-events: auto;
+}
+.right_content #tabelle_erweitern .ui.toggle.checkbox{
+    padding-left: 0 !important;
 }
 .right_content #tabelle_erweitern #btn_table_remove_expand{
     background-color: grey !important;
@@ -1790,6 +1758,7 @@ print
     float: left;
     display: block;
     width: 30%;
+    padding-left: 20px;
 }
 #print_container .print_info_content #print_legende{
     width: 100%;

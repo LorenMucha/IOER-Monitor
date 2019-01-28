@@ -21,9 +21,9 @@ const indikator_json = {
             time = zeit_slider.getTimeSet(),
             ags_set = gebietsauswahl.getSelection();
 
-        $.when(progressbar.init())
-            .then(indikator_raster_group.clean())
-            .then(indikator_json_group.clean());
+        progressbar.init();
+        indikator_raster_group.clean();
+        indikator_json_group.clean();
 
         if (raumgl) {
             raumgliederung_set = raumgl;
@@ -53,10 +53,18 @@ const indikator_json = {
                 }
 
                 object.addToMap();
-                grundakt_layer.init(raumgliederung_set);
                 table.create();
                 gebietsauswahl.init();
-                legende.fillContent();
+                //add the farbschema
+                var interval = setInterval(function () {
+                    if (indikatorauswahl.getPossebilities()) {
+                        clearInterval(interval);
+                        //add the farbschema
+                        farbschema.init();
+                        grundakt_layer.init(raumgliederung_set);
+                        legende.fillContent();
+                    }
+                }, 100)
                 if (callback) callback();
             });
 
@@ -103,8 +111,6 @@ const indikator_json = {
             progressbar.remove();
         }
         if(layer_control.zusatzlayer.getState()){layer_control.zusatzlayer.setForward()}
-        //add the farbschema
-        farbschema.init();
     },
     setPopUp:function(e){
         let text={
@@ -185,7 +191,6 @@ const indikator_json = {
                 '</div>')[0];
         }
 
-
         let bounds = layer.getBounds();
         let popup = L.popup()
             .setLatLng(bounds.getCenter())
@@ -218,10 +223,11 @@ const indikator_json = {
         });
 
         //disable charts for community level
-        if(raumgliederung.getSelectedId()==='gem' || gebietsauswahl.getSelection()==="gem"){
+        if(raumgliederung.getSelectedId()==='gem' || raeumliche_analyseebene.getSelectionId()==='gem'){
             helper.disableElement(".dev_chart_compare","Steht für die Gemeindeebene nicht zur Verfügung");
             helper.disableElement(".dev_chart_trend","Steht für die Gemeindeebene nicht zur Verfügung");
         }
+
     },
     /*/
     Set a Marker on the map with Lat Lon and Title f.eg. used inside the geographic search to tick the result inside the map

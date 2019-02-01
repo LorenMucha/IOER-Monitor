@@ -4,6 +4,12 @@ const panner = {
         return $elem;
     },
     getContainer:function(){return $('.panner')},
+    disable:function(){
+       helper.disableElement(".panner","In der gewählten Ansicht nicht verfügbar");
+    },
+    enable:function(){
+        helper.enableElement(".panner","Zeige Tabelle");
+    },
     hide:function(){
         this.getContainer().hide();
     },

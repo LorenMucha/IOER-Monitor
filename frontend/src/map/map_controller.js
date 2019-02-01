@@ -4,13 +4,6 @@ var map= L.map('map',{
 });
 
 const map_controller={
-    tools:['lupe.init()',
-            'measurement.init()',
-            'file_loader.init()',
-            'center_map.init()',
-            'zoom_out.init()',
-            'zoom_in.init()'
-    ],
   set:function(){
       map.on('moveend',         function () {
 
@@ -35,11 +28,6 @@ const map_controller={
       this.setTools();
   },
     setTools:function(){
-        $.each(this.tools,function(key,value){
-            var tmpFunc = new Function(value);
-            tmpFunc();
-        });
-
         //scalebar
         L.control.scale({
             metric:true,

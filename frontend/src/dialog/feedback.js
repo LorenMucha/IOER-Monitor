@@ -145,7 +145,7 @@ const feedback={
                 message = selector.find("#message").val(),
                 url = 'https://monitor.ioer.de/monitor_api/email/';
 
-            request_manager.sendMail(name,email,message);
+            request_manager.sendMailFeedback(name,email,message);
             //close the dialog
             dialog_manager.content.remove();
         }

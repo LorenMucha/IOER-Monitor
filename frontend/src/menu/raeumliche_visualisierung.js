@@ -31,10 +31,9 @@ const raeumliche_visualisierung = {
         $('#spatial_range_raster').show();
         $('#spatial_range_gebiete').hide();
         $('#gebiete_label').css("color","black");
-        $('#raster_label').css("color",farbschema.getColorMain());
-        panner.hide();
-        glaetten.init();
-        raster_split.init();
+        $('#raster_label').css("color",farbschema.getColorHexMain());
+        glaetten.enable();
+        panner.disable();
     },
     setGebiete:function(){
         this.upateParameter('gebiete');
@@ -45,11 +44,11 @@ const raeumliche_visualisierung = {
         $('#panRight').show();
         $('#spatial_range_raster').hide();
         $('#spatial_range_gebiete').show();
-        $('#gebiete_label').css("color",farbschema.getColorMain());
+        $('#gebiete_label').css("color",farbschema.getColorHexMain());
         $('#raster_label').css("color","black");
-        glaetten.remove();
+        glaetten.disable();
         raster_split.remove();
-        panner.init();
+        panner.enable();
     },
     setChecked:function(){
         this.getDOMObject()

@@ -26,9 +26,9 @@ const map_header ={
                 };
 
             if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete'){
-                if(!raumgliederung.getSelectedId() && gebietsauswahl.countTags()==0){
+                if(!raumgliederung.getSelectionId() && gebietsauswahl.countTags()==0){
                     spatial_text = raeumliche_analyseebene.getSelectionText()+" in Deutschland";
-                }else if(!raumgliederung.getSelectedId() && gebietsauswahl.countTags()>0){
+                }else if(!raumgliederung.getSelectionId() && gebietsauswahl.countTags()>0){
                     spatial_text = gebietsauswahl.getSelectionAsString();
                 }else{
                     spatial_text = gebietsauswahl.getSelectionAsString()+split_txt()+raumgliederung.getSelectionText();

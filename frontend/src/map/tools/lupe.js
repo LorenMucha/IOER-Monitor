@@ -40,7 +40,7 @@ const lupe={
             this.info_leave=1;
         }
         $('.toolbar').toggleClass("toolbar_close",500);
-        this.getDOMContainer().css('background-color',farbschema.getColorActive());
+        this.getDOMContainer().css('background-color',farbschema.getColorHexActive());
         this.magnifyingGlass.addTo(map);
         this.set=true;
     },

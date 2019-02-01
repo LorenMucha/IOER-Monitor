@@ -90,8 +90,8 @@ const raeumliche_analyseebene = {
 
             //check if raumgl fein is set or not -> standrad map create
             let parameter_ags = urlparamter.getUrlParameter('ags_array');
-            let selection_fein = raumgliederung.getSelectedId();
-            if (!raumgliederung.getSelectedId() && !parameter_ags) {
+            let selection_fein = raumgliederung.getSelectionId();
+            if (!raumgliederung.getSelectionId() && !parameter_ags) {
                 indikator_json.init();
             } else {
                 //check if parameter are set
@@ -147,6 +147,9 @@ const raeumliche_analyseebene = {
                 .find('#Raumgliederung')
                 .unbind()
                 .change(function () {
+                    if(!raumgliederung.getSelectionId()) {
+                        table.clearSelection();
+                    }
                     changed = true;
                     let choice = $(this).val();
                     //start the pipeline

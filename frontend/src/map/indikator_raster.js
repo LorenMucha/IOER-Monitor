@@ -1,6 +1,8 @@
-var raster_group = new L.layerGroup();
 const indikator_raster = {
-    raster_layer:'',
+    raster_layer:false,
+    getRasterLayer:function(){
+      return this.raster_layer;
+    },
     init:function(hex_min, hex_max, _seite, _settings,callback) {
         const object = this;
         let _darstellung_map = glaetten.getState(),

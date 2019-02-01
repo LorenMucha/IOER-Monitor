@@ -21,6 +21,14 @@ const start_map= {
 
         $('.kennblatt').hide();
         legende.close();
+        $('#drop_kat').slideDown();
+        //if menu is ready show it
+        var interval = setInterval(function () {
+            if (indikatorauswahl.getPossebilities()) {
+                indikatorauswahl.openMenu();
+                clearInterval(interval);
+            }
+        });
     },
     remove:function(){
         try{

@@ -1,4 +1,15 @@
 const toolbar = {
+    //scripts to activate all the scripts
+    tools:['lupe.init()',
+        'measurement.init()',
+        'file_loader.init()',
+        'center_map.init()',
+        'zoom_out.init()',
+        'zoom_in.init()',
+        'raster_split.init()',
+        'glaetten.init()',
+        'dev_chart.init()'
+    ],
     getDOMObject:function(){
         $elem = $('#toolbar');
         return $elem;
@@ -26,6 +37,7 @@ const toolbar = {
         // the mapnavbar
         this.state=true;
         this.create();
+        this.setTools();
         this.controller.set();
     },
     getHeight:function(){
@@ -67,6 +79,11 @@ const toolbar = {
                                     <i class="dropdown icon"></i>
                                     <div class="default text" id="ind_choice_info">Bitte wählen Sie einen Indikator</div>
                                     <div  id="kat_auswahl" class="menu"></div>
+                                </div>
+                                <div class="slider_container_time bottom_elements" id="slider_zeit_container">
+                                    <span>Zeitschnitt</span>
+                                    <hr class="hr"/>
+                                    <div class="zeit_slider" id="zeit_slider"></div>
                                 </div>
                                 <button class="btn btn-primary btn_dropdown kennblatt" onclick="kennblatt.open();">Kennblatt</button>
                             </div>
@@ -140,6 +157,9 @@ const toolbar = {
                             </div>
                         </div>
                         <div class="dropdown_menu" id="dropdown_layer">
+                        <div class="w-100" id="map-selection">
+                                <button type="button" class="btn btn_dropdown w-100" id="map_button">Kartenergänzungen</button>
+                            </div>
                             <div id="layer_conainer">
                                 <span class="span">Sichtbarkeit Indikator</span>
                                 <hr class="hr"/>
@@ -152,15 +172,15 @@ const toolbar = {
                             <div id="farbwahl">
                                 <span class="span">Farbschema</span>
                                 <hr class="hr"/>
-                                <div class="form-inline">
-                                    <div class="form-group">
-                                          <input type='text' name='triggerSet' id="triggerSet_min" placeholder="Min Farbwert"/>
-                                          <input type="color" class="form-control" id="color_min_user"/>
-                                           <span class="glyphicon glyphicon-trash fa-2x destroy float-right cursor" title="Auswahl leeren" id="clear_farbwahl"></span>
-                                          <input type='text' name='triggerSet' id="triggerSet_max" placeholder="Max Farbwert"/>
-                                          <input type="color" class="form-control" id="color_max_user" placeholder="Farbname oder HEX-Wert"/>
-                                           <span class="glyphicon glyphicon-plus fa-2x destroy float-right cursor" title="Farbschema erstellen" id="create_color_schema"></span>
-                                    </div>
+                                <div class="form-group-inline">
+                                      <input type='text' name='triggerSet' id="triggerSet_min" title="Min Farbwert in Hex" placeholder="#"/>
+                                      <input type="color" class="form-control" id="color_min_user"/>
+                                       <span class="glyphicon glyphicon-trash fa-2x destroy float-right cursor" title="Auswahl leeren" id="clear_farbwahl"></span>
+                                </div>
+                                <div class="form-group">
+                                      <input type='text' name='triggerSet' id="triggerSet_max" title="Max Farbwert in Hex" placeholder="#"/>
+                                      <input type="color" class="form-control" id="color_max_user" placeholder="Farbname oder HEX-Wert"/>
+                                      <button type="button" class="btn btn-secondary btn-sm float-right btn-outline-dark" id="create_color_schema">Erstellen</button>
                                 </div>
                             </div>
                             <div class="klassenbesetzung" id="klassenbesetzung">
@@ -225,21 +245,59 @@ const toolbar = {
                         </div>
                         <div class="dropdown_menu" id="dropdown_werkzeug">
                             <ul class="tools">
-                                <li class="tool_li"><div class="btn_container">
-                                    <div id="measure"></div>
+                                <li><div class="btn_container">
+                                    <div id="measure" class="image cursor"></div>
                                     <div class="btn_txt" id="measure_btn">Messen</div>
                                 </div>
                                 </li>
-                                <li class="tool_li">
+                                <li>
                                     <div class="btn_container">
-                                        <div id="lupe"></div>
+                                        <div id="lupe" class="image cursor"></div>
                                         <div class="btn_txt" id="lupe_btn">Lupe</div>
                                     </div>
                                 </li>
-                                <li class="tool_li">
+                                <li>
                                     <div class="btn_container">
-                                        <div id="import"></div>
+                                        <div id="import" class="image cursor"></div>
                                         <div class="btn_txt" id="import_btn">Import</div>
+                                    </div>
+                                </li>
+                                 <li>
+                                    <div class="btn_container">
+                                        <div id="btn_glaetten" class="image cursor" title="Glätten Sie die Rasterkart"></div>
+                                        <div class="btn_txt" id="glaetten">Glätten</div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- Analyse -->
+                         <div class="dropdown_choice mobile_hidden" id="analyse">
+                            <div class="hh_sf" id="hh_sf_analyse">
+                                <i class="large angle down icon" data-ddm="dropdown_analyse"></i>
+                                <span>Analyse</span>
+                            </div>
+                            <div class="pin">
+                                <i class="glyphicon glyphicon-pushpin" title="Menü anheften" data-ddm="dropdown_werkzeug"></i>
+                            </div>
+                        </div>
+                        <div class="dropdown_menu mobile_hidden" id="dropdown_analyse">
+                            <ul class="tools w-100">
+                                <li class="w-30">
+                                    <div class="btn_container">
+                                        <div id="dev_chart" class="image ind_chart disbale_performance cursor" data-title="Analysieren Sie die zeitliche Entwicklung eines Indikatorwertes" title="Analysieren Sie die zeitliche Entwicklung eines Indikatorwertes"></div>
+                                        <div class="btn_txt wordbreak disbale_performance">Werte- entwicklung</div>
+                                    </div>
+                                </li>
+                                 <li class="w-35">
+                                    <div class="btn_container">
+                                        <div id="dev_chart_compare" class="image ind_chart disbale_performance cursor" data-title="Analysieren Sie die zeitliche Entwicklung mehrerer Indikatorwerte" title="Analysieren Sie die zeitliche Entwicklung mehrerer Indikatorwerte"></div>
+                                        <div class="btn_txt wordbreak disbale_performance" data-title="">Entwicklungs- vergleich</div>
+                                    </div>
+                                </li>
+                                <li class="w-30">
+                                    <div class="btn_container">
+                                        <div id="ind_compare" class="image cursor" title="vergleichen Sie 2 Indikatoren oder Zeitschnitte miteinander"></div>
+                                        <div class="btn_txt wordbreak" data-title="">Indikator- vergleich</div>
                                     </div>
                                 </li>
                             </ul>
@@ -256,21 +314,21 @@ const toolbar = {
                         </div>
                         <div class="dropdown_menu" id="dropdown_ogc">
                             <div class="export_div"><b>Einbinden in eigenes GIS als</b></div>
-                            <hr class="hr_export"/>
+                            <hr class="hr"/>
                             <button id="wms" class="btn .btn-info btn_export raster_export" data-format="WMS" onclick="ogc_export.wms.open()">WMS</button>
                             <button id="wcs" class="btn .btn-info btn_export raster_export" data-format="WCS" onclick="ogc_export.wcs.open()">WCS</button>
                             <button id="wfs" class="btn .btn-info btn_export gebiete_export" data-format="WFS" onclick="ogc_export.wfs.open()">WFS</button>
                             <div class="export_div" id="export_map_display"><b>Export der Kartendarstellung als</b></div>
-                            <hr class="hr_export"/>
+                            <hr class="hr"/>
                             <div class="btn-group">
                                 <button type="button" class="btn .btn-info btn_export print_button" id="pdf_export_btn" data-format="pdf">PDF</button>
                                 <button type="button" class="btn .btn-info btn_export print_button" id="png_export_btn" data-format="png">PNG</button>
                             </div>
                             <div class="export_div" id="save_map_link"><b>Dauerhaftes Speichern der Karte auf dem IÖR-Server</b></div>
-                            <hr class="hr_export"/>
+                            <hr class="hr"/>
                             <button id="kartenlink" class="btn .btn-info">Kartenlink erzeugen</button>
                             <div class="export_div" id="load_map_link"><b>Kartenlink laden</b></div>
-                            <hr class="hr_export"/>
+                            <hr class="hr"/>
                             <form id="KartenlinkLaden" name="KartenlinkLaden">
                                 <input class="form-control" type="text"  id="rid" name="rid" placeholder="Kartenlink Nr.">
                             </form>
@@ -286,6 +344,16 @@ const toolbar = {
                 </div>
             </div>`;
       $('#Modal').find('.left_content').append(html);
+    },
+    setTools:function(){
+        $.each(this.tools,function(key,value){
+            try {
+                var tmpFunc = new Function(value);
+                tmpFunc();
+            }catch(err){
+                console.error(err);
+            }
+        });
     },
     controller:{
         set:function(){
@@ -313,9 +381,6 @@ const toolbar = {
 
                     if(ddm_container.hasClass('pinned')===false && !ddm_container.is(':visible')){
                         ddm_container.slideDown();
-                        if($(this).attr("id")==="indikator_auswahl"){
-                            indikatorauswahl.openMenu();
-                        }
                     }else if(ddm_container.is(':visible')===true &&ddm_container.hasClass('pinned')===false){
                         ddm_container.slideUp();
                     }

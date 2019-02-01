@@ -1,10 +1,12 @@
 const dev_chart={
+    chart_compare_selector:"#dev_chart_compare",
+    chart_selector:"#dev_chart",
     endpoint_id:"entwicklungsdiagramm_content",
     text:{
         de:{
             title:{
-                false:"Indikatorwertentwicklung",
-                true:"Indikatorvergleich"
+                false:"Wertentwicklung",
+                true:"Wertentwicklungsvergleich"
             },
             info:"Dieses Diagramm stellt die Entwicklung der Indikatoren dar.",
             indicator:"verfügbare Indikatoren",
@@ -28,6 +30,9 @@ const dev_chart={
             unit:"Unit",
             chart:"Development diagram for territorial unit"
         }
+    },
+    init:function(){
+        this.controller.set();
     },
     open:function(){
         let lan = language_manager.getLanguage(),
@@ -171,7 +176,6 @@ const dev_chart={
             }
 
             defCalls().done(function (arr) {
-                console.log(arr);
                 chart.merge_data = [];
                 let i = 0;
                 $.each(array, function (key, val) {
@@ -534,5 +538,61 @@ const dev_chart={
                 dev_chart.chart.merge_data = [];
             }
         }
+    },
+    controller:{
+        set:function(){
+                let chart_array = [],
+                    id_input="search_ags",
+                    set_autocomplete = function () {
+                        chart_array = indikator_json_group.getAGSArray();
+                        auto_complete.autocomplete(document.getElementById(id_input), chart_array);
+                    },
+                    get_ags=function(){
+                        return $(`#${id_input}`).data("id");
+                    },
+                    get_name=function(){
+                        return $(`#${id_input}`).val();
+                    },
+                    set_swal=function(callback){
+                        swal({
+                            title: "Bitte nennen Sie das gewünschte Gebiet",
+                            text: `<div class="form-group" style="display: unset !important;">
+                                <input type="text" id="${id_input}" class="form-control" tabindex="3" placeholder="Gebiet...">
+                           </div>`,
+                            showCancelButton: true,
+                            cancelButtonText: "Abbrechen",
+                            html: true
+                        }, function (isConfirm) {
+                            if (isConfirm) {
+                                callback();
+                            }
+
+                        });
+                        set_autocomplete();
+                    };
+                //call on select inside the toolbar
+                $(document).on("click", dev_chart.chart_selector, function () {
+                    let callback = function () {
+                        dev_chart.chart.settings.ags = get_ags();
+                        dev_chart.chart.settings.name=get_name();
+                        dev_chart.chart.settings.ind=indikatorauswahl.getSelectedIndikator();
+                        dev_chart.chart.settings.ind_vergleich=false;
+                        dev_chart.open();
+                    };
+                    set_swal(callback);
+                });
+
+            $(document).on("click", dev_chart.chart_compare_selector, function () {
+                let callback = function () {
+                    dev_chart.chart.settings.ags = get_ags();
+                    dev_chart.chart.settings.name=get_name();
+                    dev_chart.chart.settings.ind=indikatorauswahl.getSelectedIndikator();
+                    dev_chart.chart.settings.ind_vergleich=true;
+                    dev_chart.open();
+                };
+                set_swal(callback);
+            });
+        }
     }
 };
+

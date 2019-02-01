@@ -21,20 +21,20 @@ const request_manager={
                 colors()+
                 '},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+
                 '"},"query":"getJSON"}');
-        return this.sendRequestPHP({"file":json,"query":"getGeoJSON","type":"POST","debug":false});
+        return this.makeRequest({"file":json,"query":"getGeoJSON","type":"POST","debug":false});
     },
     //check if a indicator is possible to view in the the given kind of visualization (gebiete/raster)
     getAvabilityIndicator:function(_ind){
         let ind = indikatorauswahl.getSelectedIndikator();
         if(_ind){ind=_ind;}
         let json = JSON.parse('{"ind":{"id":"'+ind+'"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+'"},"query":"getAvability"}');
-        return this.sendRequestPHP({"file":json,"query":"getAvabilityIndicator","type":"POST","debug":false});
+        return this.makeRequest({"file":json,"query":"getAvabilityIndicator","type":"POST","debug":false});
     },
     //get all avaliable indicators
     getAllAvaliableIndicators:function(){
         const manager = this;
         let json = JSON.parse('{"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+'"},"query":"getAllIndicators"}');
-        return manager.sendRequestPHP({"file":json,"query":"getAllAvaliableIndicators","type":"POST","debug":false});
+        return manager.makeRequest({"file":json,"query":"getAllAvaliableIndicators","type":"POST","debug":false});
     },
     //get the possible time`s
     getJahre:function(ind){
@@ -43,7 +43,7 @@ const request_manager={
             ind_set = ind;
         }
         let json = JSON.parse('{"ind":{"id": "'+ind_set+'"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+'"},"query":"getYears"}');
-        return this.sendRequestPHP({"file":json,"query":"getJahre","type":"POST","debug":false});
+        return this.makeRequest({"file":json,"query":"getJahre","type":"POST","debug":false});
 
     },
     //get the possible spatial extends for a indicator
@@ -55,19 +55,19 @@ const request_manager={
         let json = JSON.parse('{"ind":{"id":"'+ind_set+
             '","time":"'+zeit_slider.getTimeSet()+'"},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+
             '"},"query":"getSpatialExtend"}');
-        return this.sendRequestPHP({"file":json,"query":"getRaumgliederung","type":"POST","debug":false});
+        return this.makeRequest({"file":json,"query":"getRaumgliederung","type":"POST","debug":false});
     },
     //get the sum of geometries to show them inside the loading bar
     getCountGeometries:function(raumgliederung){
         let json = JSON.parse('{"ind":{"klassenzahl":"'+klassenanzahl.getSelection()+'","time":"'+zeit_slider.getTimeSet()+
                                     '","ags_array":"'+gebietsauswahl.getSelection()+
                                     '","raumgliederung":"'+raumgliederung+'"},"query":"countgeometries"}');
-        return this.sendRequestPHP({"file":json,"query":"getCountGeometries","type":"POST","debug":false});
+        return this.makeRequest({"file":json,"query":"getCountGeometries","type":"POST","debug":false});
     },
     //get overlays like autobahn, train, communal borders, rivers
     getZusatzlayer:function(layer){
         let json = JSON.parse('{"ind":{"zusatzlayer":"'+layer+'"},"query":"getzusatzlayer"}');
-        return this.sendRequestPHP({"file":json,"query":"getZusatzlayer","type":"POST","debug":false});
+        return this.makeRequest({"file":json,"query":"getZusatzlayer","type":"POST","debug":false});
     },
     //get the needed values to expand the table, has it´s own parameters, because the logic is slightly different
     getTableExpandValues:function(expand_values,ags_array){
@@ -79,40 +79,14 @@ const request_manager={
         }
         let json = JSON.parse('{"ind":{"id":"'+indikatorauswahl.getSelectedIndikator()+'","time":"'+zeit_slider.getTimeSet()+
             '","raumgliederung":"'+raumgliederung_set+'"},"expand_values":'+JSON.stringify(expand_values)+',"ags_array":'+JSON.stringify(ags_set)+',"query":"getTableExpandValues"}');
-        return this.sendRequestPHP({"file":json,"query":"getTableExpandValues","type":"POST","debug":false});
+        return this.makeRequest({"file":json,"query":"getTableExpandValues","type":"POST","debug":false});
     },
     getTrendValues:function(indicator_id,ags,settings){
+        console.log('{"ind":{"id":"'+indicator_id+'","ags_array":"'+ags+'"},"set":'+JSON.stringify(settings)+',"query":"getTrend"}');
         let json = JSON.parse('{"ind":{"id":"'+indicator_id+'","ags_array":"'+ags+'"},"set":'+JSON.stringify(settings)+',"query":"getTrend"}');
-        return this.sendRequestPHP({"file":json,"query":"getTrend","type":"POST","debug":false});
+        return this.makeRequest({"file":json,"query":"getTrend","type":"POST","debug":false});
     },
-    sendMailFeedback:function(name, sender, message){
-        let json = {
-            type:"GET",
-            debug:false,
-            endpoint:"email/",
-            query:"send Mail",
-            data: {
-                name:name,
-                sender:sender,
-                message:message
-            }};
-        console.log(json);
-        return this.sendRequestFlask(json)
-    },
-    sendMailError:function(name,message){
-        let json = {
-            type:"GET",
-            debug:false,
-            endpoint:"email/error",
-            query:"send Mail",
-            data: {
-                name:name,
-                message:message
-            }};
-        console.error(JSON.stringify(json));
-        return this.sendRequestFlask(json)
-    },
-    sendRequestPHP:function(json){
+    makeRequest:function(json){
         const manager = this;
         this.call= $.ajax({
             async: true,
@@ -133,38 +107,15 @@ const request_manager={
         });
         return this.call;
     },
-    sendRequestFlask:function(json){
-        const manager = this;
-        this.call= $.ajax({
-            async: true,
-            type: json.type,
-            url: 'https://monitor.ioer.de/monitor_api/'+json.endpoint,
-            data: json.data,
-            error:function(xhr, ajaxOptions, thrownError){
-                manager.onError( thrownError,json.query,this.url);
-                alert_manager.alertError();
-            },
-            success:function(data){
-                if(json.debug){
-                    console.log(this.url);
-                    console.log(JSON.stringify(data));
-                }
-            }
-        });
-        return this.call;
-    },
     cancel:function(){
         this.call.abort();
     },
     onError:function( thrownError,function_name,url){
-        if(thrownError !=="abort") {
-            let message= error.getErrorMessage(`${thrownError} in function: ${function_name}`);
-            progressbar.remove();
-            alert_manager.alertError();
-            if(!window.location.href.includes("monitor_test")) {
-                this.sendMailError(message.name, message.message);
-            }
-        }
+        console.log("Error in: "+function_name);
+        progressbar.remove();
+        console.log(url);
+        console.log(thrownError);
+        alert_manager.alertError();
     }
 };
 //Todo noch umschreiben auf den neuen Mapserver
@@ -189,7 +140,8 @@ function getRasterMap(time,ind,_raumgliederung,klassifizierung,klassenanzahl,dar
 }
 //dialog
 function getStatistik(ags, name, wert){
-    let raumgliederung_txt = base_raumgliederung.getBaseRaumgliederungId();
+    let raumgliederung_txt = base_raumgliederung.getBaseRaumgliederungText();
+    //set the value if Raumgl fein was set
     return $.ajax({
         async:true,
         url: urlparamter.getURL_SVG()+"backend/dialog/statistik.php",

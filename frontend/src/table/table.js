@@ -1,11 +1,15 @@
 const table = {
     td_classes : 'collapsing',
-    table_classes : 'tablesorter',
+    table_classes : '',
     excludedAreas:['Gemeindefreies Gebiet'],
     expandState:false,
-    getDOMObject: function(){
+    selection:[],
+        getDOMObject: function(){
         $table = $('#table_ags');
         return $table;
+    },
+    init:function(){
+      this.createInteract();
     },
     getContainer:function(){return $('#table_ags');},
     getScrollableAreaDOMObject:function(){
@@ -13,19 +17,28 @@ const table = {
         return $area;
     },
     getTableBodyObject:function(){
-        $elem = $('#tBody_value_table');
+        $elem = $('.tBody_value_table');
         return $elem;
     },
     getColSpanRow:function(){
         $elem = $('#header_ind_set');
         return $elem;
     },
-    init:function(){
-        //after sort is finish reset the rang
-        $('.sorter-false').removeClass("header");
-        this.controller.set();
+    createInteract:function(){
+      $('.table_page_header').html(`
+                <div id="table_close" class="close_table">
+                    <span title="Tabelle schließen" class="glyphicon glyphicon-remove checker" id="close_checker"></span>
+                </div>
+                <div id="interact_div">
+                    <button type="button" class="btn btn-primary" id="btn_table">
+                        <i class="glyphicon glyphicon-chevron-right"></i><span>Tabelle erweitern</span></button>
+                    <div title="Tabelle filtern" id="filter_table" class="filter"></div>
+                    <div title="Tabelle als CSV exportieren" id="csv_export"></div>
+                </div>
+                <input id="search_input_table" placeholder="Suche nach Orten.." type="text" class="form-control search_input prompt" />
+      `);
     },
-    create:function(){
+    fill:function(){
         const tableObject = this.getContainer();
 
         //array sorted by name
@@ -35,11 +48,11 @@ const table = {
 
         this.clear();
         this.append(html_table);
-        this.init();
+        this.controller.set();
         this.setRang();
-        this.setStickTableHeader();
-        this.setTableSorter();
-
+        this.setSelection();
+        this.controller.setTableSorter();
+        this.controller.setStickTableHeader();
         this.expandState=false;
 
         //remove progress bar if still visible
@@ -62,14 +75,14 @@ const table = {
         filter_panel.init();
 
         //disable charts for community level
-        if(raumgliederung.getSelectedId()==='gem' || gebietsauswahl.getSelection()==="gem"){
+        if(raumgliederung.getSelectionId()==='gem' || raeumliche_analyseebene.getSelectionId()==="gem"){
             helper.disableElement(".dev_chart_compare","Steht für die Gemeindeebene nicht zur Verfügung");
             helper.disableElement(".dev_chart_trend","Steht für die Gemeindeebene nicht zur Verfügung");
         }
 
-        //create the main Table header
+        //create the main Table header --private functions
         function createTableHeader(){
-            let value_text = indikatorauswahl.getSelectedIndikator().toUpperCase()+" ("+indikatorauswahl.getIndikatorEinheit()+")",
+            let value_text = `Wert (${indikatorauswahl.getIndikatorEinheit()})`,
                 colspan = 4;
             if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
                 colspan=5;
@@ -92,7 +105,10 @@ const table = {
             return html+"</tr></thead>";
         }
         function createTableBody() {
-            let html = '<tbody id="tBody_value_table">',
+            let html = `
+                <tbody id="tBody_selection" class="avoid-sort tBody_value_table"></tbody>
+                <tbody id="tBody_value_table" class="tBody_value_table">
+            `,
                 i=0,
                 x = 0;
             $.each(layer_array,function(key,value){
@@ -111,9 +127,25 @@ const table = {
                     raumgl = raeumliche_analyseebene.getSelectionId(),
                     ind = indikatorauswahl.getSelectedIndikator(),
                     einheit = indikatorauswahl.getIndikatorEinheit(),
+                    //if excluded there is no need because here is the select function disabled
+                    tr_title=function(){
+                        if(excluded_areas.checkPerformanceAreas()){
+                            return 'title="Markierung durch klick"';
+                        }else{
+                            return "";
+                        }
+                    },
+                    exclude=function(){
+                        if($.inArray(des,table.excludedAreas)!==-1){
+                            return 'style="display:none"';
+                        }
+                        else{
+                            return "";
+                        }
+                    },
                     //'icon container' for trend and indicator-comparing inside a digramm
-                    img_trend = '<img class="dev_chart_compare" data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" title="Veränderung der Indikatorwerte für die Gebietseinheit" class="indsingle_entwicklungsdiagr" id="indikatoren_diagramm_ags' + ags + '" src="frontend/assets/icon/indikatoren_diagr.png"/>',
-                    img_trend_ind = '<img class="dev_chart_trend" data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" title="Veränderung des Indikatorwertes für die Gebietseinheit" class="ind_entwicklungsdiagr" id="indikatoren_diagramm_ags_ind' + ags + '" src="frontend/assets/icon/indikatoren_verlauf.png"/>';
+                    img_trend = '<img class="indsingle_entwicklungsdiagr dev_chart_compare disbale_performance mobile_hidden" data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" data-title="Veränderung der Indikatorwerte für die Gebietseinheit" title="Veränderung der Indikatorwerte für die Gebietseinheit" class="indsingle_entwicklungsdiagr" id="indikatoren_diagramm_ags' + ags + '" src="frontend/assets/icon/indikatoren_diagr.png"/>',
+                    img_trend_ind = '<img class="ind_entwicklungsdiagr dev_chart_trend disbale_performance mobile_hidden" data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" data-title="Veränderung des Indikatorwertes für die Gebietseinheit" title="Veränderung des Indikatorwertes für die Gebietseinheit" class="ind_entwicklungsdiagr" id="indikatoren_diagramm_ags_ind' + ags + '" src="frontend/assets/icon/indikatoren_verlauf.png"/>';
 
                 if(name === layer_array[i].gen){
                     if(value.krs){
@@ -122,17 +154,7 @@ const table = {
                         name = name + " (" + des + ")";
                     }
                 }
-                //disbale diagramm views for mobile devices
-                if(main_view.getMobileState()) {
-                    img_trend = '';
-                    img_trend_ind = '';
-                }
-
-                if($.inArray(des,table.excludedAreas)===-1) {
-                    html += '<tr id="' + ags + '">';
-                }else{
-                    html += '<tr style="display:none;" id="' + ags + '">';
-                }
+                html += `<tr ${exclude()} id="${ags}" class="tr" ${tr_title()}>`;
 
                 // handle error codes and notes
                 if(hc ==='0' && fc==='0'){
@@ -155,7 +177,7 @@ const table = {
                     html += '<td class="count_ags_table"></td><td class="td_ags">' +ags+ '</td><td class="td_name" data-des="'+des+'">' +name+'</td><td  style="text-align: right;">' +fc_name+'</td>';
                 }
                 if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
-                    html +='<td class="val-grundakt">'+grundakt_value+'</td>';
+                    html +='<td class="val-grundakt indicator_main">'+grundakt_value+'</td>';
                 }
 
                 html +='</tr>';
@@ -186,7 +208,7 @@ const table = {
             });
             function setAGSFooter() {
                 //ags_values
-                if (typeof raumgliederung.getSelectedId() !=='undefined') {
+                if (typeof raumgliederung.getSelectionId() !=='undefined') {
                     let tfoot_ags='';
                     $.each(ags_ind_array, function (key, value) {
                         $.each(value, function (key_found, value_found) {
@@ -203,7 +225,7 @@ const table = {
                                 '<th class="td_name"><img data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + indikatorauswahl.getSelectedIndikator() + '" title="Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren" class="indikatoren_gebietsprofil" src="frontend/assets/icon/indikatoren.png"/> <b>' + name + '</b></th>' +
                                 '<th class="val-ags" data-name="' + value.gen + '" data-val="' + value_g + '" data-ind="' + indikatorauswahl.getSelectedIndikator() + '"><b>' + value_set + '</b><img data-name="Bundesrepublik" data-ags="' + ags + '" data-ind="' + indikatorauswahl.getSelectedIndikator() + '" data-wert="' + value_set + '" data-einheit="' + indikatorauswahl.getIndikatorEinheit() + '" title="Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators" class="indikatoren_diagramm_ags" class="histogramm_ags" id="diagramm_ags_' + ags + '" src="frontend/assets/icon/histogramm.png"/>' + img_trend + img_trend_ind + '</th>';
                             if (indikatorauswahl.getSelectedIndiktorGrundaktState()) {
-                                tfoot_ags += '<th class="td_akt">' + grundakt_val + '</th>';
+                                tfoot_ags += '<th class="td_akt indicator_main">' + grundakt_val + '</th>';
                             }
                         });
                     });
@@ -222,7 +244,7 @@ const table = {
                     '<th class="val-ags" data-name="Bundesrepublik" data-val="' + value_g + '" data-ind="' + indikatorauswahl.getSelectedIndikator() + '"><b>' + value_g + '</b><img data-name="Bundesrepublik" data-ags="99" data-ind="' + indikatorauswahl.getSelectedIndikator() + '" data-wert="' + value_g + '" data-einheit="' + indikatorauswahl.getIndikatorEinheit() + '" title="Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators" class="indikatoren_diagramm_ags" class="histogramm_ags" id="diagramm_ags_99" src="frontend/assets/icon/histogramm.png"/>' + img_trend + img_trend_ind + '</th>';
 
                 if (indikatorauswahl.getSelectedIndiktorGrundaktState()) {
-                    tfoot_brd += '<th class="td_akt">' + grundakt_val + '</th>';
+                    tfoot_brd += '<th class="td_akt indicator_main">' + grundakt_val + '</th>';
                 }
                 return tfoot_brd;
             }
@@ -234,7 +256,7 @@ const table = {
         this.getScrollableAreaDOMObject().empty();
     },
     append:function(html_string){
-        this.getScrollableAreaDOMObject().append(html_string);
+      this.getScrollableAreaDOMObject().append(html_string);
     },
     expand:function(){
         const table = this;
@@ -272,6 +294,7 @@ const table = {
             }
             //sort by count
             results =  results.sort(function(obj1, obj2) {return obj1.count - obj2.count;});
+
             //expand the table---------------------------------------------------------------
             $.each(results,function(key,values_expand){
                 let id = values_expand.id,
@@ -310,7 +333,7 @@ const table = {
                         $('#99_expand_'+id).text(value_brd);
                     });
                     //if finer spatial choice -> expand the table footer above the brd part
-                    if(typeof raumgliederung.getSelectedId()!=='undefined'){
+                    if(typeof raumgliederung.getSelectionId()!=='undefined'){
                         //get the selection from the dropdown as string
                         let selection = $('#dropdown_grenzen_container').dropdown('get value').split(',');
                         //append the footer
@@ -383,7 +406,7 @@ const table = {
                                 if(indikatorauswahl.getSelectedIndiktorGrundaktState()) {
                                     grundakt_val = value_json.grundakt;
                                     let values_set = grundakt_val.split("/");
-                                    let values_ind = $(this).find('.val-grundakt').text().split("/");
+                                    let values_ind = $(this).find('.val-grundakt.indicator_main').text().split("/");
                                     $(this).append(`<td class="val-grundakt ${class_expand}">${grundakt_val}</td><td class="val-grundakt ${class_expand}">${getDiff_Grundakt(values_ind,values_set)}</td>`);
                                 }
                                 //apend the differences if set
@@ -402,31 +425,31 @@ const table = {
                         key_time_shift = id.replace("|","_");
                     footer_brd.append('<th id="99_expand_'+key_time_shift+'" class="val-ags '+grey_border+' '+class_expand+'"></th>');
                     if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
-                        footer_brd.append('<th id="expand_grundakt_footer_99" class="val-grundakt '+class_expand+'"></th><th id="expand_grundakt_footer_diff_99" class="val-grundakt '+class_expand+'"></th>');
+                        footer_brd.append('<th id="expand_grundakt_footer_99'+key_time_shift+'" class="val-grundakt '+class_expand+'"></th><th id="expand_grundakt_footer_diff_99'+key_time_shift+'" class="val-grundakt '+class_expand+'"></th>');
                     }
                     if(expand_panel.getDifferenceState()){
-                        footer_brd.append('<th id="expand_diff_footer_99" class="'+class_expand+'"></th>');
+                        footer_brd.append('<th id="expand_diff_footer_99'+key_time_shift+'" class="'+class_expand+'"></th>');
                     }
                     $.when(request_manager.getTableExpandValues(obj_brd,obj_ags)).done(function(data){
                         let data_array = data;
                         let value_brd = data_array['values']['99']['value_round'];
                         $('#99_expand_'+key_time_shift).text(value_brd);
                         if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
-                            let value_ind_brd = $('#tfoot_99 .td_akt').text().split("/");
+                            let value_ind_brd = $('#tfoot_99 .td_akt.indicator_main').text().split("/");
                             let grundakt = data_array['values']['99']['grundakt'];
                             let value_brd_set = grundakt.split("/");
-                            $('#expand_grundakt_footer_99').text(grundakt);
-                            $('#expand_grundakt_footer_diff_99').html(getDiff_Grundakt(value_ind_brd,value_brd_set));
+                            $('#expand_grundakt_footer_99'+key_time_shift).text(grundakt);
+                            $('#expand_grundakt_footer_diff_99'+key_time_shift).html(getDiff_Grundakt(value_ind_brd,value_brd_set));
                         }
                         if(expand_panel.getDifferenceState()){
                             //create the difference view
                             let value_ind = parseFloat((value_brd).replace(',', '.'));
                             let value_ags = parseFloat(footer_brd.find('.val-ags').find('b').text().replace(',', '.'));
-                            $('#expand_diff_footer_99').html(getDifferenceDiv(value_ind,value_ags));
+                            $('#expand_diff_footer_99'+key_time_shift).html(getDifferenceDiv(value_ind,value_ags));
                         }
                     });
                     //if finer spatial choice -> expand the table footer above the brd part
-                    if(typeof raumgliederung.getSelectedId()!=='undefined'){
+                    if(typeof raumgliederung.getSelectionId()!=='undefined'){
                         //get the selection from the dropdown as string
                         let selection = $('#dropdown_grenzen_container').dropdown('get value').split(',');
                         //append the footer
@@ -487,7 +510,7 @@ const table = {
                         $('#99_expand_'+time_set).text(value_brd);
                     });
                     //if finer spatial choice -> expand the table footer above the brd part
-                    if(typeof raumgliederung.getSelectedId()!=='undefined'){
+                    if(typeof raumgliederung.getSelectionId()!=='undefined'){
                         //get the selection from the dropdown as string
                         let selection = $('#dropdown_grenzen_container').dropdown('get value').split(',');
                         //append the footer
@@ -525,7 +548,7 @@ const table = {
                         $('#99_expand_ind').text(value_brd);
                     });
                     //if finer spatial choice -> expand the table footer above the brd part
-                    if(typeof raumgliederung.getSelectedId()!=='undefined'){
+                    if(typeof raumgliederung.getSelectionId()!=='undefined'){
                         //get the selection from the dropdown as string
                         let selection = $('#dropdown_grenzen_container').dropdown('get value').split(',');
                         //append the footer
@@ -542,7 +565,7 @@ const table = {
                 }
             });
             progressbar.remove();
-            table.setTableSorter();
+            table.controller.setTableSorter();
             table.expandState= true;
             main_view.resizeSplitter(table.getWidth()+80);
         });
@@ -604,62 +627,6 @@ const table = {
     setColspanHeader:function(val){
         this.getColSpanRow().attr("colspan",val);
     },
-    setTableSorter:function(){
-        // these default equivalents were obtained from a table of equivalents
-        $.tablesorter.characterEquivalents = {
-            'a' : '\u00e1\u00e0\u00e2\u00e3\u00e4\u0105\u00e5', // áàâãäąå
-            'A' : '\u00c1\u00c0\u00c2\u00c3\u00c4\u0104\u00c5', // ÁÀÂÃÄĄÅ
-            'c' : '\u00e7\u0107\u010d', // çćč
-            'C' : '\u00c7\u0106\u010c', // ÇĆČ
-            'e' : '\u00e9\u00e8\u00ea\u00eb\u011b\u0119', // éèêëěę
-            'E' : '\u00c9\u00c8\u00ca\u00cb\u011a\u0118', // ÉÈÊËĚĘ
-            'i' : '\u00ed\u00ec\u0130\u00ee\u00ef\u0131', // íìİîïı
-            'I' : '\u00cd\u00cc\u0130\u00ce\u00cf', // ÍÌİÎÏ
-            'o' : '\u00f3\u00f2\u00f4\u00f5\u00f6\u014d', // óòôõöō
-            'O' : '\u00d3\u00d2\u00d4\u00d5\u00d6\u014c', // ÓÒÔÕÖŌ
-            'ss': '\u00df', // ß (s sharp)
-            'SS': '\u1e9e', // ẞ (Capital sharp s)
-            'u' : '\u00fa\u00f9\u00fb\u00fc\u016f', // úùûüů
-            'U' : '\u00da\u00d9\u00db\u00dc\u016e' // ÚÙÛÜŮ
-        };
-        // modify the above defaults as follows
-        $.extend( $.tablesorter.characterEquivalents, {
-            "ae" : "\u00e6", // expanding characters æ Æ
-            "AE" : "\u00c6",
-            "oe" : "\u00f6\u0153", // œ Œ
-            "OE" : "\u00d6\u0152",
-            "d"  : "\u00f0",  // Eth (ð Ð)
-            "D"  : "\u00d0",
-            "o"  : "\u00f3\u00f2\u00f4\u00f5", // remove ö because it's in the oe now
-            "O"  : "\u00d3\u00d2\u00d4\u00d5"  // remove Ö because it's in the OE now
-        });
-
-        this.getDOMObject()
-            .tablesorter()
-            .trigger("update")
-            .bind("sortEnd",function () {
-                table.setRang();
-            });
-    },
-    destroyTableSorter:function(){
-        this.getDOMObject().trigger("destroy");
-    },
-    setStickTableHeader:function(){
-        const table = this.getDOMObject();
-        table.stickyTableHeaders({
-            fixedOffset: $('#thead'),
-            scrollableArea: $('.scrollable-area')
-        });
-    },
-    destroyStickyTableHeader:function(){
-        this.getDOMObject().stickyTableHeaders('destroy');
-    },
-    reinitializeStickyTableHeader:function(){
-        this.destroyStickyTableHeader();
-        if(this.getWidth()<right_view.getWidth()){
-            this.setStickTableHeader();
-        }
-    },
     isOpen:function(){
         let state = true;
         if ($('.right_content').is(':hidden')) {
@@ -695,6 +662,8 @@ const table = {
     controller:{
         set:function(){
             const tableObject = table.getTableBodyObject();
+            let table_body = $('#tBody_value_table'),
+                table_selection = $('#tBody_selection');
 
             //on click table head
             tableObject
@@ -771,7 +740,7 @@ const table = {
                 .unbind()
                 .on('keyup', function() {
                     let value = $(this).val().toLowerCase(),
-                        selector = tableObject.find('tr');
+                        selector = table_body.find('tr');
                     if(value.length >2) {
                         selector.each(function () {
                             if ($(this).find('.td_name').text().toLocaleLowerCase().includes(value)) {
@@ -787,39 +756,169 @@ const table = {
                 });
 
             //Hover
-            $("#tBody_value_table")
+            table_body
                 .unbind()
                 .mouseenter(function() {
                     $(this).delegate('tr', 'mouseover mouseleave', function (e) {
                         if (e.type === 'mouseover') {
-                            $(this).addClass("hover");
                             let ags = $(this).find('.td_ags').text();
                             ags.trim();
                             indikator_json_group.highlight(ags,false);
                         }
                         else {
-                            $(this).removeClass("hover");
-                            indikator_json_group.resetHightlight();
-                        }
-                    });
-                    $(this).delegate('tr', 'click', function (e) {
-                        if (e.type === 'click') {
-                            $(this).addClass("hover");
-                            let ags = $(this).find('.td_ags').text();
-                            ags.trim();
-                            indikator_json_group.highlight(ags,true);
-                        }
-                        else {
-                            $(this).removeClass("hover");
                             indikator_json_group.resetHightlight();
                         }
                     });
                 });
+            //add the scroll funcionality
             table.getScrollableAreaDOMObject()
                 .unbind()
                 .on("scroll",function(){
                     table.onScroll();
                 });
+
+            //selection on click
+            if(excluded_areas.checkPerformanceAreas()) {
+                table_body
+                    .find("tr")
+                    .unbind()
+                    .click(function () {
+                        //first check if selected
+                        let ags = $(this).attr("id");
+                        $(this)
+                            .attr("data-select", "true");
+                        table.selection.push(ags);
+                        table.setSelection();
+                    });
+
+                //remove selection
+                table_selection
+                    .find("tr")
+                    .unbind()
+                    .click(function () {
+                        let elem = $(this),
+                            ags = elem.attr("id");
+                        //remove ags from selection array
+                        table.selection = $.grep(table.selection, function (val) {
+                            return val != ags;
+                        });
+                        //remove active class
+                        elem
+                            .removeAttr("data-select")
+                            .find("td").removeClass("selected");
+                        table_body.append($(elem[0].outerHTML).attr("title", "Markierung durch klick"));
+                        elem.remove();
+                        //reset the controller
+                        table.controller.set();
+                        //trigger a table sort on name
+                    });
+            }
+        },
+        setTableSorter:function(){
+            // these default equivalents were obtained from a table of equivalents
+            $.tablesorter.characterEquivalents = {
+                'a' : '\u00e1\u00e0\u00e2\u00e3\u00e4\u0105\u00e5', // áàâãäąå
+                'A' : '\u00c1\u00c0\u00c2\u00c3\u00c4\u0104\u00c5', // ÁÀÂÃÄĄÅ
+                'c' : '\u00e7\u0107\u010d', // çćč
+                'C' : '\u00c7\u0106\u010c', // ÇĆČ
+                'e' : '\u00e9\u00e8\u00ea\u00eb\u011b\u0119', // éèêëěę
+                'E' : '\u00c9\u00c8\u00ca\u00cb\u011a\u0118', // ÉÈÊËĚĘ
+                'i' : '\u00ed\u00ec\u0130\u00ee\u00ef\u0131', // íìİîïı
+                'I' : '\u00cd\u00cc\u0130\u00ce\u00cf', // ÍÌİÎÏ
+                'o' : '\u00f3\u00f2\u00f4\u00f5\u00f6\u014d', // óòôõöō
+                'O' : '\u00d3\u00d2\u00d4\u00d5\u00d6\u014c', // ÓÒÔÕÖŌ
+                'ss': '\u00df', // ß (s sharp)
+                'SS': '\u1e9e', // ẞ (Capital sharp s)
+                'u' : '\u00fa\u00f9\u00fb\u00fc\u016f', // úùûüů
+                'U' : '\u00da\u00d9\u00db\u00dc\u016e' // ÚÙÛÜŮ
+            };
+            // modify the above defaults as follows
+            $.extend( $.tablesorter.characterEquivalents, {
+                "ae" : "\u00e6", // expanding characters æ Æ
+                "AE" : "\u00c6",
+                "oe" : "\u00f6\u0153", // œ Œ
+                "OE" : "\u00d6\u0152",
+                "d"  : "\u00f0",  // Eth (ð Ð)
+                "D"  : "\u00d0",
+                "o"  : "\u00f3\u00f2\u00f4\u00f5", // remove ö because it's in the oe now
+                "O"  : "\u00d3\u00d2\u00d4\u00d5"  // remove Ö because it's in the OE now
+            });
+
+            table.getDOMObject()
+                .tablesorter({
+                    sortList: function(){
+                        if(excluded_areas.checkPerformanceAreas()){
+                            return [[0,0],[2,0]];
+                        }
+                    }
+                })
+                .trigger("update")
+                .bind("sortEnd",function () {
+                    table.setRang();
+                });
+
+            table.controller.updateTableSorter();
+        },
+        updateTableSorter:function(){
+            table.getDOMObject().trigger("updateAll");
+        },
+        setStickTableHeader:function(){
+            table.getDOMObject().stickyTableHeaders({
+                fixedOffset: $('#thead'),
+                scrollableArea: $('.scrollable-area')
+            });
+        },
+        destroyStickyTableHeader:function(){
+            table.getDOMObject().stickyTableHeaders('destroy');
+        },
+        reinitializeStickyTableHeader:function(){
+            table.controller.destroyStickyTableHeader();
+            if(table.getWidth()<right_view.getWidth()){
+                table.controller.setStickTableHeader();
+            }
+        },
+    },
+    setSelection:function(){
+        if(this.selection.length >0 && excluded_areas.checkPerformanceAreas()) {
+            let html_array = [];
+            $('#table_page #tBody_value_table tr').each(function () {
+                let ags = $(this).attr("id");
+                if ($.inArray(ags, table.selection) >= 0) {
+                    $(this)
+                        .find("td")
+                        .addClass("selected")
+                        .each(function () {
+                            $(this).attr("data-sorter", false)
+                        });
+                    indikator_json_group.highlight(ags, false, );
+                } else {
+                    $(this)
+                        .find("td")
+                        .removeClass("selected")
+                        .each(function () {
+                            $(this).attr("data-sorter", true)
+                        });
+                    indikator_json_group.resetHightlight();
+                }
+            });
+            if (table.selection.length > 0) {
+                //push it on first position
+                $.each(table.selection, function (key, ags) {
+                    let elem = $(`#${ags}`);
+                    html_array.push(elem[0].outerHTML);
+                    elem.remove();
+                });
+                $.each(html_array, function (key, val) {
+                    $('#tBody_selection').append($(val).attr("title","Markierung entfernen duch anklicken"));
+                });
+                table.setRang();
+            }
+            table.controller.set();
+            table.getScrollableAreaDOMObject().scrollTop(0);
         }
+    },
+    clearSelection:function(){
+        this.selection=[];
+        $('#tBody_selection').empty();
     }
 };

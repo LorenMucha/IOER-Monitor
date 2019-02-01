@@ -99,7 +99,7 @@ const indikatorauswahl ={
                 }
                 //create the cat choices
                 if(main_view.getWidth()>=500) {
-                    html += `<div id="kat_item_${cat_id}" class="ui left pointing dropdown link item link_kat" value="${cat_id}" style="${background_color}">${icon_set}<i class="dropdown icon"></i>${cat_name()}<div id="submenu${cat_id}" class="menu submenu upward">`;
+                    html += `<div id="kat_item_${cat_id}" class="ui left pointing dropdown link item link_kat" data-value="${cat_id}" style="${background_color}">${icon_set}<i class="dropdown icon"></i>${cat_name()}<div id="submenu${cat_id}" class="menu submenu upward">`;
                 }else{
                     html += `<div class="header">
                                 <i class="tags icon"></i>${cat_name()}</div>
@@ -127,7 +127,7 @@ const indikatorauswahl ={
                             return set;
                         };
 
-                    html += `<div class="${markierung_class()} item link_sub" id="${ind_id}_item" data-times="${times}" data-einheit="${einheit}" data-value="${ind_id}" value="${ind_id}" data-kat="${cat_id}" data-name="${ind_name()}" data-sort="1" data-actuality="${grundakt_state}">`;
+                    html += `<div class="${markierung_class()} item link_sub" id="${ind_id}_item" data-times="${times}" data-einheit="${einheit}" data-value="${ind_id}" data-kat="${cat_id}" data-name="${ind_name()}" data-sort="1" data-actuality="${grundakt_state}">`;
                     html += ind_name() + "</div>";
                 });
                 html +='</div></div>';
@@ -211,8 +211,8 @@ const indikatorauswahl ={
             $(this).css({"color": "rgba(0,0,0,.87)", "font-weight": ""})
         });
         //highlight the elements inside the menu
-        $('#kat_item_'+menu.getIndikatorKategorie(indicator_id)).css({"color": farbschema.getColorMain(), "font-weight": "bold"});
-        $('#'+indicator_id+"_item").css({"color": farbschema.getColorMain(), "font-weight": "bold"});
+        $('#kat_item_'+menu.getIndikatorKategorie(indicator_id)).css({"color": farbschema.getColorHexMain(), "font-weight": "bold"});
+        $('#'+indicator_id+"_item").css({"color": farbschema.getColorHexMain(), "font-weight": "bold"});
     },
     getIndikatorInfo:function(indicator_id,key_name){
         let val_found = null;

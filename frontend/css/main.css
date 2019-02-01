@@ -15,66 +15,33 @@
 @import url("../lib/d3/animate.min.css");
 @import url("../lib/sweetalert/sweetalert.css");
 @import url("../lib/spectrum/spectrum.css");
+@import "styles.css";
+@import "responsive.css";
+@import "autocomplete.css";
 
-:root{
-    --main-color:#4E60AA;
-    --active-color:#8CB91B
-}
-.clearfix:before,
-.clearfix:after {
-    content: " ";
-    display: table;
-}
-.clearfix:after {
-    clear: both;
-}
-.clearfix {
-    *zoom: 0;
-    text-decoration: none;
-}
 body {
     padding: 0;
     margin: 0;
-    //font-family: 'Roboto', sans-serif;
     overflow: hidden;
-}
-.cursor{
-    cursor:pointer;
-}
-.disabled{
-    -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
-    filter: grayscale(100%);
-    opacity: 0.5;
-}
-.float-right{
-    float: right !important;
-}
-/*JQuery Dialog*/
-.ui-widget-overlay.custom-overlay
-{
-    background-color: black;
-    background-image: none;
-    opacity: 0.9;
-    z-index: 1040;
 }
 /* navbar */
 .navbar {
-    background: #4E60AA; /* For browsers that do not support gradients */
+    background: var(--main-color); /* For browsers that do not support gradients */
     position: absolute;
     height: 50px;
     width: 100%;
     top: 0;
 }
 .navbar .navbar-toggle{
-    background-color: #4E60AA !important;
+    background-color: var(--main-color) !important;
 }
 .navbar-collapse .in{
-    background-color: #4E60AA;
+    background-color: var(--main-color);
     width: auto;
     float: right;
 }
 .navbar .in{
-    background-color: #4E60AA;
+    background-color: var(--main-color);
     width: auto;
     float: right;
     z-index: 1000;
@@ -128,7 +95,7 @@ Slider
  */
 .ui-autocomplete {
     z-index: 999999999999999999999999 !important;
-    bottom: 0px;
+    bottom: 0;
     overflow-y: auto;
     height: auto;
     max-height: 600px;
@@ -138,7 +105,7 @@ Slider
     height: 1px;
     background-color: black;
     color: black;
-    margin-top: 0px !important;
+    margin-top: 0 !important;
     margin-bottom: 5px !important;
 }
 .hr_list{
@@ -208,10 +175,6 @@ Slider
     font-weight: bold;
     color:black !important;
 }
-.ui.search .prompt {
-    border-radius: 0 !important;
-    border:1px solid black;
-}
 
 /*Dialog*/
 .hr_dialog {
@@ -221,7 +184,7 @@ Slider
 .ui-dialog { z-index: 99999 !important ;}
 .ui-widget-header
 {
-    background: #4E60AA !important;
+    background: var(--main-color) !important;
     color: white !important;
 }
 .ui-dialog .ui-dialog-content {
@@ -272,7 +235,7 @@ Feedack
     width: 300px;
     height: 300px;
     background: white;
-    border: 2px solid #4E60AA;
+    border: 2px solid var(--main-color);
     padding: 10px;
     border-radius: 15px;
 }
@@ -285,7 +248,7 @@ Feedack
 .progress{
     border: 16px solid #f3f3f3;
     border-radius: 50%;
-    border-top: 16px solid #4E60AA;
+    border-top: 16px solid var(--main-color);
     width: 150px;
     height: 150px;
     -webkit-animation: spin 2s linear infinite; /* Safari */
@@ -305,22 +268,29 @@ Feedack
     z-index: 1000;
     display: inline-block;
     bottom: 20px;
+    right: 0;
+    filter: blur(0);
 }
-.btn-group-map .map-btn:hover{
+#map_compare{
+    display: none;
+    position:absolute;
+    z-index: 1000;
+    bottom: 110px;
+    right: 0;
+    filter: blur(0);
+}
+.map-btn:hover{
     border:1px solid var(--active-color);
 }
-.btn-group-map .map-btn{
-    background-color: #4E60AA;
+.map-btn{
+    background-color: var(--main-color);
     transform: rotate(270deg);
-    margin-bottom: 50px;
+    margin-bottom: 20px;
     height: 50px;
-    right: -28px;
+    right: -20px;
 }
-.btn-group-map #legende_button{
-    border-right: 1px solid white !important;
-}
-.btn-group-map .legende_button{
-    display: none;
+#map_compare .map-btn{
+    background-color: var(--active-color);
 }
 /*
 Layer Control
@@ -417,7 +387,7 @@ Legende
     background: white;
     padding: 5px;
     z-index: 3000;
-    border:2px solid #4E60AA;
+    border:2px solid var(--main-color);
     box-sizing: border-box;
     overflow-y: auto;
     overflow-x: hidden;
@@ -538,12 +508,6 @@ Toolbar.js
     overflow-x: hidden;
     height: 99%;
 }
-.btn_dropdown {
-    background-color: #8bba23 !important;
-    width: 100%;
-    margin-bottom: 10px;
-    margin-top: 10px;
-}
 #btn_reset {
     background-color: grey !important;
 }
@@ -555,7 +519,7 @@ Toolbar.js
     position: absolute;
     left: 0;
     z-index: 20000;
-    border:2px solid #4E60AA;
+    border:2px solid var(--main-color);
     padding: 20px;
     box-sizing: border-box;
     opacity: 1;
@@ -567,7 +531,7 @@ Toolbar.js
 .toolbar .menu_m {
     height: 100px;
     width: 25px;
-    background: #4E60AA;
+    background: var(--main-color);
     box-shadow: 1px 0 2px rgba(0, 0, 0, .3);
     position: absolute;
     right: -25px;
@@ -598,7 +562,7 @@ Toolbar.js
 .toolbar #content .dropdown_choice{
     width: 100%;
     border-radius: 5px;
-    background: #4E60AA;
+    background: var(--main-color);
     display: inline-block;
     padding: 7px;
     height: 34px;
@@ -641,6 +605,9 @@ Toolbar.js
     margin-bottom: 5px;
     margin-top: 5px;
 }
+.toolbar #map-selection{
+    padding-right: 5px;
+}
 /*Indicator choices also for the cloned ones*/
 .indicator_ddm{
     width: 100% !important;
@@ -653,11 +620,11 @@ Toolbar.js
 .indicator_ddm #kat_auswahl{
     width: 100%;
     height: auto;
-    border: 1px solid #4E60AA !important;
+    border: 1px solid var(--main-color) !important;
 }
 .indicator_ddm .menu .item{
-    border-left: 1px solid #4E60AA !important;
-    border-right: 1px solid #4E60AA !important;
+    border-left: 1px solid var(--main-color) !important;
+    border-right: 1px solid var(--main-color) !important;
     background-color: white;
 }
 .indicator_ddm .menu .item:hover{
@@ -731,30 +698,18 @@ Toolbar.js
     margin-top: 20px;
 }
 .toolbar #content #dropdown_raumgl #spatial_range_raster #slider_raum_container #raum_slider .ui-slider-range {
-    background-color: #4E60AA;
+    background-color: var(--main-color);
 }
 /*Slider*/
-#slider_zeit_container {
-    position: fixed;
-    left: 20%;
-    z-index: 1000;
-    width:300px;
-    height: auto !important;
-    min-height:50px;
-    box-shadow: 0 0 3px gray;
-    background-color: #4E60AA;
-    bottom:20px;
+.toolbar #slider_zeit_container {
+    margin-top: 10px;
+    width:100%;
 }
-#zeit_slider {
-    margin-top: 5px;
-    margin-left: 20px;
-    margin-right: 20px;
+.toolbar #slider_zeit_container #zeit_slider{
+    margin: 20px;
 }
-#zeit_slider .ui-slider-range {
-    background-color: #4E60AA;
-}
-.zeit_slider .ui-slider-label{
-    color: white !important;
+.toolbar .kennblatt{
+    margin-top: 20px !important;
 }
 /*
 Tools
@@ -766,76 +721,69 @@ Tools
     box-shadow: 0 0 3px gray;
 }
 .vergleich{
-    background: #4E60AA url(../assets/icon/split.png) no-repeat center;
+    background: var(--main-color) url(../assets/icon/split.png) no-repeat center;
 }
 .germany {
-    background: #4E60AA url(../assets/icon/germany.png) no-repeat center;
+    background: var(--main-color) url(../assets/icon/germany.png) no-repeat center;
 }
 .zoomIn {
-    background: #4E60AA url(../assets/icon/plus.png) no-repeat center;
+    background: var(--main-color) url(../assets/icon/plus.png) no-repeat center;
 }
 .zoomOut {
-    background: #4E60AA url(../assets/icon/minus.png) no-repeat center;
+    background: var(--main-color) url(../assets/icon/minus.png) no-repeat center;
 }
-.info {
-    background: #4E60AA url(../assets/icon/information-button.png) no-repeat center;
-}
-.locate{
-    background: #4E60AA url(../assets/icon/navigation.png) no-repeat center;
-}
-.rasterize{
-    background: #4E60AA url(../assets/icon/smooth.png) no-repeat center;
-}
-.layer_control{
-    background: #4E60AA url(../assets/icon/navigation.png) no-repeat center;
-}
-#content .dropdown_menu .btn_container .full_screen{
+
+.toolbar #content .dropdown_menu .btn_container .full_screen{
     width: 32px;
     height: 32px;
-    background: #4E60AA url(../assets/icon/fullscreen-symbol.png) no-repeat center center;
+    background: var(--main-color) url(../assets/icon/fullscreen-symbol.png) no-repeat center center;
     margin-left: 7px;
 }
-#content .dropdown_menu .btn_container #measure {
+.toolbar #content #dropdown_werkzeug ul li {
+    float: left;
+    width: 15%;
+    margin-left: 15px;
+}
+.toolbar #content  #dropdown_werkzeug ul li{
+    width:15%;
+}
+.toolbar #content  #dropdown_werkzeug ul li .image{
     width: 32px;
     height: 32px;
-    background: #4E60AA url(../assets/icon/ruler.png) no-repeat center center;
     margin-left: 7px;
 }
-#content .dropdown_menu .btn_container #t_slider{
-    width: 32px;
-    height: 32px;
-    background: #4E60AA url(../assets/icon/timeslider.png) no-repeat center center;
-    margin-left: 7px;
+.toolbar #content #dropdown_werkzeug .btn_container #measure {
+    background: var(--main-color) url(../assets/icon/ruler.png) no-repeat center center;
 }
-#content .dropdown_menu .btn_container #lupe {
-    width: 32px;
-    height: 32px;
-    background: #4E60AA url(../assets/icon/lupe.png) no-repeat center center;
-    margin-left: 7px;
+.toolbar #content #dropdown_werkzeug .btn_container #lupe {
+    background: var(--main-color) url(../assets/icon/lupe.png) no-repeat center center;
 }
-#content .dropdown_menu hr {
-    border-top: 1px solid black;
-    margin-top:0px;
-}
-#content #dropdown_werkzeug #import {
-    width: 32px;
-    height: 32px;
-    background: #4E60AA url(../assets/icon/import.png) no-repeat center center;
-    margin-left: 7px;
+.toolbar #content #dropdown_werkzeug #import {
+    background: var(--main-color) url(../assets/icon/import.png) no-repeat center center;
 }
 #content #dropdown_werkzeug #import .leaflet-control-filelayer{
     opacity: 0 !important;
-    width: 32px;
-    height: 32px
 }
-#content #dropdown_werkzeug .werkzeug_vergleich{
-    display: none;
+.toolbar #content .dropdown_menu #btn_glaetten{
+    background: var(--main-color) url(../assets/icon/smooth.png) no-repeat center center;
 }
-#content .dropdown_menu #vergleich{
-    width: 32px;
-    height: 32px;
-    background: grey url(../assets/icon/split.png) no-repeat center center;
+.toolbar #content #dropdown_analyse ul li{
+    float: left;
+}
+.toolbar #content #dropdown_analyse ul li .image{
+    width: 45px;
+    height: 45px;
     margin-left: 7px;
+}
+.toolbar #content #dropdown_analyse #dev_chart{
+    background: white url(../assets/icon/trend.png) no-repeat center center;
+}
+.toolbar #content #dropdown_analyse #dev_chart_compare{
+    background: white url(../assets/icon/trend_compare.png) no-repeat center center;
+}
+.toolbar #content #dropdown_analyse #ind_compare{
+    background: var(--main-color) url(../assets/icon/split.png) no-repeat center center;
+    height:40px;
 }
 /*
 color schema
@@ -891,7 +839,6 @@ color schema
     overflow: hidden;
 }
 .panner{
-    display: none;
     position:fixed;
     width:60px;
     height:60px;
@@ -902,10 +849,10 @@ color schema
     border-bottom-left-radius: 50px;
 }
 .tablebackground{
-    background: #4E60AA url(../assets/icon/table-grid.png) no-repeat center;
+    background: var(--main-color) url(../assets/icon/table-grid.png) no-repeat center;
 }
 .mapbackground{
-    background: #4E60AA url(../assets/icon/germany_32.png) no-repeat center;
+    background: var(--main-color) url(../assets/icon/germany_32.png) no-repeat center;
 }
 /*barchart*/
 .chart div {
@@ -949,19 +896,6 @@ color schema
     margin-top: 10px;
     display:none;
 }
-#content .dropdown_menu .tool_li {
-    float: left;
-    width: 15%;
-    margin-left: 15px;
-}
-#content .dropdown_menu .btn_container {
-    margin-right: 10px;
-    cursor: pointer;
-}
-#content .dropdown_menu .btn_container .btn_txt {
-    padding-top: 3px;
-    padding-left: 6px;
-}
 .layer_ue {
     display:inline-block;
     width: 100%;
@@ -981,11 +915,11 @@ color schema
 }
 #content .dropdown_menu #layer_conainer hr {
     border-top: 1px solid black;
-    margin-top:0px;
+    margin-top:0;
     margin-bottom: 5px;
 }
 #content .dropdown_menu #layer_conainer form{
-    margin-top:0px;
+    margin-top:0;
 }
 
 #opacity_container {
@@ -1000,7 +934,7 @@ color schema
     margin-top: 10px;
 }
 #opacity_slider .ui-slider-range {
-    background-color: #4E60AA;
+    background-color: var(--main-color);
 }
 #op_low {
     float:left;
@@ -1084,7 +1018,7 @@ Vergleichskarte Dialog------------------------------------
     right: 10px;
     top: 60px;
     z-index: 3000;
-    border: 2px solid #4E60AA;
+    border: 2px solid var(--main-color);
     width:550px;
     background: white;
     overflow-x: hidden;
@@ -1228,6 +1162,7 @@ Solution fixed headers: https://stackoverflow.com/questions/673153/html-table-wi
 }
 .right_content .table_page{
     width:100%;
+    height:100%;
 }
 .right_content .table_page .table_page_header{
     height: 15%;
@@ -1280,19 +1215,19 @@ Solution fixed headers: https://stackoverflow.com/questions/673153/html-table-wi
     overflow: auto;
     bottom: 10px;
     height:100%;
-    top:15%;
-    /*width:100%;*/
-    margin-left: 5px;
-    margin-right: 5px;
+    left: 5px;
+    right: 5px;
 }
 .right_content .scrollable-area #table_ags{
     background: #FFF;
     box-shadow: none;
     text-align: left;
     color: rgba(0,0,0,.87);
+    border:.5px solid black;
     border-spacing: 0;
-    border: 1px solid black;
     margin-bottom: 10px;
+    margin-right: 5px;
+    border-collapse: unset;
 }
 .right_content .scrollable-area table.tablesorter thead .header:not(.expand)
 {
@@ -1321,16 +1256,17 @@ Solution fixed headers: https://stackoverflow.com/questions/673153/html-table-wi
     font-size: 12px;
     text-align: center;
     overflow:hidden;
-    border: 1px solid black;
+    background-color: lightgray;
+    border:.5px solid black;
+}
+.right_content .scrollable-area #table_ags .tBody_value_table tr:hover{
+    background-color: rgba(78,96,170,.5)
 }
 .right_content .scrollable-area #table_ags tr td{
     display: table-cell;
-    border: 1px solid black;
     padding: 2px;
     font-size: 12px;
-}
-.right_content .scrollable-area #table_ags tr:hover{
-    background-color:lightgray;
+    border:.5px solid black;
 }
 .right_content .scrollable-area #table_ags tr .td_name{
     text-align:left;
@@ -1354,7 +1290,7 @@ Solution fixed headers: https://stackoverflow.com/questions/673153/html-table-wi
     text-align: right;
 }
 .right_content .scrollable-area #table_ags .tfoot tr{
-    background-color: lightgray;
+    background-color: lightgray !important;
 }
 .right_content .scrollable-area #table_ags .tfoot tr td{
     border: 1px solid black;
@@ -1363,13 +1299,13 @@ Solution fixed headers: https://stackoverflow.com/questions/673153/html-table-wi
     border-top: 2px solid black;
 }
 /*
-expand table
+table
  */
 .right_content .scrollable-area #table_ags tr .dif_val_div{
     margin-left: 1vh;
 }
 .right_content .scrollable-area #table_ags tr .dif_val_div .glyphicon{
-    color: #4E60AA;
+    color: var(--main-color);
     font-size: 2em;
 }
 .right_content .scrollable-area #table_ags tr .dif_val_div b{
@@ -1401,7 +1337,7 @@ tabelle filtern
     height: 100%;
     width: 250px;
     background: white;
-    border: 1px solid #4E60AA;
+    border: 1px solid var(--main-color);
     bottom: 0;
     top: 0;
     right: 0;
@@ -1423,7 +1359,7 @@ tabelle filtern
     height: 100%;
     width: 250px;
     background: white;
-    border: 1px solid #4E60AA;
+    border: 1px solid var(--main-color);
     bottom: 0;
     top: 0;
     right: 0;
@@ -1502,6 +1438,9 @@ tabelle filtern
 .right_content #tabelle_erweitern #btn_table{
     pointer-events: auto;
 }
+.right_content #tabelle_erweitern .ui.toggle.checkbox{
+    padding-left: 0 !important;
+}
 .right_content #tabelle_erweitern #btn_table_remove_expand{
     background-color: grey !important;
     width: 100%;
@@ -1509,7 +1448,7 @@ tabelle filtern
 }
 .right_content #tabelle_erweitern #btn_table_load_expand{
     width: 100%;
-    background-color: #4E60AA !important;
+    background-color: var(--main-color) !important;
     margin-top: 10px;
 }
 .right_content #tabelle_erweitern #btn_table_clear_expand{
@@ -1715,7 +1654,7 @@ Kennblatt
 
 .line {
     fill: none;
-    stroke: #4E60AA;
+    stroke: var(--main-color);
     stroke-width: 5px;
 }
 
@@ -1732,7 +1671,7 @@ print
 }
 #print_container .btn_dropdown{
     width: 30%;
-    background-color: #4E60AA;;
+    background-color: var(--main-color);;
 }
 #print_container .btn_dropdown i{
     margin-right: 10px;
@@ -1790,6 +1729,7 @@ print
     float: left;
     display: block;
     width: 30%;
+    padding-left: 20px;
 }
 #print_container .print_info_content #print_legende{
     width: 100%;
@@ -1834,135 +1774,4 @@ print
     width: 24px;
     animation: pulse .6s 4 forwards;
     transform-origin: center center;
-}
-@keyframes pulse{
-    0%{
-        transform: scale(5.5);
-        opacity: .2;
-    }
-    50%{
-        opacity: .8;
-    }
-    100%{
-        transform: scale(.1);
-        opacity: 1;
-    }
-}
-@media only screen and (max-width : 1280px) {
-    .navbar-text{
-        margin-left: 5px !important;
-    }
-}
-
-/*Styles for screen 515px and lower*/
-@media only screen and (max-width : 1024px) {
-    .toolbar{
-        height: 100%;
-        bottom: 0;
-        width: 300px;
-    }
-    .toolbar_close{
-        left: -300px;
-    }
-    .navbar-text{
-        display: none;
-    }
-    #slider_zeit_container {
-        min-height: 50px;
-        left: 20% !important;
-        width: 200px !important;
-    }
-    .indikator_header{
-        left: 20% !important;
-        white-space: normal;
-        width: 200px !important;
-    }
-    .hr_time{
-        display: none;
-    }
-    #entwicklungsdiagramm_content{
-        overflow-y:auto !important;
-    }
-    #header_slider_zeit{
-        display: none;
-    }
-    .navbar-text{
-        display: none;
-    }
-    #legende_l{
-        display: none;
-    }
-    #legende_button_l{
-        display: block !important;
-        left: 0;
-    }
-    #content #dropdown_raumgl .spatial_choice .label_spatial_choice {
-       font-size: 1.5rem !important;
-    }
-    #content #dropdown_raumgl .spatial_choice #spatial_choice_checkbox_container label:before{
-        width: 3.5rem !important;
-        height: 2.5rem !important;
-        background: #8CB91B !important;
-    }
-    #content #dropdown_raumgl .spatial_choice #spatial_choice_checkbox_container label:after{
-        width: 1.5rem !important;
-        height: 2.5rem !important;
-    }
-    #export_map{
-        display:none !important;
-    }
-}
-/* media queries*/
-@media only screen and (max-width : 700px) {
-    #progress_div{
-        right: 5% !important;
-        left: 5% !important;
-    }
-    .hr_time{
-        display: none;
-    }
-    #header_slider_zeit{
-        display: none;
-    }
-    .navbar-text{
-        display: none;
-    }
-    .modus_list li{
-        width: 30% !important;
-        padding: 0 !important;
-    }
-    .legende #datenalter_container{
-        display: none !important;
-    }
-    #vergleich_dialog{
-        width: 90%;
-        max-height: 600px;
-        min-height: 300px;
-    }
-
-}
-@media only screen and (max-width : 500px) {
-    .toolbar{
-        width:90%;
-        left: 0 !important;
-    }
-    .toolbar_close{
-        left: -90% !important;
-    }
-    #vergleich_dialog{
-        width: 90%;
-        height: 80%;
-    }
-    #klassenbestzung_vergleich{
-        display: none;
-    }
-    #interact_div{
-        display: none !important;
-    }
-    #scrollable-area{
-        width: 100%;
-    }
-    #layer_control .maps .float-right{
-        width:100%;
-    }
 }

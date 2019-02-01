@@ -1,6 +1,7 @@
 const glaetten = {
     control:'',
     parameter:'glaettung',
+    selector:"#btn_glaetten",
     getButtonObject:function(){
         $elem =  $('#rasterize');
         return $elem;
@@ -23,57 +24,55 @@ const glaetten = {
 
         if(parameter_set==1){
             mode="RESAMPLE=BILINEAR";
-            this.getButtonObject().css('background-color', farbschema.getColorActive());
+            this.getButtonObject().css('background-color', farbschema.getColorHexActive());
         }else{
-            this.getButtonObject().css('background-color', farbschema.getColorMain());
+            this.getButtonObject().css('background-color', farbschema.getColorHexMain());
         }
 
         return mode;
     },
-    getController:function(){
-        return this.control;
-    },
-    setController:function(_controller){
-        this.control = _controller;
-    },
     init:function(){
-        const controller = this;
+        const controller = this,
+            btn = $(`${this.selector}`);
         //the raster View Control
         if(!controller.getParamter()){
             this.setParamter(0);
         }
-        let object = new L.control({position: 'topright'});
-        object.onAdd = function () {
-            let div = L.DomUtil.create('div');
-            div.title='Die Karte glätten';
-            div.innerHTML = '<div id="rasterize" class="rasterize btn_map"></div>';
-            L.DomEvent
-                .on(div, 'dblclick', L.DomEvent.stop)
-                .on(div, 'click', L.DomEvent.stop)
-                .on(div, 'mousedown', L.DomEvent.stopPropagation)
-                .on(div, 'click', function(){
-                    if(controller.getParamter()==0) {
-                        controller.upateParameter(1);
-                    }else{
-                        controller.upateParameter(0);
-                    }
-                    indikator_raster.init();
-                    if(raster_split.getState()){
-                        indikator_raster.init(null,null,"rechts",raster_split.dialogObject.getSettings())
-                    }
-                });
-
-            return div;
-        };
-        try{
-            setTimeout(function(){
-                object.addTo(map);
-                controller.setController(object);
-            },100);
-        }catch(err){}
+        if(controller.getParamter()==1){
+            btn.css('background-color',farbschema.getColorHexActive());
+            btn.attr("title","Entfernen Sie die Glättung");
+        }else{
+            this.disable();
+        }
+        controller.controller.set();
 
     },
-    remove:function(){
-        map.removeControl(this.control);
-    }
+    disable:function(){
+        helper.disableElement(`${this.selector}`,"Funktion steht nur für Rasterkarten zur Verfügung.");
+        this.removeParamter();
+    },
+    enable:function() {
+        helper.enableElement(`${this.selector}`,"Glätten Sie die Rasterkarte");
+    },
+    controller:{
+        set:function(){
+            const controller = glaetten;
+            $(document)
+                .on("click",glaetten.selector,function() {
+                        if(controller.getParamter()==0) {
+                            controller.upateParameter(1);
+                            $(this).css('background-color',farbschema.getColorHexActive());
+                            $(this).attr("title","Entfernen Sie die Glättung");
+                        }else{
+                            controller.upateParameter(0);
+                            $(this).css('background-color',farbschema.getColorHexMain());
+                            $(this).attr("title","Glätten Sie die Rasterkart")
+                        }
+                        indikator_raster.init();
+                        if(raster_split.getState()){
+                            indikator_raster.init(null,null,"rechts",raster_split.dialog.getSettings())
+                        }
+                    });
+                }
+        }
 };

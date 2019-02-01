@@ -65,11 +65,11 @@ function loadRID(rid){
             var html = '<div><div><h3 style="color: black">Ihr Link ist für unterschiedliche räumliche Gliederungen vorhanden:</h3></div><hr style="margin-top: 10px; border-top: 1px solid black;">';
 
             if (result[0].raster_old !== "false") {
-                html += '<button type="button" class="btn btn-secondary" id="raster" style="width:100%; margin-bottom: 10px; background-color:'+farbschema.getColorMain()+'; color:white; margin-top: 10px;">Raster laden</button></br>';
+                html += '<button type="button" class="btn btn-secondary" id="raster" style="width:100%; margin-bottom: 10px; background-color:'+farbschema.getColorHexMain()+'; color:white; margin-top: 10px;">Raster laden</button></br>';
             }
             if (result[1].svg_old !== "false") {
                 html += '<div style="font-size: medium;color: black">Ihr Link wurde im alten Viewer generiert und kann in der neuen Oberfläche nicht geladen werden. Es wäre möglich den Link in der alten Oberfläche zu visualisieren.</div>';
-                html += '<button type="button" class="btn btn-secondary" id="svg_old" style="width:100%; margin-bottom: 10px; background-color:'+farbschema.getColorMain()+'; color:white;margin-top: 10px;">im alten Viewer laden</button>';
+                html += '<button type="button" class="btn btn-secondary" id="svg_old" style="width:100%; margin-bottom: 10px; background-color:'+farbschema.getColorHexMain()+'; color:white;margin-top: 10px;">im alten Viewer laden</button>';
             }
 
             if(html.length <=172){

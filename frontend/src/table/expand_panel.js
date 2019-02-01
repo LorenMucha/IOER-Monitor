@@ -109,6 +109,7 @@ const expand_panel = {
         //DDM Indikatoren
         indikatorauswahl.cloneMenu('kat_auswahl_table','link_kat_table','left',false,true);
         panel.getIndikatorauswahlDDMObject().addClass('indicator_ddm');
+        panel.getIndikatorauswahlDDMObject().find(`#${indikatorauswahl.getSelectedIndikator()}_item`).addClass("disabled");
         //if table was expand
         //DDM Time
         if($.inArray(indikatorauswahl.getSelectedIndikator(),ind_differences_hide)!== -1){
@@ -140,7 +141,7 @@ const expand_panel = {
         }
         //Kenngroesen
         let spatial_extend = function(){
-                let selection = raumgliederung.getSelectedId();
+                let selection = raumgliederung.getSelectionId();
                 if(!selection){selection = raeumliche_analyseebene.getSelectionId();}
                 return selection;
             },
@@ -193,6 +194,7 @@ const expand_panel = {
         }
     },
     init:function(){
+        this.create();
         this.fill();
         this.controller.set();
         //don`t enable function on mobile devices
@@ -202,6 +204,95 @@ const expand_panel = {
             this.enable();
         }
 
+    },
+    create:function(){
+        $('#tabelle_erweitern').html(`
+              <div id="panel_close" class="close_table">
+                        <span title="Tabelle schließen" class="glyphicon glyphicon-remove checker float-right cursor"></span>
+                    </div>
+                    <div id="hinweis_time_expand_linear" class="hinweis">
+                        <b style="color:red;" class="note">Hinweis:</b>
+                        <span>Anzeige von zusätzlichen Zeitschnitten und weiteren Kenngrößen nur bei Deaktivierung der Trendfortschreibung.</span>
+                    </div>
+                    <div id="ind_expand_container" class="ddm_expand">
+                        <span><b>Indikator zum Vergleich anfügen</b></span>
+                        <hr class="hr"/>
+                        <div id="indikator_choice_container_table" class="panel_choice_container">
+                            <div id="indicator_ddm_table" class="ui floating labeled selection selection multiple dropdown ddm_table">
+                                <input name="Indikatorauswahl" type="hidden"/>
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Bitte wählen.....</div>
+                                <div  id="kat_auswahl_table" class="menu"></div>
+                        </div>
+                        </div>
+                    </div>
+                    <div id="time_expand_conatier" class="ddm_expand">
+                        <span><b>Zeitschnitte anfügen</b></span>
+                        <hr class="hr"/>
+                        <div id="zeitschnitt_choice_container_table" class="panel_choice_container">
+                            <div id="zeitschnitt_ddm_table" class="ui selection multiple dropdown ddm_table">
+                                <input name="Indikatorauswahl" type="hidden">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Bitte wählen.....</div>
+                                <div  id="zeit_auswahl_table" class="menu"></div>
+                            </div>
+                            <div class="ui toggle checkbox">
+                                <input type="checkbox" id="selectall">
+                                <label>Alle Zeiten auswählen</label>
+                            </div>
+                            <div class="checkbox" id="differences_div">
+                                <label><input id="differences" type="checkbox" value=""/><span>Differenzen anzeigen</span></label>
+                            </div>
+                            <div id="hinweis_time" class="hinweis"><b style="color:red;" class="note">Hinweis:</b><span>Für Vergleiche können nur frühere Zeitschnitte angezeigt werden.</span></div>
+                            <div id="hinweis_time_expand_null" class="hinweis"><b style="color:red;" class="note">Hinweis:</b> Es ist nur ein Zeitschnitt verfügbar. </div>
+                        </div>
+                    </div>
+                    <div id="kenngroessen_expand_container" class="ddm_expand">
+                        <span><b>Weitere Kenngrößen zum Vergleich</b></span>
+                        <hr class="hr"/>
+                        <div id="kenngroessen_choice_container_table" class="panel_choice_container">
+                            <div id="kenngroessen_ddm_table" class="ui selection multiple dropdown ddm_table">
+                                <input name="Indikatorauswahl" type="hidden">
+                                <i class="dropdown icon"></i>
+                                <div id="kenngroessen_ddm_table_header" class="default text">Bitte wählen.....</div>
+                                <div  id="kenngroessen_auswahl_table" class="menu">
+                                    <div id="expand_abs" class="item" data-value="ABS">Absoluter Indikatorwert</div>
+                                    <div id="area_size" class="item" data-value="S00AG">Gebietsfläche</div>
+                                    <div id="expand_b00ag" class="item" data-value="B00AG">Einwohnerzahl</div>
+                                    <div id="expand_kenngroessen" class="item" data-value="UE_RaumSum">
+                                        <i class="dropdown icon left"></i>
+                                        <span>Übergeordnete Raumeinheiten</span>
+                                        <div id="ue_raum_sum_content" class="menu pointing left"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="lineare_trend_expand_container">
+                        <span><b>Lineare Trendfortschreibung</b><img id="expand_linear_tred"/> <b>für:</b></span>
+                        <hr class="hr"/>
+                        <div id="trend_choice_container_table" class="panel_choice_container">
+                            <div id="trend_ddm_table" class="ui selection multiple dropdown ddm_table">
+                                <input name="Indikatorauswahl" type="hidden">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Bitte wählen.....</div>
+                                <div  id="trend_auswahl_table" class="menu">
+                                    <div class="item" data-value="2025" value="2025">2025</div>
+                                    <div class="item" data-value="2030" value="2030">2030</div>
+                                </div>
+                            </div>
+                            <div id="trend_hinweis_expand" class="hinweis">
+                                <b class="note">Hinweis:</b>
+                                <span>Anzeige von Trendwerten nur für ausgewählte Indikatoren.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="btn_table_load_expand">Tabelle aktualisieren</button>
+                    <button type="button" class="btn btn-primary" id="btn_table_clear_expand">
+                        <i class="glyphicon glyphicon-trash"></i>
+                        <span>zurücksetzen</span>
+                    </button>
+      `);
     },
     disable:function(){
         this.getOpenButtonObject().hide();
@@ -253,6 +344,10 @@ const expand_panel = {
                     expand_panel.close();
                     table.setExpandState(false);
                     main_view.resizeSplitter(table.getWidth());
+                    expand_panel
+                        .getZeitschnittAuswahlContainer()
+                        .find(".ui.toggle.checkbox")
+                        .checkbox("set unchecked");
                 });
             /*
                 bind the semantic functionality
@@ -312,6 +407,35 @@ const expand_panel = {
                         }
                     }
                 });
+            //select all times
+            expand_panel
+                .getZeitschnittAuswahlContainer()
+                .find(".ui.toggle.checkbox")
+                .unbind()
+                .checkbox({
+                    onChecked() {
+                        let selections = function(){
+                            let values_set = [];
+                            expand_panel
+                            .getZeitschnittauswahlDDMObject()
+                            .find('.item')
+                            .each(function(){
+                                let val = $(this).data("value");
+                                values_set.push(val.toString());
+                            });
+                            return values_set;
+                        };
+                        expand_panel
+                            .getZeitschnittauswahlDDMObject()
+                            .dropdown("set selected",selections());
+                    },
+                    onUnchecked() {
+                        expand_panel
+                            .getZeitschnittauswahlDDMObject()
+                            .dropdown("clear");
+                    },
+                });
+
             //kenngrößen-------------------------------------------------------
             expand_panel.getKenngroessenauswahlDDMObject()
                 .unbind()

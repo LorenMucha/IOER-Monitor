@@ -2,14 +2,8 @@ const indikator_json = {
     json_layer : '',
     json_file:'',
     hover:true,
-    setJSONLayer:function(_layer){
-        this.json_layer = _layer;
-    },
     getJSONLayer:function(){
         return this.json_layer;
-    },
-    setJSONFile:function(_json){
-        this.json_file=_json;
     },
     getJSONFile:function(){
         return this.json_file;
@@ -21,9 +15,9 @@ const indikator_json = {
             time = zeit_slider.getTimeSet(),
             ags_set = gebietsauswahl.getSelection();
 
-        $.when(progressbar.init())
-            .then(indikator_raster_group.clean())
-            .then(indikator_json_group.clean());
+        progressbar.init();
+        indikator_raster_group.clean();
+        indikator_json_group.clean();
 
         if (raumgl) {
             raumgliederung_set = raumgl;
@@ -53,10 +47,22 @@ const indikator_json = {
                 }
 
                 object.addToMap();
-                grundakt_layer.init(raumgliederung_set);
-                table.create();
+                table.fill();
                 gebietsauswahl.init();
-                legende.fillContent();
+                //add the farbschema
+                var interval = setInterval(function () {
+                    if (indikatorauswahl.getPossebilities()) {
+                        clearInterval(interval);
+                        //add the farbschema
+                        farbschema.init();
+                        if(excluded_areas.checkPerformanceAreas()) {
+                            grundakt_layer.init(raumgliederung_set);
+                        }
+                        legende.fillContent();
+                        //disbale elements which are not set for the spatial choice
+                        excluded_areas.setPerformanceElements();
+                    }
+                }, 100);
                 if (callback) callback();
             });
 
@@ -103,8 +109,6 @@ const indikator_json = {
             progressbar.remove();
         }
         if(layer_control.zusatzlayer.getState()){layer_control.zusatzlayer.setForward()}
-        //add the farbschema
-        farbschema.init();
     },
     setPopUp:function(e){
         let text={
@@ -143,14 +147,9 @@ const indikator_json = {
             id_popup = ags.toString().replace(".",""),
             gebietsprofil = `<div><img id="pop_up_gebietsprofil_${id_popup}" title="${text[lan].profil_title}" src="frontend/assets/icon/indikatoren.png"/><b> ${text[lan].profil}</b></div>`,
             statistik = `<div><img title="${text[lan].stat_title}" id="pop_up_diagramm_ags_${id_popup}" src="frontend/assets/icon/histogramm.png"/><b>  ${text[lan].stat}</b></div>`,
-            indikatorwertentwicklung = `<div><img class="dev_chart_trend" id="pop_up_diagramm_ind_ags_${id_popup}" title="${text[lan].trend_title}" src="frontend/assets/icon/indikatoren_verlauf.png"/><b class="dev_chart_trend">  ${text[lan].trend}</b></div>`,
-            entwicklungsdiagramm = `<div><img class="dev_chart_compare" id="pop_up_diagramm_entwicklung_ags_${id_popup}" title="${text[lan].compare}" src="frontend/assets/icon/indikatoren_diagr.png"/><b class="dev_chart_compare">  ${text[lan].compare}</b></div>`;
+            indikatorwertentwicklung = `<div class="mobile_hidden disbale_performance"><img class="dev_chart_trend" id="pop_up_diagramm_ind_ags_${id_popup}" data-title="${text[lan].trend_title}" title="${text[lan].trend_title}" src="frontend/assets/icon/indikatoren_verlauf.png"/><b class="dev_chart_trend wordbreak">  ${text[lan].trend}</b></div>`,
+            entwicklungsdiagramm = `<div class="mobile_hidden disbale_performance"><img class="dev_chart_compare" id="pop_up_diagramm_entwicklung_ags_${id_popup}" data-title="${text[lan].compare}" title="${text[lan].compare}" src="frontend/assets/icon/indikatoren_diagr.png"/><b class="dev_chart_compare wordbreak">  ${text[lan].compare}</b></div>`;
 
-        //remove chart on mobile phones to save space
-        if(main_view.getMobileState()) {
-            entwicklungsdiagramm = '';
-            indikatorwertentwicklung = '';
-        }
 
         if(fc !== '0'){
             //get the single values of each fc
@@ -185,7 +184,6 @@ const indikator_json = {
                 '</div>')[0];
         }
 
-
         let bounds = layer.getBounds();
         let popup = L.popup()
             .setLatLng(bounds.getCenter())
@@ -216,12 +214,6 @@ const indikator_json = {
             dev_chart.chart.settings.ind_vergleich=false;
             dev_chart.open();
         });
-
-        //disable charts for community level
-        if(raumgliederung.getSelectedId()==='gem' || gebietsauswahl.getSelection()==="gem"){
-            helper.disableElement(".dev_chart_compare","Steht für die Gemeindeebene nicht zur Verfügung");
-            helper.disableElement(".dev_chart_trend","Steht für die Gemeindeebene nicht zur Verfügung");
-        }
     },
     /*/
     Set a Marker on the map with Lat Lon and Title f.eg. used inside the geographic search to tick the result inside the map
@@ -250,8 +242,8 @@ const indikator_json = {
     },
     highlightFeatureOnmouseover:function(e) {
             let layer = e.target;
-            if(indikator_json.hover) {
-                layer.setStyle(style.getActive());
+            if (indikator_json.hover) {
+                layer.setStyle(style.getHover());
                 if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                     layer.bringToFront();
                 }
@@ -262,22 +254,29 @@ const indikator_json = {
                 $('#legende_' + fillcolor + " i").css({
                     "width": "20px",
                     "height": "15px",
-                    "border": "2px solid " + farbschema.getColorActive()
+                    "border": "2px solid " + farbschema.getColorHexActive()
                 });
             } catch (err) {
             }
     },
     resetHighlight: function(e) {
-        let layer = e.target;
-        layer.setStyle(style.getLayerStyle(layer.feature.properties.value));
-        $('#thead').show();
-        $('#'+layer.feature.properties.ags).removeClass("hover");
-        layer_control.zusatzlayer.setForward();
-        try {
-            let fillcolor = layer.options.fillColor.replace('#', '');
-            $('#legende_' + fillcolor + " i").css({"width": "15px", "height": "10px", "border": ""});
-        }catch(err){
-            //console.log(err);
+        let layer = e.target,
+            ags = layer.feature.properties.ags,
+            ags_selection = table.selection,
+            test_select = function(){
+                return $.inArray(ags, ags_selection) >= 0;
+            };
+        if(!test_select()) {
+            layer.setStyle(style.getLayerStyle(layer.feature.properties.value));
+            $('#thead').show();
+            $('#' + ags).removeClass("hover");
+            layer_control.zusatzlayer.setForward();
+            try {
+                let fillcolor = layer.options.fillColor.replace('#', '');
+                $('#legende_' + fillcolor + " i").css({"width": "15px", "height": "10px", "border": ""});
+            } catch (err) {
+                //console.log(err);
+            }
         }
     },
     getStatistikArray:function(){

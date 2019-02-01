@@ -75,7 +75,7 @@ const zeit_slider={
                             indikator_json.init();
                         }
                         else {
-                            indikator_json.init(raumgliederung.getSelectedId());
+                            indikator_json.init(raumgliederung.getSelectionId());
                         }
                     }else{
                         indikator_raster.init();

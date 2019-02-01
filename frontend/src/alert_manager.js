@@ -1,11 +1,20 @@
 //leave function
 //ToDo noch auf EN umschreiben
 const alert_manager= {
-    leaveESCInfo: function () {
+    leaveESCInfo: function (title,message) {
+        let _title=function(){
+             let name = "Verlassen Sie die Funktion mit ESC";
+             if(title){name = title;}
+             return name;
+        },
+            _text=function(){
+                let name = "";
+                if(message){name = message;}
+                return name;
+            };
         swal({
-            title: "Verlassen Sie die Funktion mit ESC",
-            timer: 1000,
-            showConfirmButton: false
+            title: _title(),
+            text:_text()
         });
     },
     alertUpdate: function (version) {
@@ -91,9 +100,6 @@ const alert_manager= {
                     type: "warning",
                     cancelButtonText: "Abbrechen",
                     showCancelButton: false,
-                },
-                function(){
-                    raeumliche_visualisierung.getDOMObject().checkbox('uncheck');
                 }
             );
         },500));
@@ -101,9 +107,8 @@ const alert_manager= {
     alertServerlast:function(choice){
         setTimeout(function(){
             swal({
-                    title: "Erhöhte Belastung",
-                    text: "Bei der jetzigen Auswahl wird eine erhöhte Rechenlast an den Browser und unserem Server gestellt, deshalb kann es zu Verzögerungen bei den Interaktionen kommen. " +
-                        "Sie können durch eine Verfeinerung ihrer Auswahl, wie beispielsweise die Wahl eines Bundeslandes den Prozess beschleunigen.",
+                    title: "Erhöhte Rechenleistung",
+                    text: "Sie können durch eine Verfeinerung ihrer Auswahl, wie beispielsweise die Wahl eines Bundeslandes, den Prozess beschleunigen.",
                     type: "warning",
                     cancelButtonText: "Abbrechen",
                     showCancelButton: true,

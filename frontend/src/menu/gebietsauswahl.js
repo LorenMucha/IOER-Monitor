@@ -91,8 +91,8 @@ const gebietsauswahl = {
         this.setMapLayer(mapLayer);
         this.setMapLayerGrund(mapLayer_grund);
         this.setSelection(ags_array);
-        if(raumgliederung.getSelectedId()) {
-            indikator_json.init(raumgliederung.getSelectedId());
+        if(raumgliederung.getSelectionId()) {
+            indikator_json.init(raumgliederung.getSelectionId());
 
         }else{
             this.addSelectedLayersToMap();
@@ -176,11 +176,11 @@ const gebietsauswahl = {
                         gebietsauswahl.setMapLayer(mapLayer);
                         gebietsauswahl.setMapLayerGrund(mapLayer_grund);
                         gebietsauswahl.setSelection(ags_array);
-                        if(raumgliederung.getSelectedId() && !page_init){
-                            indikator_json.init(raumgliederung.getSelectedId());
+                        if(raumgliederung.getSelectionId() && !page_init){
+                            indikator_json.init(raumgliederung.getSelectionId());
                         }else {
                             gebietsauswahl.addSelectedLayersToMap();
-                            table.create();
+                            table.fill();
                             raumgliederung.init();
                         }
                     },
@@ -209,6 +209,7 @@ const gebietsauswahl = {
                     gebietsauswahl.clear();
                     indikator_json_group.fitBounds();
                     raumgliederung.hide();
+                    table.clearSelection();
                 });
         }
     }

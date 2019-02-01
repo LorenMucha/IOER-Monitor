@@ -15,18 +15,14 @@ const grundakt_layer = {
         return this.json_file;
     },
     init:function(raumgl){
-        helper.disableElement('#datenalter','Nicht verfügbar');
         //hole JSON
         const object = this;
         let grundaktmap = $("#grundaktmap");
-        if(indikatorauswahl.getSelectedIndiktorGrundaktState()) {
+            //diabled for gem and vwg to save performance
             if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'gebiete'
-                && raumgliederung.getSelectedId() !== 'vwg'
-                && raeumliche_analyseebene.getSelectionId()!=='vwg'
-                && raumgliederung.getSelectedId() !== 'gem'
-                && raeumliche_analyseebene.getSelectionId()!=='gem'
-                && zeit_slider.getTimeSet() > 2000) {
-                helper.enableElement('#datenalter', 'Zeige die Karte des Datenalters an.');
+                && zeit_slider.getTimeSet() > 2000
+                && excluded_areas.checkPerformanceAreas()) {
+
                 let def = $.Deferred(),
                     raumgliederung_set = raeumliche_analyseebene.getSelectionId();
 
@@ -56,8 +52,8 @@ const grundakt_layer = {
                         object.addToMap();
                     }
                 });
-            } else if(raeumliche_visualisierung.getRaeumlicheGliederung()==='raster'){
-                helper.enableElement('#datenalter', 'Zeige die Karte des Datenalters an.');
+            }
+            else if(raeumliche_visualisierung.getRaeumlicheGliederung()==='raster'){
                 $.ajax({
                     async:true,
                     type: "GET",
@@ -133,15 +129,16 @@ const grundakt_layer = {
                                 } else {
                                     indikator_raster_group.clean();
                                     map.removeLayer(grundaktlayer_set);
-                                    raster.addTo(map);
+                                    indikator_raster.init();
                                     click = 0;
                                 }
                             }
                         });
                     }
                 });
+            }else{
+                $('#datenalter_container').hide();
             }
-        }
     },
     addToMap:function(geoJson,klassen) {
         const object = this;

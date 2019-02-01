@@ -4,7 +4,6 @@
 <head>
 
     <title>Monitor der Siedlungs und Freiraumentwicklung</title>
-
     <!-- the scale factor-->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
@@ -26,124 +25,19 @@
                 <div id="map" class="map"></div>
                 <div id="indikator_header" class="indikator_header"><div id="header" class="header"></div><div id="header_raumgl"></div></div>
                 <div id="indikator_header_rechts" class="indikator_header_rechts"><div id="header_rechts" class="header"></div><div id="header_raumgl_rechts"></div></div>
-                <div class="slider_container_time bottom_elements" id="slider_zeit_container">
-                    <div class="zeit_slider" id="zeit_slider"></div>
-                </div>
             </div>
         </div>
         <div id="rightPane">
             <div class="right_content">
                 <div id="table_page" class="table_page">
-                    <div class="table_page_header">
-                        <div id="table_close" class="close_table">
-                            <span title="Tabelle schließen" class="glyphicon glyphicon-remove checker" id="close_checker"></span>
-                        </div>
-                        <div id="interact_div">
-                            <button type="button" class="btn btn-primary" id="btn_table">
-                                <i class="glyphicon glyphicon-chevron-right"></i><span>Tabelle erweitern</span></button>
-                            <div title="Tabelle filtern" id="filter_table" class="filter"></div>
-                            <div title="Tabelle als CSV exportieren" id="csv_export"></div>
-                        </div>
-                        <input id="search_input_table" placeholder="Suche nach Orten.." type="text" class="form-control search_input" />
-                    </div>
+                    <div class="table_page_header"></div>
                     <!--Tabelle-->
-                    <div id="scrollable-area" class="scrollable-area">
-
-                    </div>
+                    <div id="scrollable-area" class="scrollable-area"></div>
                 </div>
                 <!-- Tabelle erweitern Panel------------------------------------------------------------->
-                <div id="tabelle_erweitern" class="choice_panel">
-                    <div id="panel_close" class="close_table">
-                        <span title="Tabelle schließen" class="glyphicon glyphicon-remove checker"></span>
-                    </div>
-                    <div id="hinweis_time_expand_linear" class="hinweis">
-                        <b style="color:red;" class="note">Hinweis:</b>
-                        <span>Anzeige von zusätzlichen Zeitschnitten und weiteren Kenngrößen nur bei Deaktivierung der Trendfortschreibung.</span>
-                    </div>
-                    <div id="ind_expand_container" class="ddm_expand">
-                        <span><b>Indikator zum Vergleich anfügen</b></span>
-                        <hr class="hr"/>
-                        <div id="indikator_choice_container_table" class="panel_choice_container">
-                            <div id="indicator_ddm_table" class="ui floating labeled selection selection multiple dropdown ddm_table">
-                                <input name="Indikatorauswahl" type="hidden"/>
-                                <i class="dropdown icon"></i>
-                                <div class="default text">Bitte wählen.....</div>
-                                <div  id="kat_auswahl_table" class="menu"></div>
-                        </div>
-                        </div>
-                    </div>
-                    <div id="time_expand_conatier" class="ddm_expand">
-                        <span><b>Zeitschnitte anfügen</b></span>
-                        <hr class="hr"/>
-                        <div id="zeitschnitt_choice_container_table" class="panel_choice_container">
-                            <div id="zeitschnitt_ddm_table" class="ui selection multiple dropdown ddm_table">
-                                <input name="Indikatorauswahl" type="hidden">
-                                <i class="dropdown icon"></i>
-                                <div class="default text">Bitte wählen.....</div>
-                                <div  id="zeit_auswahl_table" class="menu"></div>
-                            </div>
-                            <div class="checkbox" id="differences_div">
-                                <label><input id="differences" type="checkbox" value=""/><span>Differenzen anzeigen</span></label>
-                            </div>
-                            <div id="hinweis_time" class="hinweis"><b style="color:red;" class="note">Hinweis:</b><span>Für Vergleiche können nur frühere Zeitschnitte angezeigt werden.</span></div>
-                            <div id="hinweis_time_expand_null" class="hinweis"><b style="color:red;" class="note">Hinweis:</b> Es ist nur ein Zeitschnitt verfügbar. </div>
-                        </div>
-                    </div>
-                    <div id="kenngroessen_expand_container" class="ddm_expand">
-                        <span><b>Weitere Kenngrößen zum Vergleich</b></span>
-                        <hr class="hr"/>
-                        <div id="kenngroessen_choice_container_table" class="panel_choice_container">
-                            <div id="kenngroessen_ddm_table" class="ui selection multiple dropdown ddm_table">
-                                <input name="Indikatorauswahl" type="hidden">
-                                <i class="dropdown icon"></i>
-                                <div id="kenngroessen_ddm_table_header" class="default text">Bitte wählen.....</div>
-                                <div  id="kenngroessen_auswahl_table" class="menu">
-                                    <div id="expand_abs" class="item" data-value="ABS" value="ABS">Absoluter Indikatorwert</div>
-                                    <div id="area_size" class="item" data-value="S00AG" value="S00AG">Gebietsfläche</div>
-                                    <div id="expand_b00ag" class="item" data-value="B00AG" value="B00AG">Einwohnerzahl</div>
-                                    <div id="expand_kenngroessen" class="item" data-value="UE_RaumSum">
-                                        <i class="dropdown icon left"></i>
-                                        <span>Übergeordnete Raumeinheiten</span>
-                                        <div id="ue_raum_sum_content" class="menu pointing left"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="lineare_trend_expand_container">
-                        <span><b>Lineare Trendfortschreibung</b><img id="expand_linear_tred"/> <b>für:</b></span>
-                        <hr class="hr"/>
-                        <div id="trend_choice_container_table" class="panel_choice_container">
-                            <div id="trend_ddm_table" class="ui selection multiple dropdown ddm_table">
-                                <input name="Indikatorauswahl" type="hidden">
-                                <i class="dropdown icon"></i>
-                                <div class="default text">Bitte wählen.....</div>
-                                <div  id="trend_auswahl_table" class="menu">
-                                    <div class="item" data-value="2025" value="2025">2025</div>
-                                    <div class="item" data-value="2030" value="2030">2030</div>
-                                </div>
-                            </div>
-                            <div id="trend_hinweis_expand" class="hinweis">
-                                <b class="note">Hinweis:</b>
-                                <span>Anzeige von Trendwerten nur für ausgewählte Indikatoren.</span>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-primary" id="btn_table_load_expand">Tabelle aktualisieren</button>
-                    <button type="button" class="btn btn-primary" id="btn_table_clear_expand">
-                        <i class="glyphicon glyphicon-trash"></i>
-                        <span>zurücksetzen</span>
-                    </button>
-                </div>
+                <div id="tabelle_erweitern" class="choice_panel"></div>
                 <!---Tabelle filtern---------------------------------------------------------------->
-                <div id="filter_div">
-                    <div id="panel_close_filter" class="close_table">
-                        <span title="Tabelle schließen" class="glyphicon glyphicon-remove checker"></span>
-                    </div>
-                    <div class="title_filter_table">Tabelle filtern</div>
-                    <hr class="hr"/>
-                    <div class="ui form" id="filter_form"></div>
-                </div>
+                <div id="filter_div"></div>
             </div>
         </div>
     </div>
@@ -151,52 +45,13 @@
     <!--Arrow for responsive approach-->
     <span id="panRight" title="Zeige Tabelle" class="panner tablebackground checker cursor" data-scroll-modifier='1'></span>
     <div class="btn-group-vertical btn-group-map" id="btn-group-map">
-        <button id="map_button" class="map-btn checker bottom_elements btn btn-primary" title="Kartenergänzungen">Hintergrund</button>
         <button id="legende_button" title="Öffne Legende" class="map-btn checker bottom_elements btn btn-primary">Legende</button>
     </div>
-    <!--Legende Container------------->
-    <div id="legende" class="legende bottom_elements">
-        <div class="legende_content">
-            <div id="legende_close"><span class="glyphicon glyphicon-remove"></span></div>
-            <div class="legende_map">
-                <div><h3 id="legende_header">Legende</h3></div>
-                <hr class="hr"/>
-                <div class="einheit_container" id="einheit_container">
-                    <span>Einheit:</span>
-                    <b id="legende_einheit"></b>
-                </div>
-                <div id="legende_i" class="legende_i"></div>
-            </div>
-            <hr class="hr"/>
-            <div id="Klassifikationsmethode_legende"><b>Klassifikationsmethode</b></div>
-            <div class="histogramm_klasseneinteilung" id="histogramm_klasseneinteilung"></div>
-            <hr class="hr"/>
-            <div id="indicator_info"><b>Informationen zum Indikator</b></div>
-            <div id="indikator_info_text"></div>
-            <button class="btn btn-primary btn_dropdown kennblatt" id="legende_kennblatt" onclick="kennblatt.open();">Kennblatt</button>
-            <hr class="hr"/>
-            <div id="legende_datangrundlage"><b>Datengrundlage</b></div>
-            <div id="datengrundlage_content"></div>
-            <div id="legende_map_projection"><b>Kartenprojektion</b></div>
-            <div>ETRS89 / UTM Zone 32N</div>
-            <hr class="hr"/>
-            <div id="legende_histogramm"><b>Histogramm</b></div>
-            <div id="histogramm_pic"></div>
-            <div class="hist_info"></div>
-            <div id="datenalter_container">
-                <button class="btn btn-primary btn_dropdown" id="datenalter">
-                    <i class="glyphicon glyphicon-chevron-down drop_arrow"></i>
-                    <span>Datenalter</span>
-                </button>
-                <div id="dropdown_datenalter">
-                    <div id="grundakt_titel">&#160;</div>
-                    <div id="grundakt_legende"></div>
-                    <div id="grundaktmap" class="grundaktmap_click"></div>
-                    <div id="hover_info_grundaktmap" class="grundaktmap_click">Ein und Ausblenden der Grundaktualität im Kartenfenster (hier klicken)</div>
-                </div>
-            </div>
-        </div>
+    <div class="btn-group-vertical" id="map_compare">
+        <button title="Öffne Legende" class="map-btn checker bottom_elements btn btn-primary">Vergleich</button>
     </div>
+    <!--Legende Container------------->
+    <div id="legende" class="legende bottom_elements"></div>
 
     <!--LINK-->
     <div id="link_text" style="display : none;">
@@ -214,91 +69,6 @@
     <div id="gebietsprofil_content" style="display:none; width: 90%;height: 90%; padding: 0px;"></div>
     <!--Objektinformationen-->
     <div id="objektinformationen_content" style="display:none; width: 100%;height: 100%;"></div>
-
-    <!--Vergleichskarte-->
-    <div id="vergleich_dialog">
-        <div id="close_vergleich" class="close_vergleich">
-            <span class="close" title="Dialog schließen">X</span>
-            <span class="glyphicon glyphicon-trash destroy" title="Den Vergleichsmodus von der Karte entfernen, kann jederzeit über den Button aktiviert werden."></span>
-        </div>
-        <div class="auswahlcontainer">
-            <span class="span">Indikator für den Vergleich</span>
-            <hr class="hr"/>
-            <div id="indicator_ddm_vergleich" class="ui selection dropdown indicator_ddm">
-                <input name="Indikatorauswahl" type="hidden"/>
-                <i class="dropdown icon"></i>
-                <div class="default text">Bitte wählen.....</div>
-                <div  id="kat_auswahl_vergleich" class="menu kat_auswahl_vergleich"></div>
-            </div>
-            <div class="ind_content">
-                <div id="time_range_raster_vergleich" class="vergleich_container">
-                    <span class="span">Zeitschnitt</span>
-                    <hr class="hr"/>
-                    <div class="zeit_slider" id="zeit_slider_vergleich"></div>
-                </div>
-                <div id="spatial_range_raster_vergleich" class="vergleich_container">
-                    <span class="span">Rasterweite in m</span>
-                    <hr class="hr"/>
-                    <div id="slider_raum_container_vergleich">
-                        <div id="raum_slider_vergleich"></div>
-                    </div>
-                </div>
-                <div id="klassifizierung_vergleich">
-                    <span class="span">Klassenanzahl</span>
-                    <hr class="hr"/>
-                    <form id="menu_klassenanzahl_vergleich" name="menu_klassifizierung">
-                        <select class="form-control Klassifikationsmethode" name="Klassenanzahl" id="Klassenanzahl_vergleich" title="Anzahl der Klassen wählen">
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7" selected>7</option>
-                        </select>
-                    </form>
-                </div>
-                <div id="klassenbestzung_vergleich">
-                    <span class="span">Klassifizierung</span>
-                    <hr class="hr"/>
-                    <div class="klassifizierung">
-                        <form id="menu_klassifizierung_vergleich" name="menu_klassifizierung2">
-                            <div class="radio_left">
-                                <label class="radio-inline" id="haeufigkeit_label_vergleich">
-                                    <input checked="checked" class="Klassifikationsmethode" name="Klassifikationsmethode" type="radio" value="gleicheAnzahl"/>
-                                    Gleiche <br>Klassenbesetzung
-                                </label>
-                            </div>
-                            <div class="radio_right">
-                                <label class="radio-inline" id="gleich_label_vergleich">
-                                    <input class="Klassifikationsmethode" name="Klassifikationsmethode" type="radio" value="gleicheBreite"/>
-                                    Gleiche <br>Klassenbreite
-                                </label>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <button class="btn btn-primary btn_dropdown" id="create_vergleichskarte_button">Karte hinzufügen</button>
-        </div>
-        <div class="legende_vergleich">
-            <div id="legende_vergleich">
-                <div class="legende_content ind_content">
-                    <span class="span">Legende</span>
-                    <hr class="hr"/>
-                    <div class="">Einheit:<b id="legende_vergleich_einheit"></b></div>
-                    <div id="legende_vergleich_i" class="legende_vergleich_generated"></div>
-                    <div class="iconlegende_schraffur"></div>
-                    <hr class="hr"/>
-                    <div><b>Datengrundlage</b></div>
-                    <div id="datengrundlage_content_vergleich" class="legende_vergleich_generated"></div>
-                    <div><b>Kartenprojektion</b></div>
-                    <div>ETRS89 / UTM Zone 32N</div>
-                    <hr class="hr"/>
-                    <div><b>Histogramm</b></div>
-                    <div id="histogramm_pic_vergleich" class="legende_vergleich_generated"></div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- print Window-->
     <div id="print_container" class="jq_dialog">

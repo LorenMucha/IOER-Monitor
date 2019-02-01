@@ -8,7 +8,7 @@ const center_map={
     init:function(){
         center_map.centerElement.onAdd = function (map) {
             var div = L.DomUtil.create('div');
-            div.title = "In die Karte hineinzoomen";
+            div.title = "Zoom auf die gesamte Ausdehnung anpassen";
             div.innerHTML = `<div id="${center_map.selector}" class="germany btn_map cursor"></div>`;
 
             L.DomEvent

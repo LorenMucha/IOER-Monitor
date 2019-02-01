@@ -21,7 +21,9 @@ const farbschema = {
         urlparamter.removeUrlParameter(this.paramter);
     },
     init: function () {
-        this.controller.set();
+        if(!this.getParamter()) {
+            this.controller.set();
+        }
     },
     reset:function(){
         this.removeParamter();
@@ -31,20 +33,20 @@ const farbschema = {
     },
     setColorChoice: function () {
         if (raeumliche_visualisierung.getRaeumlicheGliederung()==="gebiete") {
-            if (typeof raumgliederung.getSelectedId() === 'undefined') {
+            if (typeof raumgliederung.getSelectionId() === 'undefined') {
                 indikator_json.init();
             } else {
-                indikator_json.init(raumgliederung.getSelectedId());
+                indikator_json.init(raumgliederung.getSelectionId());
             }
         }
         else {
             indikator_raster.init();
         }
     },
-    getColorActive: function () {
+    getColorHexActive: function () {
         return "#8CB91B";
     },
-    getColorMain: function () {
+    getColorHexMain: function () {
         return '#4E60AA';
     },
     getHexMin: function () {
@@ -108,7 +110,9 @@ const farbschema = {
                 }catch(err){}
             });
 
-            btn_create.on("click",function(){
+            btn_create
+                .unbind()
+                .on("click",function(){
                 let min_c = picker_min.spectrum("get").toString(),
                     max_c = picker_max.spectrum("get").toString(),
                     paramter_set = `${min_c.replace("#","")},${max_c.replace("#","")}`,
@@ -119,24 +123,29 @@ const farbschema = {
                     farbschema.setParamter(paramter_set);
                 }
                 farbschema.setColorChoice();
+
             });
 
-            btn_remove.on("click",function(){
+            btn_remove
+                .unbind()
+                .on("click",function(){
                 farbschema.removeParamter();
                 if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'raster') {
                     indikator_raster.init();
                 }
                 else {
-                    if (typeof raumgliederung.getSelectedId() === 'undefined') {
+                    if (typeof raumgliederung.getSelectionId() === 'undefined') {
+                        console.log("undefined");
                         indikator_json.init();
                     } else {
-                        indikator_json.init(raumgliederung.getSelectedId());
+                        console.log("defined");
+                        indikator_json.init(raumgliederung.getSelectionId());
                     }
                 }
                 picker_min.spectrum("set",min_color);
                 picker_max.spectrum("set",max_color);
-                trigger_min.val("Min Farbwert");
-                trigger_max.val("Max Farbwert")
+                trigger_min.val("#");
+                trigger_max.val("#");
             });
         }
     }

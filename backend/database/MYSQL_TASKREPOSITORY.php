@@ -86,24 +86,24 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
     }
     /*Get all possible Indicators in a Indicator Category for 'gebiete' or 'raster'-------*/
     public function getAllIndicatorsByCategoryGebiete($kat, $modus){
-        $sql = "SELECT * 
-            FROM m_indikatoren, m_indikator_freigabe, m_zeichenvorschrift
-            WHERE m_indikatoren.ID_THEMA_KAT =  '" . $kat . "'
-            AND m_indikatoren.ID_INDIKATOR = m_indikator_freigabe.ID_INDIKATOR
-            AND m_indikator_freigabe.STATUS_INDIKATOR_FREIGABE =  '".$this->berechtigung."'
-            And m_zeichenvorschrift.ID_INDIKATOR = m_indikatoren.ID_INDIKATOR
-            GROUP BY m_indikatoren.INDIKATOR_NAME_KURZ
-            ORDER BY  m_indikatoren.MARKIERUNG DESC, m_indikatoren.SORTIERUNG ASC";
+        $sql = "SELECT m.*,IFNULL(z.FARBWERT_MIN,'FFCC99') as FARBWERT_MIN,IFNULL(z.FARBWERT_MAX,'66CC99') as FARBWERT_MAX
+                FROM m_indikatoren m, m_indikator_freigabe f, m_zeichenvorschrift z
+                WHERE m.ID_THEMA_KAT =  '" . $kat . "'
+                AND m.ID_INDIKATOR = f.ID_INDIKATOR
+                AND f.STATUS_INDIKATOR_FREIGABE =  '".$this->berechtigung."'
+                AND m.ID_INDIKATOR=z.ID_INDIKATOR
+                GROUP BY m.INDIKATOR_NAME_KURZ
+                ORDER BY  m.MARKIERUNG DESC, m.SORTIERUNG ASC";
 
         if($modus==="raster"){
-            $sql = "SELECT * 
-                FROM m_indikatoren, d_raster, m_zeichenvorschrift 
-                WHERE ID_THEMA_KAT =  '".$kat."'
-                AND m_indikatoren.ID_INDIKATOR = d_raster.INDIKATOR
-                AND d_raster.Freigabe_AUSSEN >=  '".$this->berechtigung."'
-                And m_zeichenvorschrift.ID_INDIKATOR = m_indikatoren.ID_INDIKATOR
-                GROUP BY m_indikatoren.INDIKATOR_NAME_KURZ
-                ORDER BY m_indikatoren.INDIKATOR_NAME_KURZ ASC";
+            $sql = "SELECT m.*,IFNULL(z.FARBWERT_MIN,'FFCC99') as FARBWERT_MIN,IFNULL(z.FARBWERT_MAX,'66CC99') as FARBWERT_MAX 
+                FROM m_indikatoren m, d_raster r, m_zeichenvorschrift z
+                WHERE m.ID_THEMA_KAT =  '".$kat."'
+                AND m.ID_INDIKATOR = r.INDIKATOR
+                AND r.Freigabe_AUSSEN >=  '".$this->berechtigung."'
+                And m.ID_INDIKATOR = z.ID_INDIKATOR
+                GROUP BY m.INDIKATOR_NAME_KURZ
+                ORDER BY  m.MARKIERUNG DESC, m.SORTIERUNG ASC";
         }
 
         return $this->query($sql);

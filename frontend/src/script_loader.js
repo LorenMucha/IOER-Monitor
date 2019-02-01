@@ -63,6 +63,9 @@ const script_loader={
         "frontend/src/models/error.js",
         "frontend/src/models/pips.js",
         "frontend/src/models/view_state.js",
+        "frontend/src/models/base_raumgliederung.js",
+        "frontend/src/models/excluded_areas.js",
+        "frontend/src/models/auto_complete.js",
         //menu
         "frontend/src/menu/raeumliche_visualisierung.js",
         "frontend/src/menu/raeumliche_analyseebene.js",
@@ -145,9 +148,11 @@ const script_loader={
                 if(helper.checkIE()){
                     alert_manager.alertIE();
                 }else{
-                    let message=error.getErrorMessage("script Loading");
-                    alert_manager.alertError();
-                    request_manager.sendMail(message.name,message.sender,message.message);
+                    if(!window.location.href.includes("monitor_test")) {
+                        let message = error.getErrorMessage("script Loading");
+                        alert_manager.alertError();
+                        request_manager.sendMailError(message.name, message.message);
+                    }
                 }
             }
 

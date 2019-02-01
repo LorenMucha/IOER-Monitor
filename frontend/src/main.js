@@ -13,6 +13,7 @@ function main(){
         }))
         //set the menu data
             .then(toolbar.init())
+            .then(table.init())
             .then(map_controller.set())
             .then(navbar.init())
             .then(search.init())

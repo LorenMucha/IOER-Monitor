@@ -41,21 +41,30 @@ const helper={
     getCurrentYear:function(){
         return (new Date).getFullYear();
     },
-    enableElement:function(elem,title){
-        $(elem)
-            .prop('title',title)
+    enableElement:function(_elem,title){
+        let elem = $(_elem);
+        elem
+            .removeClass('disabled')
             .prop('disabled',false)
             .css('cursor','pointer');
+
+        if(title){
+            elem.prop('title',title);
+        }
     },
-    disableElement:function(elem,text) {
-        $(elem)
+    disableElement:function(_elem,title) {
+        let elem = $(_elem);
+        elem
             .addClass('disabled')
-            .prop('title', text)
             .prop('disabled', true)
             .css('cursor', 'not-allowed');
+
+        if(title){
+            elem.prop('title',title);
+        }
     },
     highlightElementByID:function(id,color){
-        let color_set = farbschema.getColorActive();
+        let color_set = farbschema.getColorHexActive();
         if(color){
             color_set = color;
         }

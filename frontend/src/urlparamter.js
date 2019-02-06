@@ -59,7 +59,7 @@ const urlparamter={
         window.history.pushState(param, paramVal, new_url);
 
     },
-    getURL_SVG:function(){
+    getURLMonitor:function(){
         if(view_state.getProductionState()){
             return "https://monitor.ioer.de/monitor_test/";
         }else{

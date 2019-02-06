@@ -513,7 +513,7 @@ Toolbar.js
 }
 .toolbar {
     background: rgba(255, 255, 255, 1);
-    width: 350px;
+    width: 335px;
     bottom: 30px;
     top: 0;
     position: absolute;
@@ -525,7 +525,7 @@ Toolbar.js
     opacity: 1;
 }
 .toolbar_close {
-    left: -350px;
+    left: -335px;
     opacity: 1;
 }
 .toolbar .menu_m {
@@ -1218,6 +1218,9 @@ Solution fixed headers: https://stackoverflow.com/questions/673153/html-table-wi
     left: 5px;
     right: 5px;
 }
+/*
+table
+ */
 .right_content .scrollable-area #table_ags{
     background: #FFF;
     box-shadow: none;
@@ -1227,30 +1230,6 @@ Solution fixed headers: https://stackoverflow.com/questions/673153/html-table-wi
     border-spacing: 0;
     margin-bottom: 10px;
     margin-right: 5px;
-    border-collapse: unset;
-}
-.right_content .scrollable-area table.tablesorter thead .header:not(.expand)
-{
-    background: white url(../assets/icon/bg.gif) no-repeat center right;
-    padding-right: 20px;
-    cursor: pointer;
-}
-.right_content .scrollable-area table.tablesorter thead tr .headerSortUp
-{
-    background-image: url(../assets/icon/asc.gif);
-}
-.right_content .scrollable-area table.tablesorter thead tr .headerSortDown
-{
-    background-image: url(../assets/icon/desc.gif);
-}
-.right_content .scrollable-area table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp
-{
-    color: #000;
-}
-.right_content .scrollable-area #table_ags #thead{
-    z-index: 200000;
-    opacity: 1 !important;
-    background-color: lightgray !important;
 }
 .right_content .scrollable-area #table_ags #thead tr th{
     font-size: 12px;
@@ -1258,6 +1237,24 @@ Solution fixed headers: https://stackoverflow.com/questions/673153/html-table-wi
     overflow:hidden;
     background-color: lightgray;
     border:.5px solid black;
+}
+.right_content .scrollable-area #table_ags #thead .tablesorter-headerUnSorted:not(.expand)
+{
+    background: lightgray url(../assets/icon/bg.gif) no-repeat center right;
+    padding-right: 20px;
+    cursor: pointer;
+}
+.right_content .scrollable-area #table_ags #thead .tablesorter-headerAsc
+{
+    background: lightgray url(../assets/icon/asc.gif) no-repeat center right;
+}
+.right_content .scrollable-area #table_ags #thead .tablesorter-headerDesc
+{
+    background: lightgray url(../assets/icon/desc.gif) no-repeat center right;
+}
+.right_content .scrollable-area #table_ags #thead .tablesorter-headerDesc, .tablesorter-headerAsc
+{
+    color: #000;
 }
 .right_content .scrollable-area #table_ags .tBody_value_table tr:hover{
     background-color: rgba(78,96,170,.5)
@@ -1298,9 +1295,6 @@ Solution fixed headers: https://stackoverflow.com/questions/673153/html-table-wi
 .right_content .scrollable-area #table_ags #tfoot_brd{
     border-top: 2px solid black;
 }
-/*
-table
- */
 .right_content .scrollable-area #table_ags tr .dif_val_div{
     margin-left: 1vh;
 }

@@ -6,7 +6,7 @@ const dev_chart={
         de:{
             title:{
                 false:"Wertentwicklung",
-                true:"Wertentwicklungsvergleich"
+                true:"Entwicklungsvergleich"
             },
             info:"Dieses Diagramm stellt die Entwicklung der Indikatoren dar.",
             indicator:"verfügbare Indikatoren",
@@ -32,6 +32,13 @@ const dev_chart={
         }
     },
     init:function(){
+        if(raeumliche_visualisierung.getRaeumlicheGliederung()==="raster"){
+            helper.disableElement(this.chart_selector,"vergleichen Sie 2 Indikatoren oder Zeitschnitte miteinander");
+            helper.disableElement(this.chart_compare_selector,"vergleichen Sie 2 Indikatoren oder Zeitschnitte miteinander");
+        }else{
+            helper.enableElement(this.chart_selector,$(this.chart_selector).data("title"));
+            helper.enableElement(this.chart_compare_selector,$(this.chart_compare_selector).data("title"));
+        }
         this.controller.set();
     },
     open:function(){
@@ -555,7 +562,7 @@ const dev_chart={
                     },
                     set_swal=function(callback){
                         swal({
-                            title: "Bitte nennen Sie das gewünschte Gebiet",
+                            title: `Bitte wählen Sie ein/en ${base_raumgliederung.getBaseRaumgliederungText(true)}`,
                             text: `<div class="form-group" style="display: unset !important;">
                                 <input type="text" id="${id_input}" class="form-control" tabindex="3" placeholder="Gebiet...">
                            </div>`,
@@ -573,24 +580,36 @@ const dev_chart={
                 //call on select inside the toolbar
                 $(document).on("click", dev_chart.chart_selector, function () {
                     let callback = function () {
-                        dev_chart.chart.settings.ags = get_ags();
-                        dev_chart.chart.settings.name=get_name();
-                        dev_chart.chart.settings.ind=indikatorauswahl.getSelectedIndikator();
-                        dev_chart.chart.settings.ind_vergleich=false;
-                        dev_chart.open();
+                        if(get_ags()) {
+                            dev_chart.chart.settings.ags = get_ags();
+                            dev_chart.chart.settings.name = get_name();
+                            dev_chart.chart.settings.ind = indikatorauswahl.getSelectedIndikator();
+                            dev_chart.chart.settings.ind_vergleich = false;
+                            dev_chart.open();
+                        }
                     };
-                    set_swal(callback);
+                    try {
+                        set_swal(callback);
+                    }catch(err){
+                       alert_manager.alertError();
+                    }
                 });
 
             $(document).on("click", dev_chart.chart_compare_selector, function () {
                 let callback = function () {
-                    dev_chart.chart.settings.ags = get_ags();
-                    dev_chart.chart.settings.name=get_name();
-                    dev_chart.chart.settings.ind=indikatorauswahl.getSelectedIndikator();
-                    dev_chart.chart.settings.ind_vergleich=true;
-                    dev_chart.open();
+                    if(get_ags()) {
+                        dev_chart.chart.settings.ags = get_ags();
+                        dev_chart.chart.settings.name = get_name();
+                        dev_chart.chart.settings.ind = indikatorauswahl.getSelectedIndikator();
+                        dev_chart.chart.settings.ind_vergleich = true;
+                        dev_chart.open();
+                    }
                 };
-                set_swal(callback);
+                try {
+                    set_swal(callback);
+                }catch(err){
+                    alert_manager.alertError();
+                }
             });
         }
     }

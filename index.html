@@ -42,8 +42,6 @@
         </div>
     </div>
 
-    <!--Arrow for responsive approach-->
-    <span id="panRight" title="Zeige Tabelle" class="panner tablebackground checker cursor" data-scroll-modifier='1'></span>
     <div class="btn-group-vertical btn-group-map" id="btn-group-map">
         <button id="legende_button" title="Öffne Legende" class="map-btn checker bottom_elements btn btn-primary">Legende</button>
     </div>
@@ -53,59 +51,11 @@
     <!--Legende Container------------->
     <div id="legende" class="legende bottom_elements"></div>
 
-    <!--LINK-->
-    <div id="link_text" style="display : none;">
-        <img src="frontend/assets/icon/worldwide.png" style="display: block; margin-left: auto;margin-right: auto"/>
-        <h5 style="margin-bottom: 0px;">Ihre Karte wurde gespeichert. Sie können diese im Viewer jeder Zeit unter Angabe der Kartennummer
-            <b id="text_link" style="color:red;"></b> aufrufen oder über den folgenden Link direkt anderen zur Verfügung stellen:</h5>
-        <h4 style="margin-bottom: 0px;"><a id="link_rid_a"></a></h4>
-        </br>
-        <p>Kartenlink versenden:
-            <a id="rid_mail_to" style="background-color:#BDDDFD; padding-left:12px; padding-right:12px; color:#333; text-decoration:none;" class="button_standard_abschicken_a">E-Mail</a>
-        </p>
-    </div>
-
     <!--Indikatorenvergleich-->
     <div id="gebietsprofil_content" style="display:none; width: 90%;height: 90%; padding: 0px;"></div>
     <!--Objektinformationen-->
     <div id="objektinformationen_content" style="display:none; width: 100%;height: 100%;"></div>
 
-    <!-- print Window-->
-    <div id="print_container" class="jq_dialog">
-        <button class="btn btn-primary btn_dropdown" id="export_btn"><i class="glyphicon glyphicon-export"></i>Exportieren</button>
-        <div class="print_map_content" id="print_map_content">
-            <div class="print_header">
-                <h3 id="print_header_title"></h3>
-                <span id="print_header_spatial_extent"></span>
-                <hr class="hr">
-            </div>
-            <div class="map_print_container">
-                <div title="passen Sie die Karte per Drag and Drop an" id="print_map"></div>
-            </div>
-            <div class="ioer_logo"></div>
-            <div class="print_info_content">
-                <div id="print_legende"></div>
-                <div class="map_projection_print_container">
-                    <div><b>Kartenprojektion</b></div>
-                    <div>ETRS89 / UTM Zone 32N</div>
-                </div>
-                <div class="histostogramm_print_container">
-                    <div><b>Histogramm</b></div>
-                    <div id="print_histogramm"></div>
-                </div>
-            </div>
-        </div>
-        <div class="print_bottom">
-            <div id="info_ind_print">
-                <div><b>Information zum Indikator</b></div>
-                <div id="info_indikator_print"></div>
-            </div>
-            <div class="datengrundlage_print_container">
-                <div><b>Datengrundlage</b></div>
-                <div id="datengrundlage_content_print"></div>
-            </div>
-        </div>
-    </div>
 </div>
 <!-- Javascript Part -------------------------------------------------------------------------------------->
 <!-- JQuery and Plugins -->

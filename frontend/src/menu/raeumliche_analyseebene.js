@@ -31,7 +31,14 @@ const raeumliche_analyseebene = {
     },
     getSelectionText:function(){
         if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete') {
-            return this.getDOMObject().find('#Raumgliederung').find("option:selected").text().replace("- nur", "").replace("-", "");
+            return this
+                .getDOMObject()
+                .find('#Raumgliederung')
+                .find("option:selected")
+                .text()
+                .replace("* nur", "")
+                .replace("-", "")
+                .replace("ab 50 000 Ew.","");
         }else {
             return rasterweite_slider.steps[(rasterweite_slider.getParameter())];
         }

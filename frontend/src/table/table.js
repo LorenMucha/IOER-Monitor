@@ -1,6 +1,6 @@
 const table = {
     td_classes : 'collapsing',
-    table_classes : '',
+    table_classes : 'tablesorter',
     excludedAreas:['Gemeindefreies Gebiet'],
     expandState:false,
     selection:[],
@@ -106,7 +106,7 @@ const table = {
         }
         function createTableBody() {
             let html = `
-                <tbody id="tBody_selection" class="avoid-sort tBody_value_table"></tbody>
+                <tbody id="tBody_selection" class="tBody_value_table"></tbody>
                 <tbody id="tBody_value_table" class="tBody_value_table">
             `,
                 i=0,
@@ -129,11 +129,13 @@ const table = {
                     einheit = indikatorauswahl.getIndikatorEinheit(),
                     //if excluded there is no need because here is the select function disabled
                     tr_title=function(){
-                        if(excluded_areas.checkPerformanceAreas()){
-                            return 'title="Markierung durch klick"';
-                        }else{
-                            return "";
-                        }
+                        try {
+                            if (exclude.checkPerformanceAreas()) {
+                                return 'title="Markierung durch klick"';
+                            } else {
+                                return "";
+                            }
+                        }catch(err){return "";}
                     },
                     exclude=function(){
                         if($.inArray(des,table.excludedAreas)!==-1){
@@ -144,8 +146,26 @@ const table = {
                         }
                     },
                     //'icon container' for trend and indicator-comparing inside a digramm
-                    img_trend = '<img class="indsingle_entwicklungsdiagr dev_chart_compare disbale_performance mobile_hidden" data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" data-title="Veränderung der Indikatorwerte für die Gebietseinheit" title="Veränderung der Indikatorwerte für die Gebietseinheit" class="indsingle_entwicklungsdiagr" id="indikatoren_diagramm_ags' + ags + '" src="frontend/assets/icon/indikatoren_diagr.png"/>',
-                    img_trend_ind = '<img class="ind_entwicklungsdiagr dev_chart_trend disbale_performance mobile_hidden" data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" data-title="Veränderung des Indikatorwertes für die Gebietseinheit" title="Veränderung des Indikatorwertes für die Gebietseinheit" class="ind_entwicklungsdiagr" id="indikatoren_diagramm_ags_ind' + ags + '" src="frontend/assets/icon/indikatoren_verlauf.png"/>';
+                    img_trend = `<img class="indsingle_entwicklungsdiagr dev_chart_compare ${exclude.class_performance} mobile_hidden" 
+                                        data-name="${value.gen}" 
+                                        data-ags="${ags}" 
+                                        data-ind="${ind}" 
+                                        data-wert="${value_int}" 
+                                        data-einheit="${einheit}" 
+                                        data-title="Veränderung der Indikatorwerte für die Gebietseinheit" 
+                                        title="Veränderung der Indikatorwerte für die Gebietseinheit" 
+                                        id="indikatoren_diagramm_ags${ags}" 
+                                        src="frontend/assets/icon/indikatoren_diagr.png"/>`,
+                    img_trend_ind = `<img class="ind_entwicklungsdiagr dev_chart_trend ${exclude.class_performance} mobile_hidden" 
+                                        data-name="${value.gen}" 
+                                        data-ags="${ags}" 
+                                        data-ind="${ind}" 
+                                        data-wert="${value_int}" 
+                                        data-einheit="${einheit}" 
+                                        data-title="Veränderung des Indikatorwertes für die Gebietseinheit" 
+                                        title="Veränderung des Indikatorwertes für die Gebietseinheit"
+                                        id="indikatoren_diagramm_ags_ind${ags}" 
+                                        src="frontend/assets/icon/indikatoren_verlauf.png"/>`;
 
                 if(name === layer_array[i].gen){
                     if(value.krs){
@@ -778,11 +798,8 @@ const table = {
                 });
 
             //selection on click
-            if(excluded_areas.checkPerformanceAreas()) {
-                table_body
-                    .find("tr")
-                    .unbind()
-                    .click(function () {
+            if(exclude.checkPerformanceAreas()) {
+                $(document).on("click","#tBody_value_table tr",function(){
                         //first check if selected
                         let ags = $(this).attr("id");
                         $(this)
@@ -792,10 +809,8 @@ const table = {
                     });
 
                 //remove selection
-                table_selection
-                    .find("tr")
-                    .unbind()
-                    .click(function () {
+                $(document).on("click","#tBody_selection tr",function(){
+                        console.log();
                         let elem = $(this),
                             ags = elem.attr("id");
                         //remove ags from selection array
@@ -808,10 +823,11 @@ const table = {
                             .find("td").removeClass("selected");
                         table_body.append($(elem[0].outerHTML).attr("title", "Markierung durch klick"));
                         elem.remove();
-                        //reset the controller
-                        table.controller.set();
-                        //trigger a table sort on name
+                        table.controller.updateTableSorter();
                     });
+            }else{
+                table_selection.unbind();
+                table_body.unbind();
             }
         },
         setTableSorter:function(){
@@ -847,17 +863,14 @@ const table = {
             table.getDOMObject()
                 .tablesorter({
                     sortList: function(){
-                        if(excluded_areas.checkPerformanceAreas()){
+                        if(exclude.checkPerformanceAreas()){
                             return [[0,0],[2,0]];
                         }
                     }
                 })
-                .trigger("update")
                 .bind("sortEnd",function () {
                     table.setRang();
                 });
-
-            table.controller.updateTableSorter();
         },
         updateTableSorter:function(){
             table.getDOMObject().trigger("updateAll");
@@ -879,25 +892,19 @@ const table = {
         },
     },
     setSelection:function(){
-        if(this.selection.length >0 && excluded_areas.checkPerformanceAreas()) {
+        if(this.selection.length >0 && exclude.checkPerformanceAreas()) {
             let html_array = [];
             $('#table_page #tBody_value_table tr').each(function () {
                 let ags = $(this).attr("id");
                 if ($.inArray(ags, table.selection) >= 0) {
                     $(this)
                         .find("td")
-                        .addClass("selected")
-                        .each(function () {
-                            $(this).attr("data-sorter", false)
-                        });
+                        .addClass("selected");
                     indikator_json_group.highlight(ags, false, );
                 } else {
                     $(this)
                         .find("td")
-                        .removeClass("selected")
-                        .each(function () {
-                            $(this).attr("data-sorter", true)
-                        });
+                        .removeClass("selected");
                     indikator_json_group.resetHightlight();
                 }
             });
@@ -913,7 +920,7 @@ const table = {
                 });
                 table.setRang();
             }
-            table.controller.set();
+            table.controller.updateTableSorter();
             table.getScrollableAreaDOMObject().scrollTop(0);
         }
     },

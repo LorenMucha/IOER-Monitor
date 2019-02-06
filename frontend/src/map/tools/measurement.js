@@ -41,9 +41,9 @@ const measurement={
                 localization: 'de',
                 collapsed: false
             });
-            if(this.info_leave==0){
+            if(this.info_leave<=2){
                 alert_manager.leaveESCInfo("Starten Sie mit dem setzen der Messpunkte","Verlassen Sie die Funktion mit ESC");
-                this.info_leave=1;
+                this.info_leave+=1;
             }
             $('.toolbar').toggleClass("toolbar_close", 500);
             this.getDOMContainer().css('background-color', farbschema.getColorHexActive());

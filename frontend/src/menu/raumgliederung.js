@@ -23,7 +23,8 @@ const raumgliederung = {
             .find('#Raumgliederung_Fein')
             .find("option:selected").text()
             .replace("- nur","")
-            .replace("-","");
+            .replace("-","")
+            .replace("ab 50 000 Ew.","");
     },
     getDOMObject:function(){
         $elem =  $('#menu_raumgl_fein');

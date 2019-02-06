@@ -7,6 +7,7 @@ header('Content-type: application/json; charset=utf-8');
 include("../database/db_manager.php");
 
 $ags = $_GET["ags"];
+$values_string = '';
 $ind = $_GET["indikator"];
 $state_stueztpnt = $_GET['state_stueztpnt'];
 //ind development or compare

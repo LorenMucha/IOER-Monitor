@@ -1,47 +1,39 @@
 <?php
-header('Access-Control-Allow-Origin: *');
-header('Content-type: application/json; charset=utf-8');
-include("database/db_manager.php");
 
-$kartenlink = $_GET["kartenlink"];
-$param_url = $_GET["param_url"];
-if($kartenlink) {
-    $raster_link = false;
+require_once ("database/MYSQL_MANAGER.php");
 
-    $raster_url = getRasterLink($kartenlink);
-    $svg_url = getSVGLink($kartenlink);
-    $result_json = '[';
-//RASTER Old----------------------------------------------
-    if ($raster_url) {
-        $result_json .= '{"raster_old":"' . $raster_url . '"},';
-    } else {
-        $result_json .= '{"raster_old":"false"},';
+class LINK
+{
+    private $table_name = "v_user_link_speicher";
+    public function __construct($setting){
+        $this->setting = $setting;
     }
-//SVG-------------------------------------------------
-    if ($svg_url) {
-        $result_json .= '{"svg_old":"false"},';
-        $result_json .= '{"rid":"' . $svg_url . '"},';
-    } else {
-        $result_json .= '{"svg_old":"' . $kartenlink . '"},';
-        $result_json .= '{"rid":"false"},';
+    public function getResult(){
+        if($this->setting["id"]==="set"){
+            return $this->setLink();
+        }else{
+            return $this->getLink();
+        }
     }
-    $result = substr($result_json, 0, -1) . "]";
-    echo json_encode($result);
-}else if($param_url){
-    //time
-    date_default_timezone_set('Europe/Berlin');
-    $date = date('Y-m-d H:i:s');
-
-// Kartenlink speichern
-    $sql_insert = "insert into v_user_link_speicher (array_value,ZEITSTEMPEL)  values ('".$param_url."','".$date."')";
-
-    $erfolg = mysqli_query(getMySQLConnection(),$sql_insert);
-// ID der letzten Eingabe ermitteln (anhand Zeitstempel)
-    $id = 'select id from v_user_link_speicher where ZEITSTEMPEL = "'.$date.'"';
-    $id = mysqli_query(getMySQLConnection(),$id);
-    $id = mysqli_fetch_row($id);
-    $id = $id[0];
-    echo $id;
+    private function setLink(){
+        date_default_timezone_set('Europe/Berlin');
+        $date = date('Y-m-d H:i:s');
+        try {
+            $data_array=array("array_value"=>$this->setting["val"],"ZEITSTEMPEL"=>$date);
+            $filed_array=array("%s","%s");
+            MYSQL_MANAGER::get_instance()->insert($this->table_name,$data_array,$filed_array);
+            $sql_get = "select id from ".$this->table_name." where ZEITSTEMPEL = '".$date."' and array_value = '".$this->setting["val"]."'";
+            return array("state"=>"inserted","res"=>MYSQL_MANAGER::get_instance()->query($sql_get));
+        }catch (Exception $e){
+            return array("state"=>"error");
+        }
+    }
+    private function getLink(){
+        try {
+            $sql_get = "SELECT id, array_value FROM " . $this->table_name . " where id='" . $this->setting["val"] . "'";
+            return array("state"=>"get","res"=>MYSQL_MANAGER::get_instance()->query($sql_get));
+        }catch(Exception $e){
+            return array("state"=>"error");
+        }
+    }
 }
-mysqli_close(getMySQLConnection());
-?>

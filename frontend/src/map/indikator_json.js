@@ -55,12 +55,12 @@ const indikator_json = {
                         clearInterval(interval);
                         //add the farbschema
                         farbschema.init();
-                        if(excluded_areas.checkPerformanceAreas()) {
+                        if(exclude.checkPerformanceAreas()) {
                             grundakt_layer.init(raumgliederung_set);
                         }
                         legende.fillContent();
                         //disbale elements which are not set for the spatial choice
-                        excluded_areas.setPerformanceElements();
+                        exclude.setPerformanceElements();
                     }
                 }, 100);
                 if (callback) callback();
@@ -147,8 +147,8 @@ const indikator_json = {
             id_popup = ags.toString().replace(".",""),
             gebietsprofil = `<div><img id="pop_up_gebietsprofil_${id_popup}" title="${text[lan].profil_title}" src="frontend/assets/icon/indikatoren.png"/><b> ${text[lan].profil}</b></div>`,
             statistik = `<div><img title="${text[lan].stat_title}" id="pop_up_diagramm_ags_${id_popup}" src="frontend/assets/icon/histogramm.png"/><b>  ${text[lan].stat}</b></div>`,
-            indikatorwertentwicklung = `<div class="mobile_hidden disbale_performance"><img class="dev_chart_trend" id="pop_up_diagramm_ind_ags_${id_popup}" data-title="${text[lan].trend_title}" title="${text[lan].trend_title}" src="frontend/assets/icon/indikatoren_verlauf.png"/><b class="dev_chart_trend wordbreak">  ${text[lan].trend}</b></div>`,
-            entwicklungsdiagramm = `<div class="mobile_hidden disbale_performance"><img class="dev_chart_compare" id="pop_up_diagramm_entwicklung_ags_${id_popup}" data-title="${text[lan].compare}" title="${text[lan].compare}" src="frontend/assets/icon/indikatoren_diagr.png"/><b class="dev_chart_compare wordbreak">  ${text[lan].compare}</b></div>`;
+            indikatorwertentwicklung = `<div class="mobile_hidden ${exclude.class_performance}"><img class="dev_chart_trend" id="pop_up_diagramm_ind_ags_${id_popup}" data-title="${text[lan].trend_title}" title="${text[lan].trend_title}" src="frontend/assets/icon/indikatoren_verlauf.png"/><b class="dev_chart_trend wordbreak">  ${text[lan].trend}</b></div>`,
+            entwicklungsdiagramm = `<div class="mobile_hidden ${exclude.class_performance}"><img class="dev_chart_compare" id="pop_up_diagramm_entwicklung_ags_${id_popup}" data-title="${text[lan].compare}" title="${text[lan].compare}" src="frontend/assets/icon/indikatoren_diagr.png"/><b class="dev_chart_compare wordbreak">  ${text[lan].compare}</b></div>`;
 
 
         if(fc !== '0'){

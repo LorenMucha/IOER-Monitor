@@ -33,6 +33,10 @@
     opacity: 0.9;
     z-index: 1040;
 }
+/*colors*/
+.text-black{
+    color:black !important;
+}
 /*width*/
 .w-100{
     width:100% !important;

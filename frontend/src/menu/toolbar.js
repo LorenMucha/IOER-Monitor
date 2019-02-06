@@ -8,7 +8,8 @@ const toolbar = {
         'zoom_in.init()',
         'raster_split.init()',
         'glaetten.init()',
-        'dev_chart.init()'
+        'dev_chart.init()',
+        'map_link.init()'
     ],
     getDOMObject:function(){
         $elem = $('#toolbar');
@@ -158,7 +159,7 @@ const toolbar = {
                         </div>
                         <div class="dropdown_menu" id="dropdown_layer">
                         <div class="w-100" id="map-selection">
-                                <button type="button" class="btn btn_dropdown w-100" id="map_button">Kartenergänzungen</button>
+                                <button type="button" class="btn btn_dropdown w-100" id="map_button">Grundkarten</button>
                             </div>
                             <div id="layer_conainer">
                                 <span class="span">Sichtbarkeit Indikator</span>
@@ -264,7 +265,7 @@ const toolbar = {
                                 </li>
                                  <li>
                                     <div class="btn_container">
-                                        <div id="btn_glaetten" class="image cursor" title="Glätten Sie die Rasterkart"></div>
+                                        <div id="btn_glaetten" class="image cursor ${exclude.class_raster}" data-title="Glätten Sie die Rasterkarte" title="Glätten Sie die Rasterkarte"></div>
                                         <div class="btn_txt" id="glaetten">Glätten</div>
                                     </div>
                                 </li>
@@ -284,20 +285,20 @@ const toolbar = {
                             <ul class="tools w-100">
                                 <li class="w-30">
                                     <div class="btn_container">
-                                        <div id="dev_chart" class="image ind_chart disbale_performance cursor" data-title="Analysieren Sie die zeitliche Entwicklung eines Indikatorwertes" title="Analysieren Sie die zeitliche Entwicklung eines Indikatorwertes"></div>
-                                        <div class="btn_txt wordbreak disbale_performance">Werte- entwicklung</div>
+                                        <div id="dev_chart" class="image ind_chart ${exclude.class_performance} ${exclude.class_gebiete} cursor" data-title="Analysieren Sie die zeitliche Entwicklung eines Indikatorwertes" title="Analysieren Sie die zeitliche Entwicklung eines Indikatorwertes"></div>
+                                        <div class="btn_txt wordbreak ${exclude.class_performance}">Werte- entwicklung</div>
                                     </div>
                                 </li>
                                  <li class="w-35">
                                     <div class="btn_container">
-                                        <div id="dev_chart_compare" class="image ind_chart disbale_performance cursor" data-title="Analysieren Sie die zeitliche Entwicklung mehrerer Indikatorwerte" title="Analysieren Sie die zeitliche Entwicklung mehrerer Indikatorwerte"></div>
-                                        <div class="btn_txt wordbreak disbale_performance" data-title="">Entwicklungs- vergleich</div>
+                                        <div id="dev_chart_compare" class="image ind_chart ${exclude.class_performance} ${exclude.class_gebiete} cursor" data-title="Analysieren Sie die zeitliche Entwicklung mehrerer Indikatorwerte" title="Analysieren Sie die zeitliche Entwicklung mehrerer Indikatorwerte"></div>
+                                        <div class="btn_txt wordbreak ${exclude.class_performance}" data-title="">Entwicklungs- vergleich</div>
                                     </div>
                                 </li>
                                 <li class="w-30">
                                     <div class="btn_container">
-                                        <div id="ind_compare" class="image cursor" title="vergleichen Sie 2 Indikatoren oder Zeitschnitte miteinander"></div>
-                                        <div class="btn_txt wordbreak" data-title="">Indikator- vergleich</div>
+                                        <div id="ind_compare" class="image cursor ${exclude.class_raster}" data-title="vergleichen Sie 2 Indikatoren oder Zeitschnitte miteinander" title="vergleichen Sie 2 Indikatoren oder Zeitschnitte miteinander"></div>
+                                        <div class="btn_txt wordbreak" data-title="">Karten- vergleich</div>
                                     </div>
                                 </li>
                             </ul>

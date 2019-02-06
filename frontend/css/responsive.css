@@ -22,11 +22,6 @@
     .navbar-text{
         display: none;
     }
-    #slider_zeit_container {
-        min-height: 50px;
-        left: 20% !important;
-        width: 200px !important;
-    }
     .indikator_header{
         left: 20% !important;
         white-space: normal;

@@ -3,7 +3,6 @@ const script_loader={
         //JQuery Plugins
         "frontend/lib/jquery/plugin/jquery.tablesort.js",
         "frontend/lib/jquery/plugin/jquery.searchable.js",
-        "frontend/lib/jquery/plugin/scroll-into-view.js",
         "frontend/lib/jquery/plugin/jquery.stickytableheaders.min.js",
         "frontend/lib/jquery/plugin/jquery.progressTimer.js",
         "frontend/lib/jquery/plugin/jquery.splitter.js",
@@ -64,7 +63,7 @@ const script_loader={
         "frontend/src/models/pips.js",
         "frontend/src/models/view_state.js",
         "frontend/src/models/base_raumgliederung.js",
-        "frontend/src/models/excluded_areas.js",
+        "frontend/src/models/exclude.js",
         "frontend/src/models/auto_complete.js",
         //menu
         "frontend/src/menu/raeumliche_visualisierung.js",
@@ -113,10 +112,12 @@ const script_loader={
         "frontend/src/dialog/dialog_manager.js",
         "frontend/src/dialog/dev_chart.js",
         "frontend/src/dialog/feedback.js",
-        "frontend/src/dialog/ogc_export.js",
         "frontend/src/dialog/kennblatt.js",
         //TODO: needs to be removed if Reini is finished
         "frontend/src/dialog/dialog.js",
+        //export
+        "frontend/src/export/ogc_export.js",
+        "frontend/src/export/map_link.js",
         //other elements
         "frontend/src/request_manager.js",
         "frontend/src/config.js",

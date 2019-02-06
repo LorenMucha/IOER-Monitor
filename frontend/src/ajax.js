@@ -1,6 +1,6 @@
 const request_manager={
     call:false,
-    url_backend:urlparamter.getURL_SVG()+"backend/query.php",
+    url_backend:urlparamter.getURLMonitor()+"backend/query.php",
     //get the indicator-JSON
     getGeoJSON:function(ind,time,_raumgliederung,ags_array,_klassenanzahl,_klassifizierung){
         let colors = function(){
@@ -144,7 +144,7 @@ function getStatistik(ags, name, wert){
     //set the value if Raumgl fein was set
     return $.ajax({
         async:true,
-        url: urlparamter.getURL_SVG()+"backend/dialog/statistik.php",
+        url: urlparamter.getURLMonitor()+"backend/dialog/statistik.php",
         type: "POST",
         data: {
             ags: ags,

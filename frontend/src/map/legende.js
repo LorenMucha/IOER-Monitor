@@ -110,7 +110,7 @@ const legende = {
             <div id="histogramm_pic"></div>
             <div class="hist_info"></div>
             <div id="datenalter_container">
-                <button class="btn btn-primary btn_dropdown disbale_performance" id="datenalter" data-title="Zeige die Karte des Datenalters" title="Zeige die Karte des Datenalters">
+                <button class="btn btn-primary btn_dropdown ${exclude.class_performance}" id="datenalter" data-title="Zeige die Karte des Datenalters" title="Zeige die Karte des Datenalters">
                     <i class="glyphicon glyphicon-chevron-down drop_arrow"></i>
                     <span>Datenalter</span>
                 </button>
@@ -137,7 +137,7 @@ const legende = {
             info_json = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()];
 
         //close datenalter
-        if(indikatorauswahl.getSelectedIndiktorGrundaktState() && excluded_areas.checkPerformanceAreas()){
+        if(indikatorauswahl.getSelectedIndiktorGrundaktState() && exclude.checkPerformanceAreas()){
             if( object.getDatenalterContainerObject().find('#dropdown_datenalter').is(":visible")){
                 object.getDatenalterContainerObject().find('#dropdown_datenalter').show();
             }

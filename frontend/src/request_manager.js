@@ -1,6 +1,6 @@
 const request_manager={
     call:false,
-    url_backend:urlparamter.getURL_SVG()+"backend/query.php",
+    url_backend:urlparamter.getURLMonitor()+"backend/query.php",
     //get the indicator-JSON
     getGeoJSON:function(ind,time,_raumgliederung,ags_array,_klassenanzahl,_klassifizierung){
         let colors = function(){
@@ -85,6 +85,10 @@ const request_manager={
         let json = JSON.parse('{"ind":{"id":"'+indicator_id+'","ags_array":"'+ags+'"},"set":'+JSON.stringify(settings)+',"query":"getTrend"}');
         return this.sendRequestPHP({"file":json,"query":"getTrend","type":"POST","debug":false});
     },
+    handleLink:function (setting){
+        let json = JSON.parse(`{"query":"maplink","setting": {"id": "${setting.id}","val": "${setting.val}"}}`);
+        return this.sendRequestPHP({"file":json,"query":"maplink","type":"POST","debug":false});
+    },
     sendMailFeedback:function(name, sender, message){
         let json = {
             type:"GET",
@@ -126,8 +130,7 @@ const request_manager={
             },
             success:function(data){
                 if(json.debug){
-                    console.log(this.url);
-                    console.log(JSON.stringify(data));
+                    console.log(this.url,this.data,JSON.stringify(data));
                 }
             }
         });
@@ -192,7 +195,7 @@ function getStatistik(ags, name, wert){
     let raumgliederung_txt = base_raumgliederung.getBaseRaumgliederungId();
     return $.ajax({
         async:true,
-        url: urlparamter.getURL_SVG()+"backend/dialog/statistik.php",
+        url: urlparamter.getURLMonitor()+"backend/dialog/statistik.php",
         type: "POST",
         data: {
             ags: ags,

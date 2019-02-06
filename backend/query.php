@@ -9,6 +9,7 @@ require('CLASSIFY.php');
 require('EXPAND.php');
 require('SEARCH.php');
 require('TREND.php');
+require("LINK.php");
 require_once('CACHE_MANAGER.php');
 
 $q =  $_POST["values"];
@@ -235,6 +236,11 @@ try{
             ));
         }
         echo json_encode($result);
+    }
+    else if($query=="maplink"){
+        $setting = $json_obj["setting"];
+        $link = new LINK($setting);
+        echo json_encode($link->getResult());
     }
 
 

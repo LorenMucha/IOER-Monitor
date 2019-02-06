@@ -124,7 +124,6 @@ const main_view = {
         indikatorauswahl.fill();
         table.getScrollableAreaDOMObject().css("height","90%");
         if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete'){
-            panner.init();
             //bind the scroll handeler
             //reset the bootom padding of the time slider
             $('#rightPane').css("width","");

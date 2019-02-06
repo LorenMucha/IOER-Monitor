@@ -356,8 +356,13 @@ const raster_split={
         return $elem;
     },
     init:function(){
-       raster_split.constroller.set();
-       raster_split.dialog.create();
+        if(raeumliche_visualisierung.getRaeumlicheGliederung()==="raster") {
+            helper.enableElement(this.selector,"vergleichen Sie 2 Indikatoren oder Zeitschnitte miteinander");
+        }else{
+            helper.disableElement(this.selector,"für die Raumgliederung nicht verfügbar");
+        }
+        raster_split.constroller.set();
+        raster_split.dialog.create();
     },
     setController:function(_controller){
         this.control = _controller;

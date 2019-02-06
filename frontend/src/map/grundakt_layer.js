@@ -21,7 +21,7 @@ const grundakt_layer = {
             //diabled for gem and vwg to save performance
             if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'gebiete'
                 && zeit_slider.getTimeSet() > 2000
-                && excluded_areas.checkPerformanceAreas()) {
+                && exclude.checkPerformanceAreas()) {
 
                 let def = $.Deferred(),
                     raumgliederung_set = raeumliche_analyseebene.getSelectionId();

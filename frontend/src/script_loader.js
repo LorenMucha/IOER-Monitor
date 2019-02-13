@@ -118,10 +118,11 @@ const script_loader={
         //export
         "frontend/src/export/ogc_export.js",
         "frontend/src/export/map_link.js",
+        "frontend/src/export/map_print.js",
+        "frontend/src/export/Export_Helper.js",
         //other elements
         "frontend/src/request_manager.js",
         "frontend/src/config.js",
-        "frontend/src/export.js",
         "frontend/src/search.js",
         "frontend/src/webtour.js",
         "frontend/src/track.js",

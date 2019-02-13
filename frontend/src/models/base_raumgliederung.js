@@ -15,8 +15,6 @@ const base_raumgliederung={
             let sub = text,
                 string_end = sub.slice(-2);
 
-            console.log(string_end);
-
             sub = sub
                 .substring(0,text.length-2)
                 .replace("ä","a");
@@ -26,8 +24,6 @@ const base_raumgliederung={
                 .replace("n","")
                 .replace("r","");
             text=sub+string_end;
-
-            console.log(sub,string_end)
         }
         return text;
     }

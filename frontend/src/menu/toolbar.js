@@ -82,7 +82,7 @@ const toolbar = {
                                     <div  id="kat_auswahl" class="menu"></div>
                                 </div>
                                 <div class="slider_container_time bottom_elements" id="slider_zeit_container">
-                                    <span>Zeitschnitt</span>
+                                    <span><b>Zeitschnitt</b></span>
                                     <hr class="hr"/>
                                     <div class="zeit_slider" id="zeit_slider"></div>
                                 </div>
@@ -140,7 +140,7 @@ const toolbar = {
                             </div>
                             <!-- Range Slider Raster-->
                             <div id="spatial_range_raster">
-                                <span class="span">Rasterweite in m</span>
+                                <span><b>Rasterweite in m</b></span>
                                 <hr class="hr"/>
                                 <div id="slider_raum_container">
                                     <div id="raum_slider"></div>
@@ -162,7 +162,7 @@ const toolbar = {
                                 <button type="button" class="btn btn_dropdown w-100" id="map_button">Grundkarten</button>
                             </div>
                             <div id="layer_conainer">
-                                <span class="span">Sichtbarkeit Indikator</span>
+                                <span><b>Sichtbarkeit Indikator</b></span>
                                 <hr class="hr"/>
                                 <div id="opacity_container">
                                     <div id="opacity_slider"></div>
@@ -171,7 +171,7 @@ const toolbar = {
                                 </div>
                             </div>
                             <div id="farbwahl">
-                                <span class="span">Farbschema</span>
+                                <span><b>Farbschema</b></span>
                                 <hr class="hr"/>
                                 <div class="form-group-inline">
                                       <input type='text' name='triggerSet' id="triggerSet_min" title="Min Farbwert in Hex" placeholder="#"/>
@@ -185,7 +185,7 @@ const toolbar = {
                                 </div>
                             </div>
                             <div class="klassenbesetzung" id="klassenbesetzung">
-                                <span class="span">Klassenanzahl</span>
+                                <span><b>Klassenanzahl</b></span>
                                 <hr class="hr"/>
                                 <form id="menu_klassenbesetzung" name="menu_klassifizierung">
                                     <select class="form-control Klassifikationsmethode" name="Klassenanzahl" id="Klassenanzahl" title="Anzahl der Klassen w&auml;hlen">
@@ -197,7 +197,7 @@ const toolbar = {
                                     </select>
                                 </form>
                             </div>
-                            <span id="klassifizierung" class="span">Klassifizierung</span>
+                            <span id="klassifizierung"><b>Klassifizierung</b></span>
                             <hr class="hr"/>
                             <div class="klassifizierung">
                                 <form id="menu_klassifizierung" name="menu_klassifizierung2">
@@ -216,7 +216,7 @@ const toolbar = {
                                 </form>
                             </div>
                             <div class="klassifizierung" id="setting_klassifizierung">
-                                <span class="span">Art der Darstellung</span>
+                                <span><b>Art der Darstellung</b></span>
                                 <hr class="hr"/>
                                 <form id="menu_darstellung" name="menu_klassifizierung2">
                                     <div class="radio_left">
@@ -303,8 +303,8 @@ const toolbar = {
                                 </li>
                             </ul>
                         </div>
-                        <!--export-->
-                        <div class="dropdown_choice" id="export_map">
+                        <!--Export-->
+                        <div class="dropdown_choice mobile_hidden" id="export_map">
                             <div class="hh_sf" id="hh_sf_dropdown_ogc">
                                 <i class="large angle down icon" data-ddm="dropdown_ogc"></i>
                                 Export
@@ -313,7 +313,7 @@ const toolbar = {
                                 <i class="glyphicon glyphicon-pushpin" title="Menü anheften" data-ddm="dropdown_ogc"></i>
                             </div>
                         </div>
-                        <div class="dropdown_menu" id="dropdown_ogc">
+                        <div class="dropdown_menu mobile_hidden" id="dropdown_ogc">
                             <div class="export_div"><b>Einbinden in eigenes GIS als</b></div>
                             <hr class="hr"/>
                             <button id="wms" class="btn .btn-info btn_export raster_export" data-format="WMS" onclick="ogc_export.wms.open()">WMS</button>
@@ -322,8 +322,8 @@ const toolbar = {
                             <div class="export_div" id="export_map_display"><b>Export der Kartendarstellung als</b></div>
                             <hr class="hr"/>
                             <div class="btn-group">
-                                <button type="button" class="btn .btn-info btn_export print_button" id="pdf_export_btn" data-format="pdf">PDF</button>
-                                <button type="button" class="btn .btn-info btn_export print_button" id="png_export_btn" data-format="png">PNG</button>
+                                <button type="button" class="btn .btn-info btn_export print_button" id="pdf_export_btn" data-format="pdf" onclick="map_print.open('pdf')">PDF</button>
+                                <button type="button" class="btn .btn-info btn_export print_button" id="png_export_btn" data-format="png" onclick="map_print.open('png')">PNG</button>
                             </div>
                             <div class="export_div" id="save_map_link"><b>Dauerhaftes Speichern der Karte auf dem IÖR-Server</b></div>
                             <hr class="hr"/>

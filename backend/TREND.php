@@ -85,32 +85,9 @@ class TREND{
     private function smoothArray($array){
         $array_gl = array();
         $last_key = (count($array))-1;
-        //inside helper function
-        function checkSchwellenwert($array,$key,$value)
-        {
-            $array_values = array_column($array, $key);
-            $med = (array_sum($array_values)) / count($array_values);
-            //first check for dublices
-            //check if trend positiv or negativ
-            $last_key = (count($array)) - 1;
-            $trend = $array[0][$value] + $array[$last_key][$value];
-            //negative trend
-            if ($trend < $array[0][$value]) {
-                if ($value <= $med) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                if ($value >= $med) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
 
         foreach($array as $key=>$value) {
+
             $key_before = $key - 1;
             if($key ==0){$key_before=0;};
             $value_before = $array[$key_before]['value'];
@@ -123,53 +100,28 @@ class TREND{
             $max = max($stat);
             $min = min($stat);
 
-            $year_von = $array[$key_before]['year'];
-            $year_bis = $array[$key]['year'];
-
-            if( $this->grundakt_state){
-                $year_bis = $array[$key_before]["time_real"];
-                $year_von = $array[$key]["time_real"];
-            }
-
             $array_values = array_column($array,'value');
             $med = (array_sum($array_values))/count($array_values);
 
-            if ($key == 0) {
-                $set_int = $key;
-            }else if ($key == $last_key) {
-                $set_int = $key;
-            }else if ($year_von == $year_bis and $key !=0 and $key != $last_key) {
-                if(checkSchwellenwert($array,'value',$value_real)){
-                    $set_int = $key;
-                }
-            } else if ($value_real != $array[$last_key]['value'] and $value_real != $array[0]['value']) {
-                if ($value_real != $value_before) {
-                    if(checkSchwellenwert($array,'value',$value_real)){
-                        $set_int = $key;
-                    }
-                } else if ($value_real == $max or $value_real == $min) {
-                    $set_int = $key;
-                }
+            //do not exclude start and end value
+            if($key==0 or $key==$last_key){
+                array_push($array_gl, array(
+                    "value" => $array[$key]['value'],
+                    "real_value" => $array[$key]['real_value'],
+                    "date" => $array[$key]['date'],
+                    "year" => $array[$key]['year'],
+                    "month" => $array[$key]['month'],
+                    "id" => $array[$key]['id'],
+                    "name" => $array[$key]['name'],
+                    "color" => $array[$key]['color'],
+                    "einheit" => $array[$key]['einheit'],
+                    "min" => $min,
+                    "max" => $max,
+                    "med" => $med,
+                    "trend" => $array[0]['value']+$array[$last_key]['value']
+                ));
+            //prevent same values
             }
-
-            array_push($array_gl, array(
-                "value" => $array[$set_int]['value'],
-                "real_value" => $array[$set_int]['real_value'],
-                "date" => $array[$set_int]['date'],
-                "year" => $array[$set_int]['year'],
-                "month" => $array[$set_int]['month'],
-                "id" => $array[$set_int]['id'],
-                "name" => $array[$set_int]['name'],
-                "color" => $array[$set_int]['color'],
-                "einheit" => $array[$set_int]['einheit'],
-                "min" => $min,
-                "max" => $max,
-                "med" => $med,
-                "trend" => $array[0]['value']+$array[$last_key]['value'],
-                "last_key" => $array[$last_key]['value'],
-                "value_real" => $value_real,
-                "value_before" => $value_before
-            ));
         }
         return $array_gl;
     }

@@ -18,71 +18,17 @@
 @import "styles.css";
 @import "responsive.css";
 @import "autocomplete.css";
+@import "print_map.css";
+@import "toolbar.css";
+@import "navbar.css";
+@import "map.css";
+@import "table.css";
 
 body {
     padding: 0;
     margin: 0;
     overflow: hidden;
 }
-/* navbar */
-.navbar {
-    background: var(--main-color); /* For browsers that do not support gradients */
-    position: absolute;
-    height: 50px;
-    width: 100%;
-    top: 0;
-}
-.navbar .navbar-toggle{
-    background-color: var(--main-color) !important;
-}
-.navbar-collapse .in{
-    background-color: var(--main-color);
-    width: auto;
-    float: right;
-}
-.navbar .in{
-    background-color: var(--main-color);
-    width: auto;
-    float: right;
-    z-index: 1000;
-}
-.navbar .navbar-text{
-    color: white;
-    font-weight: bold;
-    margin-top: 15px;
-    font-size: large;
-    margin-left: 20%;
-}
-.navbar .navbar-brand{
-    height: 50px;
-    left:0;
-    width: 50px;
-    background: white url(../assets/kopf.png) no-repeat center;
-}
-.navbar .navbar-nav{
-    float: right;
-    margin-right: 20px;
-    width: auto;
-}
-.navbar .navbar-nav li a{
-    color: white;
-}
-.navbar .navbar-nav li a:hover{
-    background-color: #8bba23;
-    cursor:pointer;
-}
-.navbar.navbar-nav .dropdown .dropdown-toggle:hover{
-    background-color: #8bba23;
-    cursor:pointer;
-}
-.nav .open>a, .nav .open>a:hover, .nav .open>a:focus{
-    background-color: #8bba23 !important;
-    cursor:pointer;
-}
-.navbar .navbar-collapse button{
-    margin-top: 7px;
-}
-
 /*
 The Tour
  */
@@ -90,79 +36,6 @@ The Tour
 .tour-backdrop {
     position: fixed;
 }
-/*
-Slider
- */
-.ui-autocomplete {
-    z-index: 999999999999999999999999 !important;
-    bottom: 0;
-    overflow-y: auto;
-    height: auto;
-    max-height: 600px;
-    width: 320px;
-}
-.hr {
-    height: 1px;
-    background-color: black;
-    color: black;
-    margin-top: 0 !important;
-    margin-bottom: 5px !important;
-}
-.hr_list{
-    height: 1px;
-    background-color: black;
-    color: black;
-    margin-bottom: 10px !important;
-    margin-top: 5px !important;
-}
-.hr_time{
-    height: 1px;
-    margin: 2px;
-}
-.span{
-    font-weight: bold;
-}
-/*map windows */
-.indikator_header {
-    position: absolute;
-    top: 10px;
-    z-index: 500;
-    padding: 5px;
-    white-space: normal;
-    box-shadow: 0 0 3px gray;
-    background-color: white;
-    font-size: 13px;
-    max-width: 300px;
-    text-align: center;
-    left: 20%;
-}
-.indikator_header_rechts{
-    display: none;
-    position: absolute;
-    top: 10px;
-    z-index: 1000;
-    padding: 5px;
-    white-space: normal;
-    box-shadow: 0 0 3px gray;
-    background-color: white;
-    font-size: 13px;
-    max-width: 300px;
-    text-align: center;
-    right: 20%;
-}
-.header{
-    font-size: 13px;
-    font-weight: bold;
-}
-#mapwrap {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    xtouch-action: none;
-}
-
 /*SEARCH*/
 .search {
     width: 100%;
@@ -175,31 +48,6 @@ Slider
     font-weight: bold;
     color:black !important;
 }
-
-/*Dialog*/
-.hr_dialog {
-    margin-top: 1px;
-    margin-bottom: 1px;
-}
-.ui-dialog { z-index: 99999 !important ;}
-.ui-widget-header
-{
-    background: var(--main-color) !important;
-    color: white !important;
-}
-.ui-dialog .ui-dialog-content {
-    padding: 10px;
-}
-.ui-slider-label{
-    color: black !important;
-}
-.first{
-    margin-top: 0 !important;
-
-}
-.feeback_label{
-    margin-top: 10px;
-}
 /*
 Feedack
  */
@@ -207,19 +55,22 @@ Feedack
     width: 100%;
     overflow: hidden;
 }
-.feedback_form{
+#feedback_div .feeback_label{
+    margin-top: 10px;
+}
+#feedback_div .feedback_form{
     margin: 10px;
 }
-.inputGroupContainer {
+#feedback_div .inputGroupContainer {
     width: 100%;
     box-sizing: border-box;
     -webkit-box-sizing:border-box;
     -moz-box-sizing: border-box;
 }
-.input_feedback{
+#feedback_div .input_feedback{
     width: 100%;
 }
-.btn-group-feedback{
+#feedback_div .btn-group-feedback{
     float: left;
     margin: 10px;
 }
@@ -261,36 +112,6 @@ Feedack
 .progress-bar{
     line-height: 50px;
     font-size: 25px;
-}
-/*Button group for legend and map choice*/
-.btn-group-map{
-    position:absolute;
-    z-index: 1000;
-    display: inline-block;
-    bottom: 20px;
-    right: 0;
-    filter: blur(0);
-}
-#map_compare{
-    display: none;
-    position:absolute;
-    z-index: 1000;
-    bottom: 110px;
-    right: 0;
-    filter: blur(0);
-}
-.map-btn:hover{
-    border:1px solid var(--active-color);
-}
-.map-btn{
-    background-color: var(--main-color);
-    transform: rotate(270deg);
-    margin-bottom: 20px;
-    height: 50px;
-    right: -20px;
-}
-#map_compare .map-btn{
-    background-color: var(--active-color);
 }
 /*
 Layer Control
@@ -497,333 +318,7 @@ Legende
 .legende .hist_info{
     display: none;
 }
-/*
-Toolbar.js
-*/
-.content {
-    height: 100%;
-}
-#content #overflow_content{
-    overflow-y: auto;
-    overflow-x: hidden;
-    height: 99%;
-}
-#btn_reset {
-    background-color: grey !important;
-}
-.toolbar {
-    background: rgba(255, 255, 255, 1);
-    width: 335px;
-    bottom: 30px;
-    top: 0;
-    position: absolute;
-    left: 0;
-    z-index: 20000;
-    border:2px solid var(--main-color);
-    padding: 20px;
-    box-sizing: border-box;
-    opacity: 1;
-}
-.toolbar_close {
-    left: -335px;
-    opacity: 1;
-}
-.toolbar .menu_m {
-    height: 100px;
-    width: 25px;
-    background: var(--main-color);
-    box-shadow: 1px 0 2px rgba(0, 0, 0, .3);
-    position: absolute;
-    right: -25px;
-    top: 30%;
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
-    border: 1px solid #333;
-    cursor: pointer;
-    padding-left: 2px;
-}
 
-.toolbar .menu_m span {
-    color: #fff;
-    font-size: 1.5em;
-    font-weight: bold;
-    display: inline-block;
-    position: relative;
-    transform: rotate(90deg);
-    top: 39px;
-    left: -18px;
-}
-.toolbar .tools {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-}
-.toolbar #content .dropdown_choice{
-    width: 100%;
-    border-radius: 5px;
-    background: var(--main-color);
-    display: inline-block;
-    padding: 7px;
-    height: 34px;
-    color:white;
-    margin-bottom: 10px;
-}
-.toolbar #content .dropdown_choice .hh_sf{
-    float: left;
-    width: 90%;
-    cursor: pointer;
-    height: 100%;
-}
-#content .dropdown_choice .hh_sf i{
-    margin-right: 30px;
-}
-#content .dropdown_choice .pin{
-    float: right;
-    cursor: pointer;
-}
-.arrow_pinned{
-    transform: rotate(45deg);
-    color: #8CB91B;
-}
-#content .btn-primary:not(.secondary) {
-    width: 100%;
-    color: white;
-    margin-bottom: 1em;
-}
-
-#content .dropdown_menu .dropdown_menu-toggle {
-    background-color: white;
-    color:grey;
-}
-#content .dropdown_menu ul.dropdown_menu-menu{
-    width:100%;
-    margin-bottom: 5px;
-}
-.toolbar .dropdown_menu {
-    display: none;
-    margin-bottom: 5px;
-    margin-top: 5px;
-}
-.toolbar #map-selection{
-    padding-right: 5px;
-}
-/*Indicator choices also for the cloned ones*/
-.indicator_ddm{
-    width: 100% !important;
-    background-color: white !important;
-    border: 1px solid black !important;
-}
-.indicator_ddm .indicator_ddm_item_bold{
-    font-weight: bold !important;
-}
-.indicator_ddm #kat_auswahl{
-    width: 100%;
-    height: auto;
-    border: 1px solid var(--main-color) !important;
-}
-.indicator_ddm .menu .item{
-    border-left: 1px solid var(--main-color) !important;
-    border-right: 1px solid var(--main-color) !important;
-    background-color: white;
-}
-.indicator_ddm .menu .item:hover{
-    background-color:rgba(140,185,27,1) !important;
-}
-.indicator_ddm .menu .submenu{
-    z-index: 20000 !important;
-    height: auto !important;
-    min-height: 10px !important;
-    overflow-y: auto !important;
-    padding-bottom: 10px !important;
-}
-.toolbar #content #dropdown_raumgl{
-    margin-top: 0;
-}
-.toolbar #content #dropdown_raumgl .spatial_choice{
-    display: inline-block;
-    width: 90%;
-    margin: 10px;
-}
-.toolbar #content #dropdown_raumgl .spatial_choice .label_spatial_choice{
-    font-family: 'Roboto', sans-serif !important;
-    font-weight: normal;
-    font-size: 1.8rem !important;
-    margin-top: 0.5rem;
-}
-.toolbar #content #dropdown_raumgl .spatial_choice #gebiete_label{
-    float: left;
-}
-.toolbar #content #dropdown_raumgl .spatial_choice #spatial_choice_checkbox_container label:before{
-    width: 4.5rem !important;
-    height: 2.5rem !important;
-    background: #8CB91B !important;
-}
-.toolbar #content #dropdown_raumgl .spatial_choice #spatial_choice_checkbox_container label:after{
-    width: 2.5rem !important;
-    height: 2.5rem !important;
-}
-.toolbar #content #dropdown_raumgl .spatial_choice #raster_label{
-    float: right;
-}
-.toolbar #content #dropdown_raumgl .spatial_choice .checkbox{
-    margin-top: 0 !important;
-}
-.toolbar #content #dropdown_raumgl #spatial_range_gebiete .dropdown_gebietsauswahl{
-    width:100%;
-}
-.toolbar #content #dropdown_raumgl #spatial_range_gebiete .dropdown_gebietsauswahl #dropdown_grenzen_container{
-    float:left;
-    width:90%;
-}
-.toolbar #content #dropdown_raumgl #spatial_range_gebiete .dropdown_gebietsauswahl #clear_gebietsauswahl{
-    font-size: 1.5rem;
-    padding-top: 0.5rem;
-    padding-left: 0.1rem;
-    cursor: pointer;
-}
-/*spatial slider inside the raster choices */
-.toolbar #content #dropdown_raumgl #spatial_range_raster #slider_raum_container {
-    display: block;
-    margin-bottom: 0;
-}
-.toolbar #content #dropdown_raumgl #spatial_range_raster{
-    display: none;
-}
-.toolbar #content #dropdown_raumgl #spatial_range_raster #slider_raum_container #raum_slider {
-    margin-left: 10px;
-    margin-right: 20px;
-    display: block;
-    margin-bottom: 50px !important;
-    margin-top: 20px;
-}
-.toolbar #content #dropdown_raumgl #spatial_range_raster #slider_raum_container #raum_slider .ui-slider-range {
-    background-color: var(--main-color);
-}
-/*Slider*/
-.toolbar #slider_zeit_container {
-    margin-top: 10px;
-    width:100%;
-}
-.toolbar #slider_zeit_container #zeit_slider{
-    margin: 20px;
-}
-.toolbar .kennblatt{
-    margin-top: 20px !important;
-}
-/*
-Tools
- */
-.btn_map {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    box-shadow: 0 0 3px gray;
-}
-.vergleich{
-    background: var(--main-color) url(../assets/icon/split.png) no-repeat center;
-}
-.germany {
-    background: var(--main-color) url(../assets/icon/germany.png) no-repeat center;
-}
-.zoomIn {
-    background: var(--main-color) url(../assets/icon/plus.png) no-repeat center;
-}
-.zoomOut {
-    background: var(--main-color) url(../assets/icon/minus.png) no-repeat center;
-}
-
-.toolbar #content .dropdown_menu .btn_container .full_screen{
-    width: 32px;
-    height: 32px;
-    background: var(--main-color) url(../assets/icon/fullscreen-symbol.png) no-repeat center center;
-    margin-left: 7px;
-}
-.toolbar #content #dropdown_werkzeug ul li {
-    float: left;
-    width: 15%;
-    margin-left: 15px;
-}
-.toolbar #content  #dropdown_werkzeug ul li{
-    width:15%;
-}
-.toolbar #content  #dropdown_werkzeug ul li .image{
-    width: 32px;
-    height: 32px;
-    margin-left: 7px;
-}
-.toolbar #content #dropdown_werkzeug .btn_container #measure {
-    background: var(--main-color) url(../assets/icon/ruler.png) no-repeat center center;
-}
-.toolbar #content #dropdown_werkzeug .btn_container #lupe {
-    background: var(--main-color) url(../assets/icon/lupe.png) no-repeat center center;
-}
-.toolbar #content #dropdown_werkzeug #import {
-    background: var(--main-color) url(../assets/icon/import.png) no-repeat center center;
-}
-#content #dropdown_werkzeug #import .leaflet-control-filelayer{
-    opacity: 0 !important;
-}
-.toolbar #content .dropdown_menu #btn_glaetten{
-    background: var(--main-color) url(../assets/icon/smooth.png) no-repeat center center;
-}
-.toolbar #content #dropdown_analyse ul li{
-    float: left;
-}
-.toolbar #content #dropdown_analyse ul li .image{
-    width: 45px;
-    height: 45px;
-    margin-left: 7px;
-}
-.toolbar #content #dropdown_analyse #dev_chart{
-    background: white url(../assets/icon/trend.png) no-repeat center center;
-}
-.toolbar #content #dropdown_analyse #dev_chart_compare{
-    background: white url(../assets/icon/trend_compare.png) no-repeat center center;
-}
-.toolbar #content #dropdown_analyse #ind_compare{
-    background: var(--main-color) url(../assets/icon/split.png) no-repeat center center;
-    height:40px;
-}
-/*
-color schema
- */
-#farbwahl #farbwahl_btn{
-    background-color: white;
-    color: #555 !important;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-#farbwahl_btn span{
-    color: black;
-    float: right;
-    margin-top: 5px;
-}
-#farbwahl_btn .color-line {
-    line-height: 15px;
-    width: 90%;
-    margin-left: 5px;
-    margin-right: 10px;
-    display: inline-block;
-}
-#farbwahl_btn .color-line i{
-    height: 15px;
-    float: left;
-}
-#color_schema{
-    width: 90%;
-    display: none;
-}
-#color_schema .color-line {
-    line-height: 15px;
-    width: 100%;
-    margin-left: 10px;
-    display: inline-block;
-}
-#color_schema .color-line i{
-    height: 15px;
-    float: left;
-}
 #layer_conainer{
     display: inline-block;
     width: 100%;
@@ -868,18 +363,7 @@ color schema
     fill: white;
     font-family: sans-serif
 }
-#map {
-    width:100%;
-    height: 100%;
-    background-color: white;
-}
-#map_print{
-    float: right;
-    margin-top: 3px;
-    width: 160.8px;
-    height: 150px;
-    background-color: white;
-}
+
 .backButton{
     font-size: 3.5em;
 }
@@ -899,105 +383,6 @@ color schema
 .layer_ue {
     display:inline-block;
     width: 100%;
-}
-.klassifizierung form{
-    display: inline-block;
-    width: 100%;
-}
-
-.klassifizierung form .radio_left{
-    float: left;
-    width: 50%;
-}
-.klassifizierung form .radio_right{
-    float: left;
-    width: 50%;
-}
-#content .dropdown_menu #layer_conainer hr {
-    border-top: 1px solid black;
-    margin-top:0;
-    margin-bottom: 5px;
-}
-#content .dropdown_menu #layer_conainer form{
-    margin-top:0;
-}
-
-#opacity_container {
-    margin-left: 10px;
-    margin-right:10px;
-    display: block;
-    margin-bottom: 40px;
-}
-#opacity_slider {
-    margin-bottom: 10px;
-    margin-left:10px;
-    margin-top: 10px;
-}
-#opacity_slider .ui-slider-range {
-    background-color: var(--main-color);
-}
-#op_low {
-    float:left;
-}
-#op_high {
-    float:right;
-
-}
-hr.hr_export{
-    margin-bottom: 8px;
-}
-#menu_raumgl select option:disabled{
-    color: #e6e6e6;
-}
-#menu_raumgl_fein select option:disabled{
-    color: #e6e6e6;
-}
-.dropdown_menu .btn_export {
-    background: #8CB91B;
-    color:white;
-    width: 40%;
-    margin-right: 10px;
-}
-#wfs{
-    margin-top: 5px !important;
-}
-.dropdown_menu #btn_kartenlink{
-    background: #8CB91B;
-    color:white;
-    width: 60%;
-    margin-right: 10px;
-    margin-left: 10px;
-    margin-bottom: 10px;
-}
-.export_div{
-    margin-top: 10px;
-}
-#dd_grob_fein {
-    display: none;
-}
-.dropdown_menu #wms {
-    float: left;
-    margin-right: 10px;
-}
-.dropdown_menu #wcs {
-    margin-right: 10px;
-    margin-left: 10px;
-}
-.dropdown_menu #kartenlink{
-    background: #8CB91B;
-    color: white;
-    margin-bottom: 10px;
-}
-#btn_link_laden{
-    margin-top: 5px;
-    background:#8CB91B;
-}
-#bild {
-    float: right;
-    margin-right: 20px !important;
-}
-.wfs_btn{
-    margin-right: 10px;
 }
 /*IMPRESSUM*/
 .toolbar #impressum{
@@ -1218,265 +603,6 @@ Solution fixed headers: https://stackoverflow.com/questions/673153/html-table-wi
     left: 5px;
     right: 5px;
 }
-/*
-table
- */
-.right_content .scrollable-area #table_ags{
-    background: #FFF;
-    box-shadow: none;
-    text-align: left;
-    color: rgba(0,0,0,.87);
-    border:.5px solid black;
-    border-spacing: 0;
-    margin-bottom: 10px;
-    margin-right: 5px;
-}
-.right_content .scrollable-area #table_ags #thead tr th{
-    font-size: 12px;
-    text-align: center;
-    overflow:hidden;
-    background-color: lightgray;
-    border:.5px solid black;
-}
-.right_content .scrollable-area #table_ags #thead .tablesorter-headerUnSorted:not(.expand)
-{
-    background: lightgray url(../assets/icon/bg.gif) no-repeat center right;
-    padding-right: 20px;
-    cursor: pointer;
-}
-.right_content .scrollable-area #table_ags #thead .tablesorter-headerAsc
-{
-    background: lightgray url(../assets/icon/asc.gif) no-repeat center right;
-}
-.right_content .scrollable-area #table_ags #thead .tablesorter-headerDesc
-{
-    background: lightgray url(../assets/icon/desc.gif) no-repeat center right;
-}
-.right_content .scrollable-area #table_ags #thead .tablesorter-headerDesc, .tablesorter-headerAsc
-{
-    color: #000;
-}
-.right_content .scrollable-area #table_ags .tBody_value_table tr:hover{
-    background-color: rgba(78,96,170,.5)
-}
-.right_content .scrollable-area #table_ags tr td{
-    display: table-cell;
-    padding: 2px;
-    font-size: 12px;
-    border:.5px solid black;
-}
-.right_content .scrollable-area #table_ags tr .td_name{
-    text-align:left;
-}
-.right_content .scrollable-area #table_ags tr .td_ags{
-    text-align:center;
-}
-.right_content .scrollable-area #table_ags tr .td_akt{
-    text-align:right;
-}
-.right_content .scrollable-area #table_ags tr .val-ags{
-    text-align: right;
-}
-.right_content .scrollable-area #table_ags tr .val-grundakt{
-    text-align: right;
-}
-.right_content .scrollable-area #table_ags img{
-    cursor: pointer;
-}
-.right_content .scrollable-area #table_ags tr .count_ags_table{
-    text-align: right;
-}
-.right_content .scrollable-area #table_ags .tfoot tr{
-    background-color: lightgray !important;
-}
-.right_content .scrollable-area #table_ags .tfoot tr td{
-    border: 1px solid black;
-}
-.right_content .scrollable-area #table_ags #tfoot_brd{
-    border-top: 2px solid black;
-}
-.right_content .scrollable-area #table_ags tr .dif_val_div{
-    margin-left: 1vh;
-}
-.right_content .scrollable-area #table_ags tr .dif_val_div .glyphicon{
-    color: var(--main-color);
-    font-size: 2em;
-}
-.right_content .scrollable-area #table_ags tr .dif_val_div b{
-    margin-left: 1vh;
-}
-.right_content .scrollable-area #table_ags tr .dif_val_div .positiv{
-    transform: rotate(-40deg);
-}
-.right_content .scrollable-area #table_ags tr .dif_val_div .negativ{
-    transform: rotate(40deg);
-}
-.right_content .scrollable-area #table_ags .grey_border{
-    border-left: 6px solid grey !important;
-}
-/*
-tabelle filtern
- */
-.right_content .filter{
-    width: 35px;
-    height: 35px;
-    background: white url(../assets/icon/filter.png) no-repeat center center;
-    float: right;
-    margin-right: 10px;
-    cursor: pointer;
-}
-.right_content #filter_div{
-    display: none;
-    position: absolute;
-    height: 100%;
-    width: 250px;
-    background: white;
-    border: 1px solid var(--main-color);
-    bottom: 0;
-    top: 0;
-    right: 0;
-    z-index: 20000;
-    padding: 20px;
-    opacity: 1;
-}
-.right_content #filter_div .title_filter_table{
-    font-weight: bold;
-    font-size: 1.4rem;
-    padding-bottom: 2px;
-}
-/*
-    Tabelle erweitern panel
-*/
-.right_content #tabelle_erweitern{
-    display: none;
-    position: absolute;
-    height: 100%;
-    width: 250px;
-    background: white;
-    border: 1px solid var(--main-color);
-    bottom: 0;
-    top: 0;
-    right: 0;
-    z-index: 20000;
-    padding: 20px;
-    opacity: 1;
-}
-.right_content #tabelle_erweitern .panel_choice_container{
-    margin-bottom: 10px;
-}
-.right_content #tabelle_erweitern #btn_table_indikator_add{
-    width: 100%;
-}
-.right_content #tabelle_erweitern .table_add{
-    width: 100%;
-    margin-top: 10px;
-}
-.right_content #tabelle_erweitern #indikator_choice_container_table {
-    position: relative;
-    width: 100%;
-    margin-bottom: 10px;
-    margin-top: 10px;
-}
-.right_content #tabelle_erweitern .ddm_table{
-    width: 100%;
-}
-.right_content #tabelle_erweitern .ddm_table .menu{
-    height: auto;
-    z-index: 20000 !important;
-}
-.right_content #tabelle_erweitern .ddm_table .menu i{
-    margin-right: 30px;
-}
-.right_content #tabelle_erweitern .ddm_table .menu .item{
-    background-color: white;
-}
-.right_content #tabelle_erweitern .ddm_table .menu .item:hover{
-    font-weight: bold;
-}
-.right_content #tabelle_erweitern .ddm_table .menu .submenu{
-    z-index: 20000 !important;
-    overflow-x: hidden;
-}
-.right_content #tabelle_erweitern #kenngroessen_ddm_table #ue_raum_sum_content .ue_sum_content_table_erweitern{
-    margin-left: 60px;
-}
-.right_content #tabelle_erweitern #kenngroessen_ddm_table #ue_raum_sum_content .ue_sum_content_table_erweitern:first-child{
-    margin-top: 10px;
-}
-.right_content #tabelle_erweitern #zeitschnitt_choice_container_table .hinweis{
-    margin-top: 5px;
-    margin-bottom: 10px;
-}
-.right_content #tabelle_erweitern #hinweis_time_expand_linear{
-    display: none;
-    margin-bottom: 10px;
-}
-.right_content #tabelle_erweitern #hinweis_ind_expand{
-    display: none;
-}
-.right_content #tabelle_erweitern #hinweis_time_expand{
-    display: none;
-}
-.right_content #tabelle_erweitern #trend_hinweis_expand{
-    display: none;
-}
-.right_content #tabelle_erweitern #hinweis_time_expand_null{
-    display: none;
-}
-.right_content #tabelle_erweitern #trend_hinweis_expand b{
-    color: red;
-}
-.right_content #tabelle_erweitern #hinweis_time_expand_null b{
-    color: red;
-}
-.right_content #tabelle_erweitern #btn_table{
-    pointer-events: auto;
-}
-.right_content #tabelle_erweitern .ui.toggle.checkbox{
-    padding-left: 0 !important;
-}
-.right_content #tabelle_erweitern #btn_table_remove_expand{
-    background-color: grey !important;
-    width: 100%;
-    margin-top: 10px;
-}
-.right_content #tabelle_erweitern #btn_table_load_expand{
-    width: 100%;
-    background-color: var(--main-color) !important;
-    margin-top: 10px;
-}
-.right_content #tabelle_erweitern #btn_table_clear_expand{
-    width: 100%;
-    background-color: grey !important;
-    margin-top: 10px;
-}
-.right_content #tabelle_erweitern #btn_table_clear_expand i {
-    float: left;
-}
-/*
-Icons for diagramme in Table and Map PopUp
- */
-.PopUp{
-    word-break: break-all;
-}
-.indikatoren_gebietsprofil{
-    margin-right: 5px;
-    cursor:pointer;
-}
-.hc_icon{
-    margin-right: 5px;
-    cursor:pointer;
-}
-.histogramm_ags{
-    margin-left: 5px;
-    cursor:pointer;
-}
-.indikatoren_diagramm_ags{
-    cursor:pointer;
-}
-.ind_entwicklungsdiagr{
-    cursor:pointer;
-}
 /*entwicklungsdiagramm*/
 #entwicklungsdiagramm_content .container{
     width: 90%;
@@ -1600,6 +726,27 @@ Icons for diagramme in Table and Map PopUp
     font-weight: bold;
 }
 /*
+Tools
+ */
+.btn_map {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    box-shadow: 0 0 3px gray;
+}
+.vergleich{
+    background: var(--main-color) url(../assets/icon/split.png) no-repeat center;
+}
+.germany {
+    background: var(--main-color) url(../assets/icon/germany.png) no-repeat center;
+}
+.zoomIn {
+    background: var(--main-color) url(../assets/icon/plus.png) no-repeat center;
+}
+.zoomOut {
+    background: var(--main-color) url(../assets/icon/minus.png) no-repeat center;
+}
+/*
 Kennblatt
  */
 .export{
@@ -1655,110 +802,6 @@ Kennblatt
 .overlay {
     fill: none;
     pointer-events: all;
-}
-/*
-print
- */
-#print_container {
-    display: none;
-    width: 99%;
-}
-#print_container .btn_dropdown{
-    width: 30%;
-    background-color: var(--main-color);;
-}
-#print_container .btn_dropdown i{
-    margin-right: 10px;
-}
-#print_container .print_map_content{
-    display: block;
-    width: 90%;
-    height: 600px;
-    margin-top: 20px;
-}
-#print_container .print_map_content .print_header{
-    width: 100%;
-    color: black;
-    margin-left: 10px;
-    margin-top: 20px;
-}
-#print_map > div:nth-child(1) > div:nth-child(3) > svg:nth-child(1){
-    margin-top: 50px;
-    margin-left: 20px;
-}
-#print_container .print_map_content .print_header h3{
-    margin-bottom: 1px;
-}
-#print_container .print_map_content .print_header hr{
-    margin-left: 0;
-    width: 95%;
-}
-#print_container .print_map_content .ioer_logo{
-    background-image: url(../assets/header.png);
-    background-repeat: no-repeat;
-    background-position: center;
-    height: 150px;
-    background-size: 99%;
-    width: 30%;
-    float: left;
-}
-#print_container .print_map_content  .map_print_container{
-    width: 70%;
-    height: 100%;
-    float: left;
-}
-#print_container .print_map_content  .map_print_container #print_map{
-    width: 100%;
-    height: 100%;
-    background-color:white;
-    margin-top: 20px;
-}
-#print_container .print_map_content .map_print_container #print_map .leaflet-control-scale-line{
-    margin-left: 20px;
-}
-#print_container .print_map_content .map_print_container #print_map .leaflet-control-attribution{
-    margin-right: 20px;
-}
-#print_container .print_info_content{
-    float: left;
-    display: block;
-    width: 30%;
-    padding-left: 20px;
-}
-#print_container .print_info_content #print_legende{
-    width: 100%;
-    float:left;
-}
-#print_container .print_info_content .map_projection_print_container{
-    float:right;
-    width: 100%;
-    margin-top: 20px;
-}
-#print_container .print_info_content .histostogramm_print_container{
-    float:right;
-    width: 100%;
-    margin-top: 20px;
-}
-#print_container .print_info_content .histostogramm_print_container #print_histogramm{
-    width: 95%;
-}
-#print_container .print_bottom{
-    width: 95%;
-    display: block;
-    height: 200px;
-    margin-top: 100px;
-    margin-left: 20px;
-    margin-right: 20px;
-}
-#print_container .print_bottom .datengrundlage_print_container{
-    margin-top: 10px;
-}
-#print_container .print_bottom .hr{
-    width:100%;
-}
-#print_container #export_pdf{
-    max-width: 300px;
-    width: 25%;
 }
 /*The Menu Icons*/
 .notify-icon span{

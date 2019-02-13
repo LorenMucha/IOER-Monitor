@@ -36,7 +36,7 @@ const main_view = {
                     table.controller.reinitializeStickyTableHeader();
                     map_infos.resize();
                     legende.resize();
-                    map.invalidateSize()
+                    map.invalidateSize();
                 }
             });
     },

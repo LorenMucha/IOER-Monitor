@@ -242,8 +242,6 @@ try{
         $link = new LINK($setting);
         echo json_encode($link->getResult());
     }
-
-
 }catch(Error $e){
     $trace = $e->getTrace();
     echo $e->getMessage().' in '.$e->getFile().' on line '.$e->getLine().' called from '.$trace[0]['file'].' on line '.$trace[0]['line'];

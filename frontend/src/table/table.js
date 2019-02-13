@@ -83,9 +83,9 @@ const table = {
         //create the main Table header --private functions
         function createTableHeader(){
             let value_text = `Wert (${indikatorauswahl.getIndikatorEinheit()})`,
-                colspan = 4;
+                colspan = 5;
             if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
-                colspan=5;
+                colspan=6;
             }
 
             let html = `<thead id="thead" class="full-width">
@@ -93,10 +93,11 @@ const table = {
                 <th colspan="${colspan}" data-sorter="false" class="sorter-false expand" id="header_ind_set">${indikatorauswahl.getSelectedIndikatorText_Lang()+' ('+zeit_slider.getTimeSet()}</th>
                 </tr>
                 <tr class="header" id="second_row_head">
-                <th class="th_head" id="tr_rang">lfd. Nr.</th>
-                <th class="th_head ags">AGS</th>
-                <th class="th_head gebietsname">Gebietsname</th>
-                <th id="tabel_header_raumgl" class="th_head">${value_text}</th>`;
+                    <th class="th_head"></th>
+                    <th class="th_head" id="tr_rang">lfd. Nr.</th>
+                    <th class="th_head ags">AGS</th>
+                    <th class="th_head gebietsname">Gebietsname</th>
+                    <th id="tabel_header_raumgl" class="th_head">${value_text}</th>`;
 
             if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
                 html += '<th class="th_head grundakt_head" id="grundakt_head">Mittlere Grund- aktualität</th>';
@@ -113,7 +114,7 @@ const table = {
                 x = 0;
             $.each(layer_array,function(key,value){
                 //set the counter
-                if(i<(layer_array.length)-2) {i+=1;}
+                i+=1;
 
                 //set the variables
                 let ags = value.ags,
@@ -127,16 +128,6 @@ const table = {
                     raumgl = raeumliche_analyseebene.getSelectionId(),
                     ind = indikatorauswahl.getSelectedIndikator(),
                     einheit = indikatorauswahl.getIndikatorEinheit(),
-                    //if excluded there is no need because here is the select function disabled
-                    tr_title=function(){
-                        try {
-                            if (exclude.checkPerformanceAreas()) {
-                                return 'title="Markierung durch klick"';
-                            } else {
-                                return "";
-                            }
-                        }catch(err){return "";}
-                    },
                     exclude=function(){
                         if($.inArray(des,table.excludedAreas)!==-1){
                             return 'style="display:none"';
@@ -146,7 +137,7 @@ const table = {
                         }
                     },
                     //'icon container' for trend and indicator-comparing inside a digramm
-                    img_trend = `<img class="indsingle_entwicklungsdiagr dev_chart_compare ${exclude.class_performance} mobile_hidden" 
+                    img_trend = `<img class="indsingle_entwicklungsdiagr dev_chart_compare ${exclude.class_performance} mobile_hidden chart" 
                                         data-name="${value.gen}" 
                                         data-ags="${ags}" 
                                         data-ind="${ind}" 
@@ -156,7 +147,7 @@ const table = {
                                         title="Veränderung der Indikatorwerte für die Gebietseinheit" 
                                         id="indikatoren_diagramm_ags${ags}" 
                                         src="frontend/assets/icon/indikatoren_diagr.png"/>`,
-                    img_trend_ind = `<img class="ind_entwicklungsdiagr dev_chart_trend ${exclude.class_performance} mobile_hidden" 
+                    img_trend_ind = `<img class="ind_entwicklungsdiagr dev_chart_trend ${exclude.class_performance} mobile_hidden chart" 
                                         data-name="${value.gen}" 
                                         data-ags="${ags}" 
                                         data-ind="${ind}" 
@@ -167,25 +158,28 @@ const table = {
                                         id="indikatoren_diagramm_ags_ind${ags}" 
                                         src="frontend/assets/icon/indikatoren_verlauf.png"/>`;
 
-                if(name === layer_array[i].gen){
-                    if(value.krs){
-                        name = name+" ("+value.krs+")";
-                    }else {
-                        name = name + " (" + des + ")";
+                try {
+                    if (name === layer_array[i].gen && base_raumgliederung.getBaseRaumgliederungId() !== "bld") {
+                        if (value.krs) {
+                            name = name + " (" + value.krs + ")";
+                        } else {
+                            name = name + " (" + des + ")";
+                        }
                     }
-                }
-                html += `<tr ${exclude()} id="${ags}" class="tr" ${tr_title()}>`;
+                }catch(err){}
+
+                html += `<tr ${exclude()} id="${ags}" class="tr">`;
 
                 // handle error codes and notes
                 if(hc ==='0' && fc==='0'){
-                    html += '<td class="count_ags_table"></td><td class="td_ags">' + ags + '</td><td class="td_name" data-des="'+des+'"><img data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" title="Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren" class="indikatoren_gebietsprofil" id="indikatoren_gebietsprofil' + ags + '" src="frontend/assets/icon/indikatoren.png"/>' + name + '</td><td class="val-ags" data-name="' + value.gen + '" data-sort-value="'+value_int+'" data-val="' + value_int + '">' + wert + '<img data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" title="Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators" class="indikatoren_diagramm_ags" class="histogramm_ags" id="diagramm_ags' + ags + '" src="frontend/assets/icon/histogramm.png"/>' + img_trend + img_trend_ind + '</td>';
+                    html += '<td><input type="checkbox" class="select_check" data-ags="'+ags+'"></td><td class="count_ags_table selectable"></td><td class="td_ags">' + ags + '</td><td class="td_name" data-des="'+des+'"><img data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" title="Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren" class="indikatoren_gebietsprofil chart" id="indikatoren_gebietsprofil' + ags + '" src="frontend/assets/icon/indikatoren.png"/>' + name + '</td><td class="val-ags" data-name="' + value.gen + '" data-sort-value="'+value_int+'" data-val="' + value_int + '">' + wert + '<img data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" title="Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators" class="indikatoren_diagramm_ags" class="histogramm_ags" id="diagramm_ags' + ags + '" src="frontend/assets/icon/histogramm.png"/>' + img_trend + img_trend_ind + '</td>';
                 }
                 else if (hc !== '0') {
                     //split the hc
                     let hc_arr = hc.split("||");
                     let hc_value = hc_arr[1];
                     let hc_text = hc_arr[0];
-                    html += '<td class="count_ags_table"></td><td class="td_ags">'+ags + '</td><td class="td_name" data-des="'+des+'"><img data-name="'+name+'" data-ags="'+ags+'" data-ind="'+ind+'" data-wert="'+wert+'" data-einheit="'+einheit+'" title="Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren" class="indikatoren_gebietsprofil" id="indikatoren_gebietsprofil'+ags+'" src="frontend/assets/icon/indikatoren.png"/>'+name+'</td><td class="val-ags" data-name="'+name+'" data-sort-value="'+value_int+'" data-val="' +value_int+'"><img class="hc_icon" src="frontend/assets/hinweis/hinweis_'+hc_value+'.png" title="' +hc_text+'"/>' +wert+'<img data-name="'+name+'" data-ags="'+ags+'" data-ind="'+ind+'" data-sort-value="'+value_int+'" data-wert="'+wert+'" data-einheit="'+einheit+'" title="Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators" class="histogramm_ags" src="frontend/assets/icon/histogramm.png"/>'+img_trend+img_trend_ind+'</td>';
+                    html += '<td><input type="checkbox" class="select_check" data-ags="'+ags+'"></td><td class="count_ags_table"></td><td class="td_ags selectable cursor" '+tr_title()+'>'+ags + '</td><td class="td_name" data-des="'+des+'"><img data-name="'+name+'" data-ags="'+ags+'" data-ind="'+ind+'" data-wert="'+wert+'" data-einheit="'+einheit+'" title="Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren" class="indikatoren_gebietsprofil chart" id="indikatoren_gebietsprofil'+ags+'" src="frontend/assets/icon/indikatoren.png"/>'+name+'</td><td class="val-ags" data-name="'+name+'" data-sort-value="'+value_int+'" data-val="' +value_int+'"><img class="hc_icon" src="frontend/assets/hinweis/hinweis_'+hc_value+'.png" title="' +hc_text+'"/>' +wert+'<img data-name="'+name+'" data-ags="'+ags+'" data-ind="'+ind+'" data-sort-value="'+value_int+'" data-wert="'+wert+'" data-einheit="'+einheit+'" title="Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators" class="histogramm_ags" src="frontend/assets/icon/histogramm.png"/>'+img_trend+img_trend_ind+'</td>';
                 }
                 else if (fc !== '0') {
                     //split the fc
@@ -194,7 +188,7 @@ const table = {
                     let fc_name = fc_arr[2];
                     let fc_color = fc_arr[1];
                     let fc_beschreibung = fc_arr[3];
-                    html += '<td class="count_ags_table"></td><td class="td_ags">' +ags+ '</td><td class="td_name" data-des="'+des+'">' +name+'</td><td  style="text-align: right;">' +fc_name+'</td>';
+                    html += '<td><input type="checkbox" class="select_check" data-ags="'+ags+'"></td><td class="count_ags_table"></td><td class="td_ags">' +ags+ '</td><td class="td_name" data-des="'+des+'">' +name+'</td><td  style="text-align: right;">' +fc_name+'</td>';
                 }
                 if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
                     html +='<td class="val-grundakt indicator_main">'+grundakt_value+'</td>';
@@ -259,6 +253,7 @@ const table = {
                 let img_trend_ind = '<img data-name="Bundesrepublik" data-ags="99" data-ind="' + indikatorauswahl.getSelectedIndikator() + '" data-wert="' + value_g + '" data-einheit="' + indikatorauswahl.getIndikatorEinheit() + '" title="Veränderung des Indikatorwertes für die Gebietseinheit" class="ind_entwicklungsdiagr" id="indikatoren_diagramm_ags_ind99" src="frontend/assets/icon/indikatoren_verlauf.png"/>';
 
                 let tfoot_brd = '<tfoot class="tfoot full-width"><tr id="tfoot_99">' +
+                    '<th></th>'+
                     '<th colspan="2"></th>' +
                     '<th class="td_name"><img data-name="Bundesrepublik" data-ags="99" data-ind="' + indikatorauswahl.getSelectedIndikator() + '" title="Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren" class="indikatoren_gebietsprofil" src="frontend/assets/icon/indikatoren.png"/> <b>Bundesrepublik</b></th>' +
                     '<th class="val-ags" data-name="Bundesrepublik" data-val="' + value_g + '" data-ind="' + indikatorauswahl.getSelectedIndikator() + '"><b>' + value_g + '</b><img data-name="Bundesrepublik" data-ags="99" data-ind="' + indikatorauswahl.getSelectedIndikator() + '" data-wert="' + value_g + '" data-einheit="' + indikatorauswahl.getIndikatorEinheit() + '" title="Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators" class="indikatoren_diagramm_ags" class="histogramm_ags" id="diagramm_ags_99" src="frontend/assets/icon/histogramm.png"/>' + img_trend + img_trend_ind + '</th>';
@@ -798,10 +793,12 @@ const table = {
                 });
 
             //selection on click
+            /*
+            ToDo: Markierfunktion nochmal überarbeiten da sie die Diagramme verdeckt -> eher checkbox ?
             if(exclude.checkPerformanceAreas()) {
-                $(document).on("click","#tBody_value_table tr",function(){
+                $(document).on("click","#tBody_value_table tr .selectable",function(){
                         //first check if selected
-                        let ags = $(this).attr("id");
+                        let ags = $(this).closest('tr').attr("id");
                         $(this)
                             .attr("data-select", "true");
                         table.selection.push(ags);
@@ -809,9 +806,9 @@ const table = {
                     });
 
                 //remove selection
-                $(document).on("click","#tBody_selection tr",function(){
-                        console.log();
-                        let elem = $(this),
+                $(document).on("click","#tBody_selection tr .selectable",function(){
+                        $(this).attr("title", "Markierung durch klick");
+                        let elem = $(this).closest('tr'),
                             ags = elem.attr("id");
                         //remove ags from selection array
                         table.selection = $.grep(table.selection, function (val) {
@@ -821,14 +818,14 @@ const table = {
                         elem
                             .removeAttr("data-select")
                             .find("td").removeClass("selected");
-                        table_body.append($(elem[0].outerHTML).attr("title", "Markierung durch klick"));
+                        table_body.append($(elem[0].outerHTML));
                         elem.remove();
                         table.controller.updateTableSorter();
                     });
             }else{
                 table_selection.unbind();
                 table_body.unbind();
-            }
+            }*/
         },
         setTableSorter:function(){
             // these default equivalents were obtained from a table of equivalents

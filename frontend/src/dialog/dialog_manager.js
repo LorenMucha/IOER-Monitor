@@ -8,6 +8,9 @@ const dialog_manager={
         close:false,
         modal:false
     },
+    setInstruction:function(_instructions){
+      this.instructions=_instructions;
+    },
     calculateWidth:function(){
         let width = main_view.getWidth();
         if($('.right_content').is(':visible') || width >=1280 && width<2000){
@@ -67,6 +70,9 @@ const dialog_manager={
                 manager.close();
             }
         });
+    },
+    getContent:function(){
+      return this.content;
     },
     close:function(){
         $('.jq_dialog').remove();

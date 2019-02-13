@@ -99,10 +99,13 @@ const dev_chart={
             </div>
         `);
         //settings for the manager
-        dialog_manager.instructions.endpoint = `${this.endpoint_id}`;
-        dialog_manager.instructions.html= html;
-        dialog_manager.instructions.title=dev_chart.text[lan].title[this.chart.settings.ind_vergleich];
-        dialog_manager.instructions.modal=false;
+        let instructions = {
+            endpoint:`${this.endpoint_id}`,
+            html:html,
+            title:dev_chart.text[lan].title[this.chart.settings.ind_vergleich],
+            modal:false
+        };
+        dialog_manager.setInstruction(instructions);
         dialog_manager.create();
         this.chart.create();
 
@@ -462,9 +465,9 @@ const dev_chart={
                             container.attr("height",height).attr("width",width);
                             $(this).blur();
                             if (value === 'png') {
-                                svgString2Image(width, height, '.container_diagramm #diagramm svg', saveIMAGE);
+                                Export_Helper.svgString2Image(width, height, '.container_diagramm #diagramm svg', Export_Helper.saveIMAGE);
                             } else if (value === 'pdf') {
-                                svgString2DataURL(width, height, '.container_diagramm #diagramm svg',savePDF);
+                                Export_Helper.svgString2DataURL(width, height, '.container_diagramm #diagramm svg',Export_Helper.savePDF);
                             }
                         }
                     });

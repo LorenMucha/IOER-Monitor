@@ -1,0 +1,109 @@
+#print_container #map_print{
+    float: right;
+    margin-top: 3px;
+    width: 160.8px;
+    height: 150px;
+    background-color: white;
+}
+#print_container .btn_dropdown{
+    width: 30%;
+    background-color: var(--main-color);;
+}
+#print_container .btn_dropdown i{
+    margin-right: 10px;
+}
+#print_container .print_map_content{
+    display: block;
+    height: 700px;
+    margin-top: 20px;
+}
+#print_container .print_map_content .print_header{
+    width: 100%;
+    color: black;
+    margin-left: 10px;
+    margin-top: 20px;
+}
+#print_map > div:nth-child(1) > div:nth-child(3) > svg:nth-child(1){
+    margin-top: 50px;
+    margin-left: 20px;
+}
+#print_container .print_map_content .print_header h3{
+    margin-bottom: 1px;
+}
+#print_container .print_map_content .print_header hr{
+    margin-left: 0;
+    width: 95%;
+}
+#print_container .print_map_content .ioer_logo{
+    background-image: url(../assets/header.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 150px;
+    background-size: 99%;
+    width: 30%;
+    float: left;
+}
+#print_container .print_map_content  .map_print_container{
+    width: 75%;
+    height: 100%;
+    float: left;
+}
+#print_container .print_map_content  .map_print_container #print_map{
+    width: 100%;
+    height: 100%;
+    background-color:white;
+    margin-top: 20px;
+}
+#print_container .print_map_content .map_print_container #print_map .leaflet-control-scale-line{
+    margin-left: 20px;
+}
+#print_container .print_map_content .map_print_container #print_map .leaflet-control-attribution{
+    margin-right: 20px;
+}
+#print_container .print_info_content{
+    float: right;
+    display: block;
+    width: 20%;
+    margin-right: 20px;
+}
+#print_container .highlight{
+    color: var(--active-color);
+    font-size: 2vh;
+    cursor: pointer !important;
+}
+#print_container .hover_close{
+    margin-top: 3vh;
+}
+#print_container .hover_close .disable_print{
+    -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+    filter: grayscale(100%);
+    opacity: 0.5;
+}
+#print_container .hover_close .display-none{
+    display: none;
+}
+#print_container .print_info_content #print_legende{
+    width: 100%;
+}
+#print_container .print_info_content .map_projection_print_container{
+    width: 100%;
+    margin-top: 20px;
+}
+#print_container .print_bottom{
+    width: 95%;
+    display: block;
+    height: 200px;
+    margin-top: 100px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+#print_container .print_bottom .datengrundlage_print_container{
+    margin-top: 10px;
+}
+#print_container .print_bottom .hr{
+    width:100%;
+}
+#print_container #export_pdf{
+    max-width: 300px;
+    width: 25%;
+}

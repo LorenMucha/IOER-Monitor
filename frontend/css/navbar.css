@@ -1,0 +1,57 @@
+.navbar {
+    background: var(--main-color); /* For browsers that do not support gradients */
+    position: absolute;
+    height: 50px;
+    width: 100%;
+    top: 0;
+}
+.navbar .navbar-toggle{
+    background-color: var(--main-color) !important;
+}
+.navbar-collapse .in{
+    background-color: var(--main-color);
+    width: auto;
+    float: right;
+}
+.navbar .in{
+    background-color: var(--main-color);
+    width: auto;
+    float: right;
+    z-index: 1000;
+}
+.navbar .navbar-text{
+    color: white;
+    font-weight: bold;
+    margin-top: 15px;
+    font-size: large;
+    margin-left: 20%;
+}
+.navbar .navbar-brand{
+    height: 50px;
+    left:0;
+    width: 50px;
+    background: white url(../assets/kopf.png) no-repeat center;
+}
+.navbar .navbar-nav{
+    float: right;
+    margin-right: 20px;
+    width: auto;
+}
+.navbar .navbar-nav li a{
+    color: white;
+}
+.navbar .navbar-nav li a:hover{
+    background-color: #8bba23;
+    cursor:pointer;
+}
+.navbar.navbar-nav .dropdown .dropdown-toggle:hover{
+    background-color: #8bba23;
+    cursor:pointer;
+}
+.nav .open>a, .nav .open>a:hover, .nav .open>a:focus{
+    background-color: #8bba23 !important;
+    cursor:pointer;
+}
+.navbar .navbar-collapse button{
+    margin-top: 7px;
+}

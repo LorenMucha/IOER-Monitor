@@ -196,7 +196,11 @@ const indikator_json = {
         });
 
         $(document).on('click','#pop_up_diagramm_ags_'+id_popup,function(){
-            openStatistik(ags,gen,value_ags);
+            //todo REINIS Should we declare the variables here or in statistics.js? What about other variables ()
+            statistics.selectedAGS = ags;
+            statistics.selectedAreaName= gen;
+            statistics.selectedIndicator= indikatorauswahl.getSelectedIndikator();
+            statistics.open();
         });
         $(document).on('click','#pop_up_diagramm_entwicklung_ags_'+id_popup,function(){
             //openEntwicklungsdiagramm(ags,gen,indikatorauswahl.getSelectedIndikator(),true);

@@ -230,7 +230,7 @@ try{
             array_push($result,array(
                 $val["cat_id"]=>array(
                     "cat_name"=>$val["cat_name"],
-                    "car_name_en"=>$val["cat_name_en"],
+                    "cat_name_en"=>$val["cat_name_en"],
                     "values"=>$res
                 )
             ));

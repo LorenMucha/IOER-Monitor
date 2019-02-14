@@ -194,22 +194,22 @@ function getRasterMap(time,ind,_raumgliederung,klassifizierung,klassenanzahl,dar
 function getStatistik(ags, name, wert){
     let raumgliederung_txt = base_raumgliederung.getBaseRaumgliederungId();
     return $.ajax({
-        async:true,
-        url: urlparamter.getURLMonitor()+"backend/dialog/statistik.php",
-        type: "POST",
-        data: {
-            ags: ags,
-            name: name,
-            wert: wert,
-            einheit:indikatorauswahl.getIndikatorEinheit(),
-            raumgliederung_name: raumgliederung_txt,
-            raeumliche_ausdehnung:gebietsauswahl.getSelectionAsString(),
-            indikator:indikatorauswahl.getSelectedIndikator(),
-             jahr:zeit_slider.getTimeSet(),
-            map_array:indikator_json_group.getLayerArray(),
-        },
-        success:function(){
-            console.log(this.url);
-        }
+            async:true,
+            url: urlparamter.getURLMonitor()+"backend/dialog/statistik.php",
+            type: "POST",
+            data: {
+                ags: ags,
+                name: name,
+                wert: wert,
+                einheit:indikatorauswahl.getIndikatorEinheit(),
+                raumgliederung_name: raumgliederung_txt,
+                raeumliche_ausdehnung:gebietsauswahl.getSelectionAsString(),
+                indikator:indikatorauswahl.getSelectedIndikator(),
+                jahr:zeit_slider.getTimeSet(),
+                map_array:indikator_json_group.getLayerArray(),
+            },
+            success:function(){
+                console.log(this.url);
+            }
     });
 }

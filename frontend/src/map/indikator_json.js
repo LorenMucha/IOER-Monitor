@@ -196,10 +196,13 @@ const indikator_json = {
         });
 
         $(document).on('click','#pop_up_diagramm_ags_'+id_popup,function(){
-            //todo REINIS Should we declare the variables here or in statistics.js? What about other variables ()
-            statistics.selectedAGS = ags;
-            statistics.selectedAreaName= gen;
-            statistics.selectedIndicator= indikatorauswahl.getSelectedIndikator();
+            //todo REINIS Should we declare the variables (ags, name, indicator...) here or in statistics.js? What about other variables ()
+            statistics.chart.settings.ags=ags;
+            statistics.chart.settings.name=gen;
+            statistics.chart.settings.ind=indikatorauswahl.getSelectedIndikator();
+            statistics.chart.settings.allValuesJSON  = indikator_json.getJSONFile();
+            statistics.chart.settings.indText=indikatorauswahl.getSelectedIndikatorText();
+            statistics.chart.settings.indUnit=indikatorauswahl.getIndikatorEinheit();
             statistics.open();
         });
         $(document).on('click','#pop_up_diagramm_entwicklung_ags_'+id_popup,function(){

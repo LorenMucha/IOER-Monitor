@@ -57,6 +57,18 @@ const webTour={
                         if(typeof indikatorauswahl.getSelectedIndikator()==='undefined') {
                             indikatorauswahl.setIndicator('S12RG');
                         }
+                    }
+                },
+                {
+                    element:"#zeit_slider",
+                    title:"Zeitslider",
+                    content:"Verändern Sie den Zeitschnitt des Indikators",
+                    onShow:function(){
+                        helper.highlightElementByID(this.element.replace("#",""));
+
+                    },
+                    onNext:function(){
+                        helper.resetHighlightElementByID(this.element.replace("#",""));
                         helper.slideUpElementByID('drop_kat');
                         helper.slideDownElementByID('dropdown_raumgl');
                     }
@@ -70,7 +82,7 @@ const webTour={
 
                     },
                     onNext:function(){
-                        helper.resetHighlightElementByID(this.element.replace(".",""))
+                        helper.resetHighlightElementByID(this.element.replace(".",""));
                     }
                 },
                 {
@@ -123,6 +135,7 @@ const webTour={
                         helper.slideUpElementByID('dropdown_layer');
                     }
                 },
+                //Tools
                 {
                     element: "#hh_sf_dropdown_werkzeug",
                     title: "Werkzeuge",
@@ -132,6 +145,18 @@ const webTour={
                     },
                     onNext: function () {
                         helper.slideUpElementByID('dropdown_werkzeug');
+                    }
+                },
+                //analyse
+                {
+                    element:"#hh_sf_analyse",
+                    title:"Analayse",
+                    content:"Visualisierungen um Indikatoranalysen zu unterstützen",
+                    onShow: function () {
+                        helper.slideDownElementByID('dropdown_analyse');
+                    },
+                    onNext: function () {
+                        helper.slideUpElementByID('dropdown_analyse');
                     }
                 },
                 {
@@ -183,6 +208,19 @@ const webTour={
                     placement: "left",
                     onNext:function(){
                         expand_panel.close();
+                    }
+                },
+                //checkboxes inside Table
+                {
+                    element:"#checkbox_12060",
+                    title:"Markierung",
+                    ppacement:"left",
+                    content:"Markieren Sie Gebiete in der Tabelle",
+                    onShown: function(){
+                        helper.highlightElementByID(this.element.replace("#",""));
+                    },
+                    onNext: function () {
+                        helper.highlightElementByID(this.element.replace("#",""));
                     }
                 },
                 {
@@ -260,6 +298,7 @@ const webTour={
                         $('#legende').css("width", "250px");
                         $('#dropdown_datenalter').hide();
                         $('#histogramm_pic').css("margin-left", "0px");
+                        $('#help').click();
                     }
                 },
                 {

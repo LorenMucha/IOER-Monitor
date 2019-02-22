@@ -16,16 +16,27 @@ const filter_panel = {
         return $elem;
     },
     init:function(){
+        this.create();
         this.fill();
         this.controller.set();
 
+    },
+    create:function(){
+       $('#filter_div').html(`
+        <div id="panel_close_filter" class="close_table">
+            <span title="Tabelle schließen" class="glyphicon glyphicon-remove checker float-right"></span>
+            </div>
+            <div class="title_filter_table">Tabelle filtern</div>
+            <hr class="hr"/>
+        <div class="ui form" id="filter_form"></div>
+        `);
     },
     fill:function(){
         let not_showing=["ror","lks","kfs","g50","stt"],
             raumgl = gebietsauswahl.getSelectionAsString();
 
-        if(raumgliederung.getSelectedId()){
-            raumgl = raumgliederung.getSelectedId();
+        if(raumgliederung.getSelectionId()){
+            raumgl = raumgliederung.getSelectionId();
         }
         if($.inArray(raumgl,not_showing)!==-1){
             helper.disableElement('#filter_table',"Keine möglichen Filteroptionen");

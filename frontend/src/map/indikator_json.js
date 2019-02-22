@@ -2,17 +2,15 @@ const indikator_json = {
     json_layer : '',
     json_file:'',
     hover:true,
-    setJSONLayer:function(_layer){
-        this.json_layer = _layer;
-    },
+    ags_count:false,
     getJSONLayer:function(){
         return this.json_layer;
     },
-    setJSONFile:function(_json){
-        this.json_file=_json;
-    },
     getJSONFile:function(){
         return this.json_file;
+    },
+    getAGSCount:function(){
+        return this.ags_count;
     },
     init:function(raumgl, callback) {
         const object = this;
@@ -34,9 +32,13 @@ const indikator_json = {
 
         //info how much geomtries will be created and afterwards stat the creation
         $.when(request_manager.getCountGeometries(raumgliederung_set)).done(function (x) {
-            setTimeout(function () {
-                progressbar.setHeaderText("Lade " + x[0].count + " Gebiete");
-            }, 100)
+                var interval = setInterval(function () {
+                    if (progressbar.getContainer().is(":visible")) {
+                        clearInterval(interval);
+                        indikator_json.ags_count = x[0].count;
+                        progressbar.setHeaderText("Lade " + x[0].count + " Gebiete");
+                    }
+                },10);
         });
 
         $.when(request_manager.getGeoJSON(ind, time, raumgliederung_set, ags_set,klassenanzahl.getSelection(),klassifzierung.getSelectionId()))
@@ -53,26 +55,32 @@ const indikator_json = {
                 }
 
                 object.addToMap();
-                table.create();
-                gebietsauswahl.init();
-                //add the farbschema
+                //add the farbschema if indicator ddm is loaded
                 var interval = setInterval(function () {
+                    //if all indictaor values are ready
                     if (indikatorauswahl.getPossebilities()) {
                         clearInterval(interval);
                         //add the farbschema
                         farbschema.init();
-                        grundakt_layer.init(raumgliederung_set);
+                        table.fill();
+                        gebietsauswahl.init();
+                        if(exclude.checkPerformanceAreas()) {
+                            grundakt_layer.addToLegende({raumgl:raumgliederung_set});
+                        }
                         legende.fillContent();
+                        page_init = false;
+                        //set the callback
+                        if (callback) callback();
                     }
-                }, 100)
-                if (callback) callback();
+                    //if table is ready
+                }, 100);
             });
-
-        page_init = false;
     },
     addToMap:function(geoJson_set, klassenJson_set){
         const object = this;
         let geoJson = this.json_file;
+        //close all existing popus
+        this.closePopUp();
         //optional parameter for undependant creation
         if(geoJson_set){
             geoJson = geoJson_set;
@@ -104,19 +112,18 @@ const indikator_json = {
             style: object.setStyle,
             onEachFeature: onEachFeature
         });
-
-        jsongroup.addLayer(object.json_layer).addTo(map);
+        //add the layer to map
+        indikator_json_group.add(object.json_layer);
+        indikator_json_group.addToMap();
+        //create the banner
         map_header.set();
-        if($('.right_content').is(":hidden")){
-            progressbar.remove();
-        }
         if(layer_control.zusatzlayer.getState()){layer_control.zusatzlayer.setForward()}
     },
     setPopUp:function(e){
         let text={
                 de:{
-                    profil:"Indikatorwertübersicht",
-                    profil_title:"Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren",
+                    profil:"Wertübersicht",
+                    profil_title:"Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren",
                     stat:"Statistik",
                     stat_title:"Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators",
                     trend:dev_chart.text[language_manager.getLanguage()].title[false],
@@ -126,7 +133,7 @@ const indikator_json = {
                 },
                 en:{
                     profil:"Indicator value overview",
-                    profil_title:"Area profile: Characteristic of this room unit with value overview of all indicators",
+                    profil_title:"Characteristic of this room unit with value overview of all indicators",
                     stat:"Statistics",
                     stat_title:"Indicator value of the territorial unit in relation to statistical characteristics of the spatial selection and the selected indicator",
                     trend:"Trend Indicator",
@@ -141,54 +148,60 @@ const indikator_json = {
             value_ags = layer.feature.properties.value_comma,
             einheit = layer.feature.properties.einheit,
             ags = layer.feature.properties.ags,
-            grundakt = $('#'+ags).find('.td_akt').text(),
             val_d = helper.dotTocomma(value_ags),
             //fc = Fehlercode
             fc = layer.feature.properties.fc.toString(),
             div,
             id_popup = ags.toString().replace(".",""),
-            gebietsprofil = `<div><img id="pop_up_gebietsprofil_${id_popup}" title="${text[lan].profil_title}" src="frontend/assets/icon/indikatoren.png"/><b> ${text[lan].profil}</b></div>`,
-            statistik = `<div><img title="${text[lan].stat_title}" id="pop_up_diagramm_ags_${id_popup}" src="frontend/assets/icon/histogramm.png"/><b>  ${text[lan].stat}</b></div>`,
-            indikatorwertentwicklung = `<div><img class="dev_chart_trend" id="pop_up_diagramm_ind_ags_${id_popup}" title="${text[lan].trend_title}" src="frontend/assets/icon/indikatoren_verlauf.png"/><b class="dev_chart_trend">  ${text[lan].trend}</b></div>`,
-            entwicklungsdiagramm = `<div><img class="dev_chart_compare" id="pop_up_diagramm_entwicklung_ags_${id_popup}" title="${text[lan].compare}" src="frontend/assets/icon/indikatoren_diagr.png"/><b class="dev_chart_compare">  ${text[lan].compare}</b></div>`;
+            gebietsprofil = `<div class="cursor w-100" id="pop_up_gebietsprofil_${id_popup}">
+                                <b class="float-right w-75 wordbreak">${text[lan].profil}</b>
+                                <img title="${text[lan].profil_title}" 
+                                     style="margin-right: .5vh;" 
+                                     src="frontend/assets/icon/indikatoren.png"/>
+                             </div>`,
+            statistik = `<div class="cursor w-100" id="pop_up_diagramm_ags_${id_popup}">
+                              <b class="float-right w-75">${text[lan].stat}</b>
+                              <img title="${text[lan].stat_title}" 
+                                src="frontend/assets/icon/histogramm.png"/>
+                         </div>`,
+            indikatorwertentwicklung = `<div class="mobile_hidden dev_chart_trend oneTime ${exclude.class_performance} cursor w-100" id="pop_up_diagramm_ind_ags_${id_popup}">
+                                            <b class="float-right w-75">${text[lan].trend}</b>
+                                            <img data-title="${text[lan].trend_title}" 
+                                                title="${text[lan].trend_title}"
+                                                style="margin-right: 1.3vh;" 
+                                                src="${dev_chart.icon.single.path}"/>
+                                        </div>`,
+            entwicklungsdiagramm = `<div class="mobile_hidden dev_chart_compare ${exclude.class_performance} oneTime cursor w-100" id="pop_up_diagramm_entwicklung_ags_${id_popup}" >
+                                            <b class="wordbreak float-right w-75">${text[lan].compare}</b>
+                                            <img data-title="${text[lan].compare}" 
+                                                title="${text[lan].compare}"
+                                                style="margin-right: 1.3vh;"  
+                                                src="${dev_chart.icon.multiple.path}"/>
+                                    </div>`;
 
-        //remove chart on mobile phones to save space
-        if(main_view.getMobileState()) {
-            entwicklungsdiagramm = '';
-            indikatorwertentwicklung = '';
-        }
 
-        if(fc !== '0'){
+        if(fc !== '0') {
             //get the single values of each fc
             let arr = fc.split("||");
             let text = arr[2];
             let color = arr[1];
-            div = $('<div class="PopUp">' +
-                '<div>' +
-                '<div><b style="color:red">'+text+'</b></div>' +
-                '</div>')[0];
-        }else if(!grundakt){
-            div =  $('<div class="PopUp">' +
-                '<div>' +
-                '<b>'+gen+': '+'</b>'+val_d+' '+einheit+'' +
-                '</div>' +
-                '<hr class="hr"/> '+
-                '<div id="pop_up_interactions">'+
-                gebietsprofil+statistik+indikatorwertentwicklung+entwicklungsdiagramm+
-                '</div>'+
-                '</div>')[0];
-        }
-        else{
-            div =  $('<div class="PopUp">' +
-                '<div>' +
-                '<b>'+gen+': '+'</b>'+val_d+' '+einheit+'' +
-                '</div>' +
-                '<div>Grundaktualität: '+grundakt+'</div>' +
-                '<hr class="hr"/> '+
-                '<div id="pop_up_interactions">'+
-                gebietsprofil+statistik+indikatorwertentwicklung+entwicklungsdiagramm+
-                '</div>'+
-                '</div>')[0];
+            div = $(`<div class="PopUp">
+                        <div><b style="color:red">${text}</b></div>
+                    </div>`)[0];
+        }else{
+            div =  $(`<div class="PopUp inline-block w-100">
+                        <div class="w-100">
+                            <div><b>${gen}</b></div>
+                             <hr class="hr"/> 
+                            <div><b>Indikatorwert:</b> ${val_d} ${einheit}</div>
+                        </div> 
+                        <div style="margin-top: 1vh;">
+                            ${gebietsprofil}
+                            ${statistik}
+                            ${indikatorwertentwicklung}
+                            ${entwicklungsdiagramm}
+                        </div>
+                        </div>`)[0];
         }
 
         let bounds = layer.getBounds();
@@ -221,13 +234,19 @@ const indikator_json = {
             dev_chart.chart.settings.ind_vergleich=false;
             dev_chart.open();
         });
-
-        //disable charts for community level
-        if(raumgliederung.getSelectedId()==='gem' || raeumliche_analyseebene.getSelectionId()==='gem'){
-            helper.disableElement(".dev_chart_compare","Steht für die Gemeindeebene nicht zur Verfügung");
-            helper.disableElement(".dev_chart_trend","Steht für die Gemeindeebene nicht zur Verfügung");
+        //disbale chart fdor excluded areas, needs to place here and not in exclude because of it´s dynamic content
+        if(!exclude.checkPerformanceAreas()){
+            helper.disableElement(`#pop_up_diagramm_entwicklung_ags_${id_popup}`,exclude.disable_text);
+            helper.disableElement(`#pop_up_diagramm_ind_ags_${id_popup}`,exclude.disable_text);
+        }else{
+            helper.enableElement(`#pop_up_diagramm_entwicklung_ags_${id_popup}`,$(`#pop_up_diagramm_entwicklung_ags_${id_popup}`).data("title"));
+            helper.enableElement(`#pop_up_diagramm_ind_ags_${id_popup}`,$(`#pop_up_diagramm_ind_ags_${id_popup}`).data("title"));
         }
-
+    },
+    closePopUp:function(){
+        try {
+            map.closePopup();
+        }catch(err){}
     },
     /*/
     Set a Marker on the map with Lat Lon and Title f.eg. used inside the geographic search to tick the result inside the map
@@ -256,8 +275,8 @@ const indikator_json = {
     },
     highlightFeatureOnmouseover:function(e) {
             let layer = e.target;
-            if(indikator_json.hover) {
-                layer.setStyle(style.getActive());
+            if (indikator_json.hover) {
+                layer.setStyle(style.getHover());
                 if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                     layer.bringToFront();
                 }
@@ -268,22 +287,29 @@ const indikator_json = {
                 $('#legende_' + fillcolor + " i").css({
                     "width": "20px",
                     "height": "15px",
-                    "border": "2px solid " + farbschema.getColorActive()
+                    "border": "2px solid " + farbschema.getColorHexActive()
                 });
             } catch (err) {
             }
     },
     resetHighlight: function(e) {
-        let layer = e.target;
-        layer.setStyle(style.getLayerStyle(layer.feature.properties.value));
-        $('#thead').show();
-        $('#'+layer.feature.properties.ags).removeClass("hover");
-        layer_control.zusatzlayer.setForward();
-        try {
-            let fillcolor = layer.options.fillColor.replace('#', '');
-            $('#legende_' + fillcolor + " i").css({"width": "15px", "height": "10px", "border": ""});
-        }catch(err){
-            //console.log(err);
+        let layer = e.target,
+            ags = layer.feature.properties.ags,
+            ags_selection = table.selection,
+            test_select = function(){
+                return $.inArray(ags, ags_selection) >= 0;
+            };
+        if(!test_select()) {
+            layer.setStyle(style.getLayerStyle(layer.feature.properties.value));
+            $('#thead').show();
+            $('#' + ags).removeClass("hover");
+            layer_control.zusatzlayer.setForward();
+            try {
+                let fillcolor = layer.options.fillColor.replace('#', '');
+                $('#legende_' + fillcolor + " i").css({"width": "15px", "height": "10px", "border": ""});
+            } catch (err) {
+                //console.log(err);
+            }
         }
     },
     getStatistikArray:function(){

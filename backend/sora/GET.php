@@ -2,7 +2,7 @@
 header('Access-Control-Allow-Origin: *');
 header('Content-type: application/json; charset=utf-8');
 require("../database/MYSQL_TASKREPOSITORY.php");
-require("../HELPER.php");
+require("../models/Helper.php");
 
 $q =  $_GET["values"];
 $json_obj = json_decode($q, true);
@@ -13,7 +13,7 @@ $raumgliederung =$json_obj['ind']['raumgliederung'];
 $klassifizierung = $json_obj['ind']['klassifizierung'];
 $klassenanzahl = $json_obj['ind']['klassenzahl'];
 $ags_user = trim($json_obj['ind']['ags_array']);
-$colors =(object)$json_obj['ind']['colors'];
+$colors =(object)$json_obj['ind']['Colors'];
 $query = strtolower($json_obj['query']);
 
 try{
@@ -84,7 +84,7 @@ try{
         $json = substr($json, 0, -1);
         $json .="}";
         header('Content-type: application/json; charset=utf-8');
-        echo HELPER::get_instance()->escapeJsonString($json);
+        echo Helper::get_instance()->escapeJsonString($json);
     }
 }catch(Error $e){
     $trace = $e->getTrace();

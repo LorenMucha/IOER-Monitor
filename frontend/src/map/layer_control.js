@@ -30,7 +30,7 @@ const layer_control={
     },
     baselayer:{
         paramter:'baselayer',
-        layer_set: "",
+        layer_set: "topplus",
         baselayer_sw:{
             topplus:L.tileLayer.wms('https://sgx.geodatenzentrum.de/wms_topplus_web_open', {
                 layers: 'web_grau',
@@ -95,7 +95,8 @@ const layer_control={
         },
         getParameter:function(){
             if(!urlparamter.getUrlParameter(this.paramter)){
-                this.setParamter('webatlas');
+                //if not set replace it with the standard base layer
+                this.setParamter(layer_control.baselayer.layer_set);
             }
             return urlparamter.getUrlParameter(this.paramter);
         },
@@ -365,6 +366,14 @@ const layer_control={
                 });
         },
         setBaselayer:function(_id){
+            map.eachLayer(function(layer){
+                //not working for all layer so try
+                try{
+                    if(layer.options.id==="baselayer"){
+                        map.removeLayer(layer);
+                    }
+                }catch(err){}
+            });
             $.each(layer_control.baselayer.getBaseLayerGroup_set(), function (key, value) {
                 if (_id.indexOf(value.options.name) >= 0) {
                     layer_control.baselayer.layer_set = value;
@@ -372,8 +381,6 @@ const layer_control={
                     value.bringToBack();
                     layer_control.baselayer.updateParamter(_id);
                     dialog_manager.close();
-                }else{
-                    map.removeLayer(value);
                 }
             });
         },

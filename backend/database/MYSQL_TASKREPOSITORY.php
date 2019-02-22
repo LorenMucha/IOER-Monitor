@@ -11,7 +11,7 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
 
         return self::$instance;
     }
-
+    //Query all the existing categories for `gebiete`
     public function getAllCategoriesGebiete(){
         $sql= $sql_kategorie = "SELECT * FROM m_thematische_kategorien, m_them_kategorie_freigabe
                         WHERE m_thematische_kategorien.ID_THEMA_KAT = m_them_kategorie_freigabe.ID_THEMA_KAT
@@ -19,6 +19,7 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
                         GROUP BY SORTIERUNG_THEMA_KAT";
         return $this->query($sql);
     }
+    //Query all the existing categories for `raster`
     public function getAllCategoriesRaster(){
         $sql = "select * from m_thematische_kategorien, m_indikatoren, d_raster 
                 where m_thematische_kategorien.ID_THEMA_KAT = m_indikatoren.ID_THEMA_KAT 
@@ -28,6 +29,7 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
                 order by m_thematische_kategorien.sortierung_thema_kat";
         return $this->query($sql);
     }
+    //Query all the possible spatial extends for a single indicator and a given modus (raster or gebiete)
     public function getSpatialExtend($modus,$year,$ind){
         $sql_gebiete = "SELECT i.ID_INDIKATOR, i.RAUMEBENE_BLD,i.RAUMEBENE_ROR,i.RAUMEBENE_KRS,i.RAUMEBENE_LKS,
                             i.RAUMEBENE_KFS,i.RAUMEBENE_VWG,i.RAUMEBENE_GEM,i.RAUMEBENE_G50,i.RAUMEBENE_STT
@@ -46,12 +48,14 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
             return $this->query($sql_gebiete);
         }
     }
-    /* Get all sorts of names for the spatial structure ----------------------------------*/
+    // Get all sorts of names for the spatial structure like Bundesland, Raumordnungsregionen...
     public function getSpatialExtendDictionary(){
         $sql = "SELECT Raumgliederung_HTML as name, NAME_EN as name_en, DB_KENNUNG as id, Sortierung as order_id from v_raumgliederung Group By NAME order by Sortierung";
         return $this->query($sql);
     }
-    /*Get all indicator values in a spatial extend als the difference between BRD-AGS and KRS-AGS if set*/
+    /*Get all indicator values in a spatial extend and the difference between BRD-AGS and KRS-AGS if set, needed for the dropdown menu
+    -> result is a json with all the necessary information inside which are needed to create the map
+    */
     public function getAllIndicatorValuesInAGS($year,$ags,$diff_brd,$diff_krs){
         $sql_krs = "";
         $sql_brd="";
@@ -108,12 +112,13 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
 
         return $this->query($sql);
     }
+    // get all the indicator values and specific informations like `Grundaktualität` for a special Indicator selected by year, id and it´s ags
     public function getIndicatorValuesByAGS($year,$indikator_id,$ags){
         $sql = "SELECT i.INDIKATORWERT AS value, i.ID_INDIKATOR as ind, z.EINHEIT as einheit,i.FEHLERCODE as fc, i.HINWEISCODE as hc, i.AGS as ags, z.RUNDUNG_NACHKOMMASTELLEN as rundung,
                                 COALESCE((SELECT x.INDIKATORWERT FROM m_indikatorwerte_".$year." x WHERE x.ID_INDIKATOR = 'Z00AG' AND x.ags=i.AGS AND x.INDIKATORWERT <=".$year."),0) as grundakt_year,
                                 COALESCE((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS =i.AGS AND y.INDIKATORWERT <= ".$year."),0) as grundakt_month,
                                 z.MITTLERE_AKTUALITAET_IGNORE as grundakt_state,
-                                z.INDIKATOR_NAME_KURZ as name,
+                                z.INDIKATOR_NAME as name,
                                 (SELECT FARBWERT_MAX FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$indikator_id."') as color_max,
                                 (SELECT FARBWERT_MIN FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$indikator_id."') as color_min
                                 FROM m_indikatorwerte_" . $year . " i, m_indikator_freigabe f, m_indikatoren z
@@ -121,8 +126,8 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
                                 AND f.STATUS_INDIKATOR_FREIGABE = " . $this->berechtigung . "
                                 And z.ID_INDIKATOR = f.ID_INDIKATOR
                                 AND i.AGS = '".$ags."'
-                                and not i.AGS='99'
-                                Group by i.AGS";
+                                Group By i.AGS";
+
         return $this->query($sql);
     }
     /* get only the single AGS-value for a given Indicator*/
@@ -133,7 +138,7 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
         $rs = $this->query($sql);
         return $rs[0]->value;
     }
-    /* function to get all values in a given terretory for instance saxony
+    /* function to get all values in a given spatial extend for instance saxony
         - $ags is a example AGS inside the ags array, f.eg. the first value to calculate the digit length
     */
     public function getIndicatorValuesInSpatialExtend($year, $indikator_id, $ags , $ags_user_array){
@@ -170,7 +175,8 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
         }
        return $this->query($sql);
     }
-    function getIndicatorPossibleTimeArray($ind, $modus, $exclude_year)
+    // get all the possible time shifts for a given indicator, it is also possible to exclude specific years
+    public function getIndicatorPossibleTimeArray($ind, $modus, $exclude_year)
     {
         $times = array();
         if ($modus === 'gebiete') {
@@ -209,7 +215,8 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
         });
         return $times;
     }
-    function checkIndicatorAvability($indikator,$modus)
+    //check if a indicator is avaliable for the given modus (raster, gebiete) needed for the switch between raster and svg maps
+    public function checkIndicatorAvability($indikator,$modus)
     {
         $query = "SELECT ID_INDIKATOR, Jahr FROM m_indikator_freigabe WHERE ID_INDIKATOR = '" . $indikator . "' AND STATUS_INDIKATOR_FREIGABE ='".$this->berechtigung."' Group by Jahr";
         if($modus==='raster') {
@@ -223,7 +230,7 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
                 return false;
             }
     }
-    function getIndicatorGrundaktualitaet($ags, $year){
+    public function getIndicatorGrundaktualitaet($ags, $year){
         $sql_year = "SELECT INDIKATORWERT as value FROM m_indikatorwerte_" . $year . " WHERE ID_INDIKATOR = 'Z00AG' and AGS ='" . $ags . "' AND INDIKATORWERT <= " . $year . " ";
         $sql_month = "SELECT INDIKATORWERT as value FROM m_indikatorwerte_" . $year . " WHERE ID_INDIKATOR = 'Z01AG' and AGS ='" . $ags . "' AND INDIKATORWERT <= " . $year . " ";
 
@@ -238,27 +245,22 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
             return $rs_akt_year[0]->value."/".$rs_akt_mon[0]->value;
         }
     }
-    function getIndicatorRundung($indicator_id){
-        $sql = "SELECT * FROM m_indikatoren WHERE ID_INDIKATOR='" . $indicator_id . "'";
-        $rs = $this->query($sql);
-        return $rs->RUNDUNG_NACHKOMMASTELLEN;
-    }
-    function getIndicatorValueForBRD($indicator_id,$year){
+    public function getIndicatorValueForBRD($indicator_id,$year){
         $sql = "Select INDIKATORWERT as value FROM m_indikatorwerte_" . $year . " where ID_INDIKATOR ='".$indicator_id."' AND AGS = '99'" ;
         $rs = $this->query($sql);
         return $rs[0]->value;
     }
-    function getIndicatorColors($ind){
+    public function getIndicatorColors($ind){
         $sql = "SELECT FARBWERT_MAX as max,FARBWERT_MIN as min FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$ind."'";
         $rs = $this->query($sql);
         return $rs[0];
     }
-    function getGrundaktState($ind){
+    public function getGrundaktState($ind){
         $sql = "SELECT MITTLERE_AKTUALITAET_IGNORE as value FROM m_indikatoren where ID_INDIKATOR = '".$ind."'";
         $rs = $this->query($sql);
         return intval($rs[0]->value);
     }
-    function getPostGreYear($year){
+    public function getPostGreYear($year){
         $sql = "select PostGIS_Tabelle_Jahr from v_geometrie_jahr_viewer_postgis where Jahr_im_Viewer =".$year;
         $rs = $this->query($sql);
         return intval($rs[0]->PostGIS_Tabelle_Jahr);

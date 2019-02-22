@@ -1,13 +1,13 @@
 <?php
 require_once('database/POSTGRESQL_TASKRESPOSITORY.php');
 require_once('database/MYSQL_TASKREPOSITORY.php');
-require_once('ERRORS.php');
-require_once('NOTES.php');
-require_once('HELPER.php');
+include_once 'models/NOTES.php';
+include_once 'models/Helper.php';
 require_once('CACHE_MANAGER.php');
-require_once ('COLORS.php');
+include_once 'models/Colors.php';
+include_once 'models/Errors.php';
 
-class JSON
+class Json
 {
     protected static $instance = NULL;
     private $json;
@@ -78,7 +78,7 @@ class JSON
                                 $text_hc = "0";
                             }
 
-                            $fc = ERRORS::get_instance()->getCodeValues(intval($fc_id));
+                            $fc = Errors::get_instance()->getCodeValues(intval($fc_id));
                             if ($fc != 0) {
                                 $fc = $fc_id . "||" . $fc[0]["color"] . "||" . $fc[0]["name"] . "||" . $fc[0]["description"];
                             }
@@ -104,10 +104,10 @@ class JSON
                 $id = '';
                 foreach ($row_postgre as $key => $val) {
                     if ($key != "geojson") {
-                        $props .= (strlen($props) > 0 ? ',' : '') . '"' . $key . '":"' . HELPER::get_instance()->escapeJsonString($val) . '"';
+                        $props .= (strlen($props) > 0 ? ',' : '') . '"' . $key . '":"' . Helper::get_instance()->escapeJsonString($val) . '"';
                     }
                     if ($key == "id") {
-                        $id .= ',"id":"' . HELPER::get_instance()->escapeJsonString($val) . '"';
+                        $id .= ',"id":"' . Helper::get_instance()->escapeJsonString($val) . '"';
                     }
                 }
 

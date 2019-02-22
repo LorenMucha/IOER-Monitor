@@ -50,7 +50,7 @@ const legende = {
                 return map_content.height()*(1/2)
             },
             close_icon = this.getCloseIconObject(),
-            show_button_grp = $(".btn-group-map"),
+            show_button_grp = $("#btn-group-map"),
             legende_container = this.getDOMObject();
         //only for Multiview
         if(view_state.getViewState()==="mw"){
@@ -71,6 +71,8 @@ const legende = {
             close_icon.css("right","30px");
         }
         legende_container.css({"max-height":height(),"width":width});
+        //restore if window resize
+        legende.getShowButtonObject().show();
     },
     init:function(){
         const legende = this;
@@ -110,21 +112,19 @@ const legende = {
             <div id="histogramm_pic"></div>
             <div class="hist_info"></div>
             <div id="datenalter_container">
-                <button class="btn btn-primary btn_dropdown" id="datenalter">
+                <button class="btn btn-primary btn_dropdown ${exclude.class_performance}" id="datenalter" data-title="Zeige die Karte des Datenalters" title="Zeige die Karte des Datenalters">
                     <i class="glyphicon glyphicon-chevron-down drop_arrow"></i>
                     <span>Datenalter</span>
                 </button>
                 <div id="dropdown_datenalter">
                     <div id="grundakt_titel">&#160;</div>
                     <div id="grundakt_legende"></div>
-                    <div id="grundaktmap" class="grundaktmap_click"></div>
-                    <div id="hover_info_grundaktmap" class="grundaktmap_click">Ein und Ausblenden der Grundaktualität im Kartenfenster (hier klicken)</div>
+                    <div id="grundaktmap" class="grundaktmap_click cursor" title="Ein und Ausblenden der Grundaktualität im Kartenfenster (hier klicken)"></div>
                 </div>
             </div>
         </div>
       `;
         this.getDOMObject().html(html);
-        //diable or enable datenalter BTN if not avaliable
     },
     fillContent:function() {
         const object = this;
@@ -138,13 +138,11 @@ const legende = {
             info_json = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()];
 
         //close datenalter
-        if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
-            helper.enableElement("#datenalter","Zeige die Karte des Datenalters.");
+        if(indikatorauswahl.getSelectedIndiktorGrundaktState() && exclude.checkPerformanceAreas()){
             if( object.getDatenalterContainerObject().find('#dropdown_datenalter').is(":visible")){
                 object.getDatenalterContainerObject().find('#dropdown_datenalter').show();
             }
         }else{
-            helper.disableElement("#datenalter","Für die Auswahl nicht verfügbar.");
             object.getDatenalterContainerObject().find('#dropdown_datenalter').hide();
         }
 
@@ -247,7 +245,7 @@ const legende = {
       return this.getDOMObject().is(":visible");
     },
     close: function(){
-        let show_button = $(".btn-group-map"),
+        let show_button = $("#btn-group-map"),
             legende_container = this.getDOMObject();
         legende_container.hide('slow',function(){});
         if(view_state.getViewState()!=='responsive'){

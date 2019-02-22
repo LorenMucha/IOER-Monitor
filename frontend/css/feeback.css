@@ -1,0 +1,27 @@
+/*
+Feedack
+ */
+#feedback_div{
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+#feedback_div .feeback_label{
+    margin-top: 10px;
+}
+#feedback_div .feedback_form{
+    margin: 10px;
+}
+#feedback_div .inputGroupContainer {
+    width: 100%;
+    box-sizing: border-box;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing: border-box;
+}
+#feedback_div .input_feedback{
+    width: 100%;
+}
+#feedback_div .btn-group-feedback{
+    float: left;
+    margin: 10px;
+}

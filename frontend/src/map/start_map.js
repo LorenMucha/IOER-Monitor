@@ -21,6 +21,14 @@ const start_map= {
 
         $('.kennblatt').hide();
         legende.close();
+        $('#drop_kat').slideDown();
+        //if menu is ready show it
+        var interval = setInterval(function () {
+            if (indikatorauswahl.getPossebilities()) {
+                indikatorauswahl.openMenu();
+                clearInterval(interval);
+            }
+        });
     },
     remove:function(){
         try{
@@ -28,6 +36,6 @@ const start_map= {
         }catch(err){}
         this.state=false;
         layer_control.init();
-        map_infos.show();
+        map_header.show();
     }
 };

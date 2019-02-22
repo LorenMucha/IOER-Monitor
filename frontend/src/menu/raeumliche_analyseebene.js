@@ -31,7 +31,14 @@ const raeumliche_analyseebene = {
     },
     getSelectionText:function(){
         if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete') {
-            return this.getDOMObject().find('#Raumgliederung').find("option:selected").text().replace("- nur", "").replace("-", "");
+            return this
+                .getDOMObject()
+                .find('#Raumgliederung')
+                .find("option:selected")
+                .text()
+                .replace("* nur", "")
+                .replace("-", "")
+                .replace("ab 50 000 Ew.","");
         }else {
             return rasterweite_slider.steps[(rasterweite_slider.getParameter())];
         }
@@ -90,37 +97,37 @@ const raeumliche_analyseebene = {
 
             //check if raumgl fein is set or not -> standrad map create
             let parameter_ags = urlparamter.getUrlParameter('ags_array');
-            let selection_fein = raumgliederung.getSelectedId();
-            if (!raumgliederung.getSelectedId() && !parameter_ags) {
+            let selection_fein = raumgliederung.getSelectionId();
+            if (!raumgliederung.getSelectionId() && !parameter_ags) {
                 indikator_json.init();
             } else {
                 //check if parameter are set
                 if (parameter_ags) {
                     //set the ddm grob map
-                    indikator_json.init(menu.getSelectionId(),
-                        function () {
-                            //reacreate the ddm grob
-                            let ags_set = parameter_ags.split(',');
-                            page_init = true;
-                            gebietsauswahl.getDOMObject()
-                                .dropdown('refresh')
-                                .dropdown('set selected', ags_set);
-                            if (selection_fein) {
-                                //check if the parameter is possible for the given indicator
-                                raumgliederung.init();
-                                if ($.inArray(selection_fein, menu.range) !== -1) {
-                                    $('#raumgl_fein' + selection_fein).prop("selected", true);
-                                    indikator_json.init(selection_fein);
-                                } else {
-                                    indikator_json_group.clean();
-                                    alert_manager.alertNotinSpatialRange($('#Raumgliederung option:selected').text(), $('#Raumgliederung option:selected').val());
-                                    if (menu.range.length < 1) {
-                                        raumgliederung.hide();
-                                    }
+                    let callback=function(){
+                        let ags_set = parameter_ags.split(',');
+                        console.log(ags_set);
+                        page_init = true;
+                        gebietsauswahl.getDOMObject()
+                            .dropdown('refresh')
+                            .dropdown('set selected', ags_set);
+
+                        if (selection_fein) {
+                            //check if the parameter is possible for the given indicator
+                            raumgliederung.init();
+                            if ($.inArray(selection_fein, menu.range) !== -1) {
+                                $('#raumgl_fein' + selection_fein).prop("selected", true);
+                                indikator_json.init(selection_fein);
+                            } else {
+                                indikator_json_group.clean();
+                                alert_manager.alertNotinSpatialRange($('#Raumgliederung option:selected').text(), $('#Raumgliederung option:selected').val());
+                                if (menu.range.length < 1) {
+                                    raumgliederung.hide();
                                 }
                             }
                         }
-                    );
+                    };
+                    indikator_json.init(menu.getSelectionId(),callback);
                 }
             }
         }
@@ -147,6 +154,9 @@ const raeumliche_analyseebene = {
                 .find('#Raumgliederung')
                 .unbind()
                 .change(function () {
+                    if(!raumgliederung.getSelectionId()) {
+                        table.clearSelection();
+                    }
                     changed = true;
                     let choice = $(this).val();
                     //start the pipeline

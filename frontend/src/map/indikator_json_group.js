@@ -1,5 +1,6 @@
 var jsongroup = new L.FeatureGroup();
 const indikator_json_group = {
+    //for highlighting layer on table mouseover
     highlight:function(ags, fit_bounds){
         try {
             jsongroup.eachLayer(function (layer) {
@@ -10,13 +11,10 @@ const indikator_json_group = {
                             let bounds = layer.getBounds();
                             map.fitBounds(bounds);
                         }
-                        layer.setStyle(style.getActive());
+                        layer.setStyle(style.getHover());
                         if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                             layer.bringToFront();
                         }
-                        return false;
-                    } else {
-                        return false;
                     }
                 });
             });
@@ -24,10 +22,16 @@ const indikator_json_group = {
     },
     resetHightlight:function(){
         try {
+            let ags_selection = table.selection;
             jsongroup.eachLayer(function (layer) {
                 layer.eachLayer(function (layer) {
-                    layer.setStyle(style.getLayerStyle(layer.feature.properties.value));
-                    return false;
+                    let ags = layer.feature.properties.ags,
+                        test_select = function(){
+                            return $.inArray(ags, ags_selection) >= 0;
+                        };
+                    if(!test_select()) {
+                        layer.setStyle(style.getLayerStyle(layer.feature.properties.value));
+                    }
                 });
             });
         }catch(err){}
@@ -45,7 +49,12 @@ const indikator_json_group = {
     },
     clean:function(){
         jsongroup.clearLayers();
-        jsongroup_grund.clearLayers();
+    },
+    add:function(layer){
+        jsongroup.addLayer(layer);
+    },
+    addToMap(){
+      jsongroup.addTo(map);
     },
     getLayerArray:function(exluded_areas){
         let ags_array = [];
@@ -81,5 +90,16 @@ const indikator_json_group = {
             });
         });
         return ags_array;
+    },
+    getAGSArray:function(){
+        let values = [];
+        jsongroup.eachLayer(function (layer) {
+            layer.eachLayer(function (layer) {
+                let ags_feature = layer.feature.properties.ags,
+                    name = layer.feature.properties.gen;
+                values.push({id:ags_feature,name:name});
+            });
+        });
+        return values;
     }
 };

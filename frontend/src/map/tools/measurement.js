@@ -35,35 +35,33 @@ const measurement={
                 secondaryLengthUnit: 'meters',
                 captureZIndex: 10000,
                 primaryAreaUnit: 'hectares',
-                activeColor: farbschema.getColorActive(),
-                completedColor: farbschema.getColorMain(),
+                activeColor: farbschema.getColorHexActive(),
+                completedColor: farbschema.getColorHexMain(),
                 position: 'topleft',
                 localization: 'de',
                 collapsed: false
             });
-            if(this.info_leave==0){
-                alert_manager.leaveESCInfo();
-                this.info_leave=1;
+            if(this.info_leave<=2){
+                alert_manager.leaveESCInfo("Starten Sie mit dem setzen der Messpunkte","Verlassen Sie die Funktion mit ESC");
+                this.info_leave+=1;
             }
             $('.toolbar').toggleClass("toolbar_close", 500);
-            this.getDOMContainer().css('background-color', farbschema.getColorActive());
+            this.getDOMContainer().css('background-color', farbschema.getColorHexActive());
             elementM.addTo(map);
-            $('.leaflet-control-measure-toggle ')
-                .animate({"width": "80px", "height": "80px"}, 1000,
-                    function () {
-                        $(this).css({"width": "40px", "height": "40px"})
-                    });
             this.set = true;
             this.surveyElement = elementM;
             indikator_json.hover=false;
+            elementM. _startMeasure();
+            $('.leaflet-control-measure-toggle.js-toggle').remove();
+            $('.leaflet-control-measure-interaction.js-interaction').show();
         }catch(err){}
     },
     remove:function(){
         try {
             this.surveyElement.remove();
         }catch(err){}
-        this.getDOMContainer().css('background-color','#4E60AA;');
-        this.set=false;
+        measurement.getDOMContainer().css('background-color',farbschema.getColorHexMain());
+        measurement.set=false;
         indikator_json.hover=true;
     }
 };

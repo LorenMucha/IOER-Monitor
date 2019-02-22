@@ -2,13 +2,13 @@ const feedback={
     endpoint_id:"feedback_div",
     text:{
         de:{
-            like:'Wie gefällt Ihnen unser neuer IÖR-Monitor ?</b><br/>Lassen Sie es uns wissen',
+            like:'Haben Sie Anregungen oder Wünsche ?</b><br/>Lassen Sie es uns wissen',
             message:"Nachricht",
             send:"Senden",
             cancel:"Abbrechen"
         },
         en:{
-            like:'How do you like our new IÖR monitor? </b><br/> Let us know',
+            like:'Do you have suggestions or wishes ? </b><br/> Let us know',
             message:"Message",
             send:"Send",
             cancel:"Cancel"
@@ -60,10 +60,13 @@ const feedback={
                             </div>
             `);
         //settings for the manager
-        dialog_manager.instructions.endpoint = `${this.endpoint_id}`;
-        dialog_manager.instructions.html= html;
-        dialog_manager.instructions.title="Feedback";
-        dialog_manager.instructions.modal=true;
+        let instructions = {
+            endpoint:`${this.endpoint_id}`,
+            html:html,
+            title:"Feedback",
+            modal:true
+        };
+        dialog_manager.setInstruction(instructions);
         dialog_manager.create();
         this.controller.validate();
     },
@@ -145,7 +148,7 @@ const feedback={
                 message = selector.find("#message").val(),
                 url = 'https://monitor.ioer.de/monitor_api/email/';
 
-            request_manager.sendMail(name,email,message);
+            request_manager.sendMailFeedback(name,email,message);
             //close the dialog
             dialog_manager.content.remove();
         }

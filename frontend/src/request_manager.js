@@ -1,6 +1,6 @@
 const request_manager={
     call:false,
-    url_backend:urlparamter.getURL_SVG()+"backend/query.php",
+    url_backend:urlparamter.getURLMonitor()+"backend/query.php",
     //get the indicator-JSON
     getGeoJSON:function(ind,time,_raumgliederung,ags_array,_klassenanzahl,_klassifizierung){
         let colors = function(){
@@ -73,8 +73,7 @@ const request_manager={
     //get the needed values to expand the table, has it´s own parameters, because the logic is slightly different
     getTableExpandValues:function(expand_values,ags_array){
         let ags_set = indikator_json_group.getLayerArray(table.excludedAreas);
-        let raumgliederung_set = raeumliche_analyseebene.getSelectionId();
-        if(raumgliederung.getSelectedId()){raumgliederung_set=raumgliederung.getSelectedId();}
+        let raumgliederung_set = base_raumgliederung.getBaseRaumgliederungId();
         //optional ags array must include ags object {ags:01}
         if(ags_array){
             ags_set = ags_array;
@@ -87,11 +86,15 @@ const request_manager={
         let json = JSON.parse('{"ind":{"id":"'+indicator_id+'","ags_array":"'+ags+'"},"set":'+JSON.stringify(settings)+',"query":"getTrend"}');
         return this.sendRequestPHP({"file":json,"query":"getTrend","type":"POST","debug":false});
     },
-    sendMail:function(name,sender,message){
+    handleLink:function (setting){
+        let json = JSON.parse(`{"query":"maplink","setting": {"id": "${setting.id}","val": "${setting.val}"}}`);
+        return this.sendRequestPHP({"file":json,"query":"maplink","type":"POST","debug":false});
+    },
+    sendMailFeedback:function(name, sender, message){
         let json = {
             type:"GET",
             debug:false,
-            endpoint:"email",
+            endpoint:"email/",
             query:"send Mail",
             data: {
                 name:name,
@@ -99,6 +102,19 @@ const request_manager={
                 message:message
             }};
         console.log(json);
+        return this.sendRequestFlask(json)
+    },
+    sendMailError:function(name,message){
+        let json = {
+            type:"GET",
+            debug:false,
+            endpoint:"email/error",
+            query:"send Mail",
+            data: {
+                name:name,
+                message:message
+            }};
+        console.error(JSON.stringify(json));
         return this.sendRequestFlask(json)
     },
     sendRequestPHP:function(json){
@@ -115,8 +131,7 @@ const request_manager={
             },
             success:function(data){
                 if(json.debug){
-                    console.log(this.url);
-                    console.log(JSON.stringify(data));
+                    console.log(this.url,this.data,JSON.stringify(data));
                 }
             }
         });
@@ -127,7 +142,7 @@ const request_manager={
         this.call= $.ajax({
             async: true,
             type: json.type,
-            url: 'https://monitor.ioer.de/monitor_api/'+json.endpoint+"/",
+            url: 'https://monitor.ioer.de/monitor_api/'+json.endpoint,
             data: json.data,
             error:function(xhr, ajaxOptions, thrownError){
                 manager.onError( thrownError,json.query,this.url);
@@ -151,7 +166,7 @@ const request_manager={
             progressbar.remove();
             alert_manager.alertError();
             if(!window.location.href.includes("monitor_test")) {
-                this.sendMail(message.name, message.sender, message.message);
+                this.sendMailError(message.name, message.message);
             }
         }
     }
@@ -178,14 +193,10 @@ function getRasterMap(time,ind,_raumgliederung,klassifizierung,klassenanzahl,dar
 }
 //dialog
 function getStatistik(ags, name, wert){
-    let raumgliederung_txt = raeumliche_analyseebene.getSelectionText();
-    //set the value if Raumgl fein was set
-    if(raumgliederung.getSelectedId() != null){
-        raumgliederung_txt = raumgliederung.getSelectionText();
-    }
+    let raumgliederung_txt = base_raumgliederung.getBaseRaumgliederungId();
     return $.ajax({
         async:true,
-        url: urlparamter.getURL_SVG()+"backend/dialog/statistik.php",
+        url: urlparamter.getURLMonitor()+"backend/dialog/statistik.php",
         type: "POST",
         data: {
             ags: ags,

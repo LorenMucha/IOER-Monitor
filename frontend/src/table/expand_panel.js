@@ -65,7 +65,7 @@ const expand_panel = {
         return $elem;
     },
     getUebergeordneteKenngroessenObject:function(){
-        $elem = $('#expand_kenngroessen').hide();
+        $elem = $('#expand_kenngroessen');
         return $elem;
     },
     //hinweise
@@ -141,7 +141,7 @@ const expand_panel = {
         }
         //Kenngroesen
         let spatial_extend = function(){
-                let selection = raumgliederung.getSelectedId();
+                let selection = raumgliederung.getSelectionId();
                 if(!selection){selection = raeumliche_analyseebene.getSelectionId();}
                 return selection;
             },
@@ -194,6 +194,7 @@ const expand_panel = {
         }
     },
     init:function(){
+        this.create();
         this.fill();
         this.controller.set();
         //don`t enable function on mobile devices
@@ -203,6 +204,95 @@ const expand_panel = {
             this.enable();
         }
 
+    },
+    create:function(){
+        $('#tabelle_erweitern').html(`
+              <div id="panel_close" class="close_table">
+                        <span title="Tabelle schließen" class="glyphicon glyphicon-remove checker float-right cursor"></span>
+                    </div>
+                    <div id="hinweis_time_expand_linear" class="hinweis">
+                        <b style="color:red;" class="note">Hinweis:</b>
+                        <span>Anzeige von zusätzlichen Zeitschnitten und weiteren Kenngrößen nur bei Deaktivierung der Trendfortschreibung.</span>
+                    </div>
+                    <div id="ind_expand_container" class="ddm_expand">
+                        <span><b>Indikator zum Vergleich anfügen</b></span>
+                        <hr class="hr"/>
+                        <div id="indikator_choice_container_table" class="panel_choice_container">
+                            <div id="indicator_ddm_table" class="ui floating labeled selection selection multiple dropdown ddm_table">
+                                <input name="Indikatorauswahl" type="hidden"/>
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Bitte wählen.....</div>
+                                <div  id="kat_auswahl_table" class="menu"></div>
+                        </div>
+                        </div>
+                    </div>
+                    <div id="time_expand_conatier" class="ddm_expand">
+                        <span><b>Zeitschnitte anfügen</b></span>
+                        <hr class="hr"/>
+                        <div id="zeitschnitt_choice_container_table" class="panel_choice_container">
+                            <div id="zeitschnitt_ddm_table" class="ui selection multiple dropdown ddm_table">
+                                <input name="Indikatorauswahl" type="hidden">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Bitte wählen.....</div>
+                                <div  id="zeit_auswahl_table" class="menu"></div>
+                            </div>
+                            <div class="ui toggle checkbox">
+                                <input type="checkbox" id="selectall">
+                                <label>Alle Zeiten auswählen</label>
+                            </div>
+                            <div class="checkbox" id="differences_div">
+                                <label><input id="differences" type="checkbox" value=""/><span>Differenzen anzeigen</span></label>
+                            </div>
+                            <div id="hinweis_time" class="hinweis"><b style="color:red;" class="note">Hinweis:</b><span>Für Vergleiche können nur frühere Zeitschnitte angezeigt werden.</span></div>
+                            <div id="hinweis_time_expand_null" class="hinweis"><b style="color:red;" class="note">Hinweis:</b> Es ist nur ein Zeitschnitt verfügbar. </div>
+                        </div>
+                    </div>
+                    <div id="kenngroessen_expand_container" class="ddm_expand">
+                        <span><b>Weitere Kenngrößen zum Vergleich</b></span>
+                        <hr class="hr"/>
+                        <div id="kenngroessen_choice_container_table" class="panel_choice_container">
+                            <div id="kenngroessen_ddm_table" class="ui selection multiple dropdown ddm_table">
+                                <input name="Indikatorauswahl" type="hidden">
+                                <i class="dropdown icon"></i>
+                                <div id="kenngroessen_ddm_table_header" class="default text">Bitte wählen.....</div>
+                                <div  id="kenngroessen_auswahl_table" class="menu">
+                                    <div id="expand_abs" class="item" data-value="ABS">Absoluter Indikatorwert</div>
+                                    <div id="area_size" class="item" data-value="S00AG">Gebietsfläche</div>
+                                    <div id="expand_b00ag" class="item" data-value="B00AG">Einwohnerzahl</div>
+                                    <div id="expand_kenngroessen" class="item" data-value="UE_RaumSum">
+                                        <i class="dropdown icon left"></i>
+                                        <span>Übergeordnete Raumeinheiten</span>
+                                        <div id="ue_raum_sum_content" class="menu pointing left"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="lineare_trend_expand_container">
+                        <span><b>Lineare Trendfortschreibung</b><img id="expand_linear_tred"/> <b>für:</b></span>
+                        <hr class="hr"/>
+                        <div id="trend_choice_container_table" class="panel_choice_container">
+                            <div id="trend_ddm_table" class="ui selection multiple dropdown ddm_table">
+                                <input name="Indikatorauswahl" type="hidden">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Bitte wählen.....</div>
+                                <div  id="trend_auswahl_table" class="menu">
+                                    <div class="item" data-value="2025" value="2025">2025</div>
+                                    <div class="item" data-value="2030" value="2030">2030</div>
+                                </div>
+                            </div>
+                            <div id="trend_hinweis_expand" class="hinweis">
+                                <b class="note">Hinweis:</b>
+                                <span>Anzeige von Trendwerten nur für ausgewählte Indikatoren.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="btn_table_load_expand">Tabelle aktualisieren</button>
+                    <button type="button" class="btn btn-primary" id="btn_table_clear_expand">
+                        <i class="glyphicon glyphicon-trash"></i>
+                        <span>zurücksetzen</span>
+                    </button>
+      `);
     },
     disable:function(){
         this.getOpenButtonObject().hide();
@@ -254,6 +344,10 @@ const expand_panel = {
                     expand_panel.close();
                     table.setExpandState(false);
                     main_view.resizeSplitter(table.getWidth());
+                    expand_panel
+                        .getZeitschnittAuswahlContainer()
+                        .find(".ui.toggle.checkbox")
+                        .checkbox("set unchecked");
                 });
             /*
                 bind the semantic functionality
@@ -280,13 +374,16 @@ const expand_panel = {
                         //sort the time array desc
                         expand_panel.expandArray = _.sortBy(expand_panel.expandArray, 'total').reverse();
                         //disable other choice possibilities
-                        expand_panel.getHinweisOnlyOlderTimeShiftsObject().hide();
-                        expand_panel.getTrendAuswahlContainer().hide();
-                        expand_panel.getUebergeordneteKenngroessenObject().hide();
+                        helper.disableElement("#"+expand_panel.getHinweisOnlyOlderTimeShiftsObject().attr("id"));
+                        helper.disableElement("#"+expand_panel.getTrendAuswahlContainer().attr("id"));
+                        helper.disableElement("#"+expand_panel.getUebergeordneteKenngroessenObject().attr("id"));
                         $(this).blur();
                     },
                     onLabelRemove: function (value) {
                         expand_panel.expandArray = helper.removefromarray(expand_panel.expandArray,value);
+                        helper.enableElement("#"+expand_panel.getUebergeordneteKenngroessenObject().attr("id"));
+                        helper.enableElement("#"+expand_panel.getHinweisOnlyOlderTimeShiftsObject().attr("id"));
+                        helper.enableElement("#"+expand_panel.getTrendAuswahlContainer().attr("id"));
                     }
                 });
             //the times to expand the table
@@ -302,7 +399,7 @@ const expand_panel = {
                             einheit: indikatorauswahl.getIndikatorEinheit(),
                             count: 20
                         });
-                        expand_panel.getTrendAuswahlContainer().hide();
+                        helper.disableElement("#"+expand_panel.getTrendAuswahlContainer().attr("id"));
                         $(this).blur();
                     },
                     onLabelRemove: function (value) {
@@ -311,6 +408,7 @@ const expand_panel = {
                         if (selection.length <= 1) {
                             expand_panel.getTrendAuswahlContainer().show();
                         }
+                        helper.enableElement("#"+expand_panel.getTrendAuswahlContainer().attr("id"));
                     }
                 });
             //select all times
@@ -363,7 +461,7 @@ const expand_panel = {
                             expand_panel.expandArray.push({id:addedValue,text:'Gesamte Bundesrepublik ('+zeit_slider.getTimeSet()+')',time:zeit_slider.getTimeSet(),einheit:false, count: 15});
                         }
                         else if(addedValue === 'bld'){
-                            expand_panel.expandArray.push({id:addedValue,text:'Übergeordnetes Bundesland ('+zeit_slider.getTimeSet()+')',time:zeit_slider.getTimeSet(),einheit:false,count: 15});
+                            expand_panel.expandArray.push({id:addedValue,text:'Bundesland ('+zeit_slider.getTimeSet()+')',time:zeit_slider.getTimeSet(),einheit:false,count: 15});
                         }
                         else{
                             expand_panel.expandArray.push({id:addedValue,text:addedText,time:zeit_slider.getTimeSet(),einheit:false,count: 10});
@@ -381,7 +479,7 @@ const expand_panel = {
                     onAdd: function (addedValue, addedText, $addedChoice) {
                         expand_panel.clear();
                         expand_panel.expandArray.push({id:indikatorauswahl.getSelectedIndikator()+'|'+addedValue,text:'Trendfortschreibung ('+addedValue+')',time:addedValue,einheit:indikatorauswahl.getIndikatorEinheit(),count:30});
-                        expand_panel.getZeitschnittAuswahlContainer().hide();
+                        helper.disableElement("#"+expand_panel.getZeitschnittAuswahlContainer().attr("id"));
                         $('#hinweis_time_expand_linear').show();
                         $(this).blur();
                     },
@@ -389,7 +487,7 @@ const expand_panel = {
                         expand_panel.expandArray = helper.removefromarray(panel.expandArray,indikatorauswahl.getSelectedIndikator()+'|'+value);
                         let selection = expand_panel.getTrendfortschreibungauswahlDDMObject().dropdown('get value').split(',');
                         if(selection.length<= 1){
-                            expand_panel.getZeitschnittAuswahlContainer().show();
+                            helper.enableElement("#"+expand_panel.getZeitschnittAuswahlContainer().attr("id"));
                             $('#hinweis_time_expand_linear').hide();
                         }
                     }

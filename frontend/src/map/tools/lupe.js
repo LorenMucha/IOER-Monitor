@@ -40,13 +40,13 @@ const lupe={
             this.info_leave=1;
         }
         $('.toolbar').toggleClass("toolbar_close",500);
-        this.getDOMContainer().css('background-color',farbschema.getColorActive());
+        this.getDOMContainer().css('background-color',farbschema.getColorHexActive());
         this.magnifyingGlass.addTo(map);
         this.set=true;
     },
     remove:function(){
-        this.magnifyingGlass.remove();
-        this.getDOMContainer().css('background-color','#4E60AA;');
-        this.set=false;
+        lupe.magnifyingGlass.remove();
+        lupe.getDOMContainer().css('background-color','#4E60AA;');
+        lupe.set=false;
     }
 };

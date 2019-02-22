@@ -6,6 +6,7 @@ const indikatorauswahl ={
     paramter:'ind',
     previous_indikator:'',
     schema:{
+        //collection of icons which stands for each category https://semantic-ui.com/elements/icon.html
         "N":{"name":"Nachhaltigkeit","icon":"<i class='leaf icon'></i>","color":false},
         "S":{"name":"Siedlung","icon":false,"color":"#fceded"},
         "V":{"name":"Verkehr","icon":false,"color":"#ededfd"},
@@ -17,7 +18,7 @@ const indikatorauswahl ={
         "U":{"name":"Landschaftsqualität","icon":"<i class='heart icon'></i>","color":false},
         "O":{"name":"Ökosystemleistungen","icon":"<i class='umbrella icon'></i>","color":false},
         "R":{"name":"Risiko","icon":"<i class='exclamation icon'></i>","color":false},
-        "E":{"name":"Energie","icon":"<i class='bolt icon'></i>","color":false},
+        "E":{"name":"Energie","icon":"<i class='adjust icon'></i>","color":false},
         "M":{"name":"Materiallager","icon":"<i class='cubes icon'></i>","color":false},
         "X":{"name":"Relief","icon":"<i class='align right icon'></i>","color":false}
     },
@@ -98,14 +99,14 @@ const indikatorauswahl ={
                     icon_set=icon;
                 }
                 //create the cat choices
-                if(main_view.getWidth()>=500) {
+                if(main_view.getHeight()>=700) {
                     html += `<div id="kat_item_${cat_id}" class="ui left pointing dropdown link item link_kat" data-value="${cat_id}" style="${background_color}">${icon_set}<i class="dropdown icon"></i>${cat_name()}<div id="submenu${cat_id}" class="menu submenu upward">`;
                 }else{
                     html += `<div class="header">
                                 <i class="tags icon"></i>${cat_name()}</div>
                             <div class="divider"></div>`
                 }
-                //create the supselection
+                //create the subselection
                 $.each(cat_value.indicators, function (key, value) {
                     let ind_id = key,
                         ind_name=function(){
@@ -211,8 +212,8 @@ const indikatorauswahl ={
             $(this).css({"color": "rgba(0,0,0,.87)", "font-weight": ""})
         });
         //highlight the elements inside the menu
-        $('#kat_item_'+menu.getIndikatorKategorie(indicator_id)).css({"color": farbschema.getColorMain(), "font-weight": "bold"});
-        $('#'+indicator_id+"_item").css({"color": farbschema.getColorMain(), "font-weight": "bold"});
+        $('#kat_item_'+menu.getIndikatorKategorie(indicator_id)).css({"color": farbschema.getColorHexMain(), "font-weight": "bold"});
+        $('#'+indicator_id+"_item").css({"color": farbschema.getColorHexMain(), "font-weight": "bold"});
     },
     getIndikatorInfo:function(indicator_id,key_name){
         let val_found = null;
@@ -244,9 +245,8 @@ const indikatorauswahl ={
         this.getSelectedIndikatorText();
         return $('#'+this.getSelectedIndikator()+"_item").attr("data-name");
     },
+    //function to clone the inidcator dropdown menu to reuse it for example inside table expand or chart
     cloneMenu:function(appendToId,newClassId,orientation,exclude_kat,possible_indicators){
-
-        $('.'+newClassId).remove();
 
         let target_ddm = $('.link_kat');
         if(target_ddm.length===0){
@@ -261,36 +261,34 @@ const indikatorauswahl ={
                 .addClass(newClassId);
         });
 
-        $('.'+newClassId).
-        each(function() {
-            let element = $(this);
-            let kat = $(this).attr("value");
-            let time = zeit_slider.getTimeSet();
-            //add  the needed classes and change the id
-            element
-                .find('i')
-                .addClass(orientation);
-            element
-                .find('.submenu')
-                .addClass(orientation)
-                .addClass('transition')
-                .removeAttr("id")
-                .attr('id', 'submenu'+kat+newClassId)
-                .find('.item').each(function(){
-                //if true clone only indicators which times are possible with the indicator set times
-                if(possible_indicators){
-                    let times_values = $(this).data("times").toString().split(',');
-                    let kat_name = $(this).data("kat");
-                    let time = zeit_slider.getTimeSet().toString();
-                    if($.inArray(time,times_values)===-1){
-                        $(this).remove();
+        $('.'+newClassId)
+            .each(function() {
+                let element = $(this);
+                let kat = $(this).attr("value");
+                let time = zeit_slider.getTimeSet();
+                //add  the needed classes and change the id
+                element
+                    .find('i')
+                    .addClass(orientation);
+                element
+                    .find('.submenu')
+                    .addClass(orientation)
+                    .addClass('transition')
+                    .removeAttr("id")
+                    .attr('id', 'submenu'+kat+newClassId)
+                    .find('.item').each(function(){
+                    //if true clone only indicators which times are possible with the indicator set times
+                    if(possible_indicators){
+                        let times_values = $(this).data("times").toString().split(',');
+                        let kat_name = $(this).data("kat");
+                        let time = zeit_slider.getTimeSet().toString();
+                        if($.inArray(time,times_values)===-1){
+                            $(this).remove();
+                        }
                     }
-                }
+                })
             })
-        });
-
-        //remove empty kats
-        $(' .'+newClassId).each(function(){
+        .each(function(){
             if($(this).find('.item').length ==0){
                 $(this).remove();
             }

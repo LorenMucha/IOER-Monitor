@@ -7,24 +7,21 @@ const navbar={
       let html = `<div class="navbar-default navbar">
           <div class="navbar-primary">
               <nav class="navbar navbar-static-top" role="navigation">
-                  <div class="navbar-header">
-                      <button type="button" class="navbar-toggle" data-toggle="collapse"
-                              data-target="#navbar-collapse-8">
-                          <span class="icon-bar"/>
-                      </button>
+                  <div class="navbar-header w-100">
                       <a class="navbar-brand" href="https://www.ioer.de" target="_blank"/>
-                  </div>
-                  <div>
-                      <a href="http://www.ioer-monitor.de"><p class="navbar-text">Monitor der Siedlungs- und Freiraumentwicklung (IÖR-Monitor)</p></a>
-                  </div>
-                  <div class="collapse navbar-collapse" id="navbar-collapse-8">
-                      <ul class="nav navbar-nav">
-                          <li><a id="webtour"
-                                 title="unternehmen Sie eine Tour durch die Funktionalitäten des IÖR-Monitors">IÖR-Monitor
-                              Tour</a></li>
-                          <li><a id="feedback_a" onclick="feedback.open();">Feedback</a></li>
-                          <!--<li><a id="language" data-value="en"><i class="gb uk flag"></i></a></li>-->
-                      </ul>
+                      <a class="float-left navbar-header-text mobile_hidden" href="http://www.ioer-monitor.de"><p>Monitor der Siedlungs- und Freiraumentwicklung (IÖR-Monitor)</p></a>
+                       <div id="nav_click" class="h-100">
+                           <div class="navbar-text float-right help" id="help">
+                                <p>Hilfe</p>
+                                <div id="help-content" class="help-content">
+                                    <div>
+                                        <div class="cursor"><i class="road icon"></i><a id="webtour" title="unternehmen Sie eine Tour durch die Funktionalitäten des IÖR-Monitors">Monitor Tour</a></div>
+                                        <div class="cursor"><i class="envelope icon"></i><a id="feedback_a" onclick="feedback.open();">Feedback</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                           <!--<div class="navbar-text float-right language" id="language"><i class="gb uk flag"></i></div>-->
+                      </div>
                   </div>
               </nav>
           </div>
@@ -35,7 +32,7 @@ const navbar={
     },
     controller:{
       set:function(){
-          const nav = navbar;
+          const help_content = $("#help-content");
           $('#language')
               .unbind()
               .click(function(){
@@ -57,6 +54,15 @@ const navbar={
                     navbar.getDomObject().find('.navbar-text').text('Monitor der Siedlungs- und Freiraumentwicklung (IÖR-Monitor)');
                 }
           });
+          $("#nav_click")
+              //for mobile devices, without hover
+              .click(function(){
+                 if(help_content.is(":visible")){
+                     help_content.hide();
+                 }else{
+                     help_content.show();
+                 }
+              });
       }
     }
 };

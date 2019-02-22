@@ -44,8 +44,8 @@ const klassenanzahl = {
                         klassenanzahl .updateParamter(value);
                     }
                     if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete'){
-                        if(typeof raumgliederung.getSelectedId() !=='undefined'){
-                            indikator_json.init(raumgliederung.getSelectedId());
+                        if(typeof raumgliederung.getSelectionId() !=='undefined'){
+                            indikator_json.init(raumgliederung.getSelectionId());
                         }else{
                             indikator_json.init();
                         }

@@ -1,0 +1,58 @@
+.navbar {
+    background: var(--main-color); /* For browsers that do not support gradients */
+    position: absolute;
+    height: 50px;
+    top: 0;
+    left:0;
+    right:0;
+    z-index: 3000;
+}
+.navbar .in{
+    background-color: var(--main-color);
+    width: auto;
+    float: right;
+}
+.navbar .navbar-header-text{
+    color: white;
+    font-weight: bold;
+    margin-top: 15px;
+    font-size: large;
+    margin-left: 20%;
+}
+.navbar .navbar-text{
+    color: white;
+    font-weight: bold;
+    margin-top: 15px;
+}
+.navbar .navbar-brand{
+    height: 50px;
+    left:0;
+    width: 50px;
+    background: white url(../assets/kopf.png) no-repeat center;
+}
+.navbar .help{
+    margin-right: 10px;
+}
+.navbar .help-content{
+    display: none;
+    right:0;
+    top:50px;
+    z-index: 1000;
+    background-color: var(--main-color);
+}
+.navbar #nav_click:hover .help-content{
+    display: block;
+}
+.navbar .help-content div div:first-child{
+    border-bottom: 0.5px solid white;
+}
+.navbar .help-content div{
+    z-index: 1000;
+    padding: 1vh;
+}
+.navbar .help-content div div:hover{
+    background-color: var(--active-color);
+}
+.navbar .help-content div a{
+    color:white;
+}

@@ -3,7 +3,6 @@ const script_loader={
         //JQuery Plugins
         "frontend/lib/jquery/plugin/jquery.tablesort.js",
         "frontend/lib/jquery/plugin/jquery.searchable.js",
-        "frontend/lib/jquery/plugin/scroll-into-view.js",
         "frontend/lib/jquery/plugin/jquery.stickytableheaders.min.js",
         "frontend/lib/jquery/plugin/jquery.progressTimer.js",
         "frontend/lib/jquery/plugin/jquery.splitter.js",
@@ -63,6 +62,9 @@ const script_loader={
         "frontend/src/models/error.js",
         "frontend/src/models/pips.js",
         "frontend/src/models/view_state.js",
+        "frontend/src/models/base_raumgliederung.js",
+        "frontend/src/models/exclude.js",
+        "frontend/src/models/auto_complete.js",
         //menu
         "frontend/src/menu/raeumliche_visualisierung.js",
         "frontend/src/menu/raeumliche_analyseebene.js",
@@ -86,8 +88,7 @@ const script_loader={
         "frontend/src/map/start_map.js",
         "frontend/src/map/map_header.js",
         "frontend/src/map/legende.js",
-        "frontend/src/map/map_reset.js",
-        "frontend/src/map/map_infos.js",
+        "frontend/src/map/MapHelper.js",
         //map tool
         "frontend/src/map/tools/lupe.js",
         "frontend/src/map/tools/measurement.js",
@@ -97,6 +98,7 @@ const script_loader={
         "frontend/src/map/tools/zoom_out.js",
         "frontend/src/map/tools/file_loader.js",
         "frontend/src/map/tools/center_map.js",
+        "frontend/src/map/tools/geolocate.js",
         //table
         "frontend/src/table/table.js",
         "frontend/src/table/expand_panel.js",
@@ -110,14 +112,17 @@ const script_loader={
         "frontend/src/dialog/dialog_manager.js",
         "frontend/src/dialog/dev_chart.js",
         "frontend/src/dialog/feedback.js",
-        "frontend/src/dialog/ogc_export.js",
         "frontend/src/dialog/kennblatt.js",
         //TODO: needs to be removed if Reini is finished
         "frontend/src/dialog/dialog.js",
+        //export
+        "frontend/src/export/ogc_export.js",
+        "frontend/src/export/map_link.js",
+        "frontend/src/export/map_print.js",
+        "frontend/src/export/Export_Helper.js",
         //other elements
         "frontend/src/request_manager.js",
         "frontend/src/config.js",
-        "frontend/src/export.js",
         "frontend/src/search.js",
         "frontend/src/webtour.js",
         "frontend/src/track.js",
@@ -145,9 +150,11 @@ const script_loader={
                 if(helper.checkIE()){
                     alert_manager.alertIE();
                 }else{
-                    let message=error.getErrorMessage("script Loading");
-                    alert_manager.alertError();
-                    request_manager.sendMail(message.name,message.sender,message.message);
+                    if(!window.location.href.includes("monitor_test")) {
+                        let message = error.getErrorMessage("script Loading");
+                        alert_manager.alertError();
+                        request_manager.sendMailError(message.name, message.message);
+                    }
                 }
             }
 

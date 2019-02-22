@@ -53,10 +53,18 @@ const style = {
             fillOpacity: opacity_slider.getOpacity()
         }
     },
+    getHover:function(){
+        return {
+            weight: 5,
+            color: farbschema.getColorHexMain(),
+            dashArray: '',
+            fillOpacity: opacity_slider.getOpacity()
+        }
+    },
     getActive:function(){
         return {
             weight: 5,
-            color: '#8CB91B',
+            color: farbschema.getColorHexActive(),
             dashArray: '',
             fillOpacity: opacity_slider.getOpacity()
         }

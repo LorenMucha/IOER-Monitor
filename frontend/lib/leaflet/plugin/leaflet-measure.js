@@ -3060,7 +3060,7 @@ exports.degrees = {
   // can be used OO-style. This wrapper holds altered versions of all the
   // underscore functions. Wrapped objects may be chained.
 
-  // HELPER function to continue chaining intermediate results.
+  // Helper function to continue chaining intermediate results.
   var result = function(obj) {
     return this._chain ? _(obj).chain() : obj;
   };
@@ -4767,7 +4767,7 @@ sprintf.vsprintf = vsprintf;
     };
   };
 
-  // HELPER for collection methods to determine whether a collection
+  // Helper for collection methods to determine whether a collection
   // should be iterated as an array or as an object
   // Related: http://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength
   // Avoids a very nasty iOS 8 JIT bug on ARM-64. #2094
@@ -6120,7 +6120,7 @@ sprintf.vsprintf = vsprintf;
   // can be used OO-style. This wrapper holds altered versions of all the
   // underscore functions. Wrapped objects may be chained.
 
-  // HELPER function to continue chaining intermediate results.
+  // Helper function to continue chaining intermediate results.
   var result = function(instance, obj) {
     return instance._chain ? _(obj).chain() : obj;
   };

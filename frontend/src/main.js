@@ -12,7 +12,9 @@ function main(){
             }
         }))
         //set the menu data
+            .then(panner.init())
             .then(toolbar.init())
+            .then(table.init())
             .then(map_controller.set())
             .then(navbar.init())
             .then(search.init())
@@ -27,7 +29,7 @@ function main(){
             .then(left_view.setMapView())
             .then(function () {
                 if (urlparamter.getUrlParameter('rid')) {
-                    loadRID(urlparamter.getUrlParameter('rid'));
+                    map_link.controller.loadRID(urlparamter.getUrlParameter('rid'));
                     return false;
                 }
                 else if (indikatorauswahl.getSelectedIndikator()) {

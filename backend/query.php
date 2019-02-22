@@ -1,15 +1,16 @@
 <?php
 header('Access-Control-Allow-Origin: *');
 header('Content-type: application/json; charset=utf-8');
-require("database/MYSQL_TASKREPOSITORY.php");
-require("HELPER.php");
-require('JSON.php');
-require("OVERLAY.php");
-require('CLASSIFY.php');
-require('EXPAND.php');
-require('SEARCH.php');
-require('TREND.php');
-require_once('CACHE_MANAGER.php');
+include_once "database/MYSQL_TASKREPOSITORY.php";
+include "models/Helper.php";
+include "models/UserLink.php";
+include 'chart/Chart.php';
+include_once 'CACHE_MANAGER.php';
+include_once "Json.php";
+include_once "map/Overlay.php";
+include_once "table/TableExpand.php";
+include_once "map/Classify.php";
+include_once 'models/Search.php';
 
 $q =  $_POST["values"];
 $json_obj = json_decode($q, true);
@@ -36,9 +37,9 @@ try{
         $cache_manager = new CACHE_MANAGER($indicator,$year,$raumgliederung,$klassifizierung,$klassenanzahl);
         try{
             if (!$cache_manager->check_cached($ags_array,$colors)) {
-                $indicator_json = new JSON($indicator,$year,$raumgliederung,$ags_array);
+                $indicator_json = new Json($indicator,$year,$raumgliederung,$ags_array);
                 $geometry_values = $indicator_json->createJSON();
-                $class_manager = new CLASSIFY($geometry_values,$klassenanzahl,$colors,$indicator,$klassifizierung);
+                $class_manager = new Classify($geometry_values,$klassenanzahl,$colors,$indicator,$klassifizierung);
                 $classes = $class_manager->classify();
                 //save the cache but not avaliable user colors
                 if(count((array)$colors)==0 and count($ags_array)==0){
@@ -76,9 +77,10 @@ try{
     else if($query==='getallindicators'){
         $language = $json_obj['format']['language'];
         $json = '{';
-        $kategories = MYSQL_TASKREPOSITORY::get_instance()->getAllCategoriesGebiete();
         if($modus=='raster') {
             $kategories = MYSQL_TASKREPOSITORY::get_instance()->getAllCategoriesRaster();
+        }else{
+            $kategories = MYSQL_TASKREPOSITORY::get_instance()->getAllCategoriesGebiete();
         }
 
         foreach($kategories as $row){
@@ -152,7 +154,7 @@ try{
         $json = substr($json, 0, -1);
         $json .="}";
         header('Content-type: application/json; charset=utf-8');
-        echo HELPER::get_instance()->escapeJsonString($json);
+        echo Helper::get_instance()->escapeJsonString($json);
     }
     //get all possible years
     else if($query=='getyears'){
@@ -180,14 +182,14 @@ try{
     //get the map overlay
     else if($query=="getzusatzlayer"){
         $zusatzlayer = $json_obj['ind']['zusatzlayer'];
-        $overlay = new OVERLAY($zusatzlayer);
+        $overlay = new Overlay($zusatzlayer);
         echo json_encode($overlay->getJSON());
     }
     //get the values to Expand the Table by the given values
     else if($query=="gettableexpandvalues"){
         $zusatz_values = $json_obj['expand_values'];
         $ags_array =  $json_obj['ags_array'];
-        $expand = new EXPAND($indicator,$year,$raumgliederung);
+        $expand = new TableExpand($indicator,$year,$raumgliederung);
         $rs = $expand->getExpandValues($zusatz_values,$ags_array);
         echo json_encode($rs);
     }
@@ -195,19 +197,23 @@ try{
     else if($query=="search"){
         $search_string = $json_obj['q'];
         $option = $json_obj['option'];
-        $search = new SEARCH($search_string,$option);
+        $search = new Search($search_string,$option);
         echo json_encode($search->query());
     }
     //get the values to create the chart
     else if($query=="gettrend"){
-        //example setting: set":{"all_points":"true","forecast":"true","compare":"true"}
-        $settings = (object)$json_obj['set'];
-        $forecast = HELPER::get_instance()->extractBoolen($settings->forecast);
-        $compare = HELPER::get_instance()->extractBoolen($settings->compare);
-        $all_points = HELPER::get_instance()->extractBoolen($settings->all_points);
-        $trend = new TREND($ags_array[0],$indicator,$all_points,$compare,$forecast);
-        echo json_encode($trend->getTrendValues(),JSON_UNESCAPED_UNICODE);
-        //echo json_encode($trend->toJSON());
+        try {
+            //example setting: set":{"all_points":"true","forecast":"true","compare":"true"}
+            $settings = (object)$json_obj['set'];
+            $forecast = Helper::get_instance()->extractBoolen($settings->forecast);
+            $compare = Helper::get_instance()->extractBoolen($settings->compare);
+            $all_points = Helper::get_instance()->extractBoolen($settings->all_points);
+            $trend = new Chart($ags_array[0], $indicator, $all_points, $compare, $forecast);
+            echo json_encode($trend->getTrendValues(), JSON_UNESCAPED_UNICODE);
+        }catch(Error $e){
+            $trace = $e->getTrace();
+            echo $e->getMessage().' in '.$e->getFile().' on line '.$e->getLine().' called from '.$trace[0]['file'].' on line '.$trace[0]['line'];
+        }
     }
     /*get all indicator values for a gives ags with differences to BRD and KRS if set*/
     else if($query=="getvaluesags"){
@@ -236,8 +242,11 @@ try{
         }
         echo json_encode($result);
     }
-
-
+    else if($query=="maplink"){
+        $setting = $json_obj["setting"];
+        $link = new UserLink($setting);
+        echo json_encode($link->getResult());
+    }
 }catch(Error $e){
     $trace = $e->getTrace();
     echo $e->getMessage().' in '.$e->getFile().' on line '.$e->getLine().' called from '.$trace[0]['file'].' on line '.$trace[0]['line'];

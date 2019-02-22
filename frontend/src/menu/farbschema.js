@@ -33,20 +33,20 @@ const farbschema = {
     },
     setColorChoice: function () {
         if (raeumliche_visualisierung.getRaeumlicheGliederung()==="gebiete") {
-            if (typeof raumgliederung.getSelectedId() === 'undefined') {
+            if (typeof raumgliederung.getSelectionId() === 'undefined') {
                 indikator_json.init();
             } else {
-                indikator_json.init(raumgliederung.getSelectedId());
+                indikator_json.init(raumgliederung.getSelectionId());
             }
         }
         else {
             indikator_raster.init();
         }
     },
-    getColorActive: function () {
+    getColorHexActive: function () {
         return "#8CB91B";
     },
-    getColorMain: function () {
+    getColorHexMain: function () {
         return '#4E60AA';
     },
     getHexMin: function () {
@@ -123,7 +123,6 @@ const farbschema = {
                     farbschema.setParamter(paramter_set);
                 }
                 farbschema.setColorChoice();
-
             });
 
             btn_remove
@@ -134,12 +133,12 @@ const farbschema = {
                     indikator_raster.init();
                 }
                 else {
-                    if (typeof raumgliederung.getSelectedId() === 'undefined') {
+                    if (typeof raumgliederung.getSelectionId() === 'undefined') {
                         console.log("undefined");
                         indikator_json.init();
                     } else {
                         console.log("defined");
-                        indikator_json.init(raumgliederung.getSelectedId());
+                        indikator_json.init(raumgliederung.getSelectionId());
                     }
                 }
                 picker_min.spectrum("set",min_color);

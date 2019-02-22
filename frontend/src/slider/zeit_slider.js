@@ -19,11 +19,11 @@ const zeit_slider={
         const object = this;
         let time_param = this.getTimeSet(),
             value_set=jahre.length-1,
-            slider = this.getSliderDOMObject();
+            slider = this.getSliderDOMObject(),
+            oneTimeClasses = $('.oneTime');
 
         //show the time container
         object.jahre= jahre;
-        object.show();
 
         if(!time_param){
             object.setParameter(jahre[value_set]);
@@ -32,12 +32,12 @@ const zeit_slider={
         else{
             if(jahre.length == 1){
                 object.updateParam(jahre[value_set]);
-                alert_manager.alertOneTimeShift();
-                object.hide();
+                helper.disableElement("#"+object.getContainerDOMObject().attr("id"),`Der Indikator steht nur für den Zeitschnitt ${zeit_slider.getTimeSet()} zur Verfügung.`);
             }
             else if($.inArray(parseInt(time_param),jahre)!= -1){
                 object.updateParam(jahre[$.inArray(parseInt(time_param),jahre)]);
                 value_set = $.inArray(parseInt(time_param),jahre);
+                helper.enableElement("#"+object.getContainerDOMObject().attr("id"),``);
             }
             else{
                 if($.inArray(parseInt(time_param),jahre) == -1){
@@ -75,7 +75,7 @@ const zeit_slider={
                             indikator_json.init();
                         }
                         else {
-                            indikator_json.init(raumgliederung.getSelectedId());
+                            indikator_json.init(raumgliederung.getSelectionId());
                         }
                     }else{
                         indikator_raster.init();

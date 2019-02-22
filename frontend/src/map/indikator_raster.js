@@ -1,6 +1,8 @@
-var raster_group = new L.layerGroup();
 const indikator_raster = {
-    raster_layer:'',
+    raster_layer:false,
+    getRasterLayer:function(){
+      return this.raster_layer;
+    },
     init:function(hex_min, hex_max, _seite, _settings,callback) {
         const object = this;
         let _darstellung_map = glaetten.getState(),
@@ -38,7 +40,7 @@ const indikator_raster = {
                 //store the gloabal Variables
 
                 //set Raster for map
-                object.raster_layer = new L.tileLayer.wms(url + pfad_mapfile,
+                let raster_layer = new L.tileLayer.wms(url + pfad_mapfile,
                     {
                         layers: layername,
                         cache: Math.random(),
@@ -49,29 +51,31 @@ const indikator_raster = {
                         group: "ioer",
                         pfadmapfile: pfad_mapfile,
                         layername: layername,
-                        einheit: einheit
+                        einheit: einheit,
+                        id:"indicator_raster"
                     });
 
                 if (_seite) {
                     //removeRasterBySide(_seite);
                     indikator_raster_group.clean(_seite);
-                    object.raster_layer.setParams({id: _seite}, false);
-                    raster_split.getController().setRightLayers(object.raster_layer.addTo(map));
+                    raster_layer.setParams({seite: _seite}, false);
+                    raster_split.getController().setRightLayers(raster_layer.addTo(map));
                 } else {
-                    object.raster_layer.setParams({id: 'links'}, false);
+                    raster_layer.setParams({seite: 'links'}, false);
                     if (raster_split.getState()) {
                         indikator_raster_group.clean('links');
-                        raster_split.getController().setLeftLayers(object.raster_layer.addTo(map));
+                        raster_split.getController().setLeftLayers(raster_layer.addTo(map));
                     } else {
                         indikator_raster_group.clean();
                         indikator_json_group.clean();
-                        object.raster_layer.addTo(map);
+                        raster_layer.addTo(map);
                     }
-                    grundakt_layer.init(x[7]);
+                    grundakt_layer.addToLegende();
                 }
-                raster_group.addLayer(object.raster_layer);
-                object.raster_layer.bringToFront();
-                object.raster_layer.setOpacity(opacity_slider.getOpacity());
+                indikator_raster_group.add(raster_layer);
+                raster_layer.bringToFront();
+                raster_layer.setOpacity(opacity_slider.getOpacity());
+                object.raster_layer = raster_layer;
                 map.on('click', object.onClick);
                 if (!_seite){
                     var interval = setInterval(function () {

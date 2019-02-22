@@ -26,7 +26,7 @@ const right_view = {
                     left_view.show();
                     legende.getShowButtonObject().show();
                     panner.setTableBackground();
-                    panner.init();
+                    panner.show();
                     btn_group_map.show();
                 }
             } else {
@@ -39,7 +39,6 @@ const right_view = {
         }else{
             alert_manager.alertNoIndicatorChosen();
         }
-        //bind the close icon
 
         //disable divider
         view.getCloseIconObject()
@@ -51,9 +50,9 @@ const right_view = {
     close:function(){
         this.hide();
         $('#mapwrap').removeClass('splitter_panel');
-        panner.init();
+        panner.show();
         legende.resize();
-        map_infos.resize();
+        map.invalidateSize();
     },
     isVisible:function(){
         let state = true;

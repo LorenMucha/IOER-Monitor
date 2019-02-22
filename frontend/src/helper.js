@@ -41,22 +41,30 @@ const helper={
     getCurrentYear:function(){
         return (new Date).getFullYear();
     },
-    enableElement:function(elem,title){
-        $(elem)
+    enableElement:function(_elem,title){
+        let elem = $(_elem);
+        elem
             .removeClass('disabled')
-            .prop('title',title)
             .prop('disabled',false)
             .css('cursor','pointer');
+
+        if(title){
+            elem.prop('title',title);
+        }
     },
-    disableElement:function(elem,text) {
-        $(elem)
+    disableElement:function(_elem,title) {
+        let elem = $(_elem);
+        elem
             .addClass('disabled')
-            .prop('title', text)
             .prop('disabled', true)
             .css('cursor', 'not-allowed');
+
+        if(title){
+            elem.prop('title',title);
+        }
     },
     highlightElementByID:function(id,color){
-        let color_set = farbschema.getColorActive();
+        let color_set = farbschema.getColorHexActive();
         if(color){
             color_set = color;
         }
@@ -76,14 +84,6 @@ const helper={
     checkIE:function(){
         var ua = window.navigator.userAgent;
         var msie = ua.indexOf("MSIE ");
-
-        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))  // If Internet Explorer, return version number
-        {
-            return true;
-        }
-        else  // If another browser, return 0
-        {
-            return false;
-        }
+        return msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./);
     }
 };

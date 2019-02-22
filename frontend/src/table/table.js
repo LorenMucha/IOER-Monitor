@@ -3,9 +3,13 @@ const table = {
     table_classes : 'tablesorter',
     excludedAreas:['Gemeindefreies Gebiet'],
     expandState:false,
+    selection:[],
     getDOMObject: function(){
         $table = $('#table_ags');
         return $table;
+    },
+    init:function(){
+      this.createInteract();
     },
     getContainer:function(){return $('#table_ags');},
     getScrollableAreaDOMObject:function(){
@@ -13,39 +17,348 @@ const table = {
         return $area;
     },
     getTableBodyObject:function(){
-        $elem = $('#tBody_value_table');
+        $elem = $('.tBody_value_table');
         return $elem;
     },
     getColSpanRow:function(){
         $elem = $('#header_ind_set');
         return $elem;
     },
-    init:function(){
-        //after sort is finish reset the rang
-        $('.sorter-false').removeClass("header");
-        this.controller.set();
+    createInteract:function(){
+      $('.table_page_header').html(`
+                <div id="table_close" class="close_table">
+                    <span title="Tabelle schließen" class="glyphicon glyphicon-remove checker" id="close_checker"></span>
+                </div>
+                <div id="interact_div">
+                    <button type="button" class="btn btn-primary mobile_hidden" id="btn_table">
+                        <i class="glyphicon glyphicon-chevron-right" title="Tabelle mit Indikatorwerten oder Zeitschnitten erweitern"></i><span>erweitern</span></button>
+                    <div title="Tabelle filtern" id="filter_table" class="filter"></div>
+                    <div title="Tabelle als CSV exportieren" id="csv_export"></div>
+                     <input id="search_input_table" placeholder="Suche nach Orten.." type="text" class="form-control search_input prompt" />
+                </div>
+                <hr class="hr"/>
+      `);
     },
-    create:function(){
+    fill:function(){
         const tableObject = this.getContainer();
 
         //array sorted by name
-        let layer_array = _.sortBy(indikator_json_group.getLayerArray(),"gen");
-        let html_table = '<table id="table_ags" class="'+this.table_classes+'">';
+        let layer_array = _.sortBy(indikator_json_group.getLayerArray(),"gen"),
+            html_table = '<table id="table_ags" class="'+this.table_classes+'">',
+            //create the main Table header --private functions
+            createTableHeader=function(){
+                let value_text = `Wert (${indikatorauswahl.getIndikatorEinheit()})`,
+                    colspan = 5;
+                if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
+                    colspan=6;
+                }
+                //the html for the header
+                let html = `<thead id="thead" class="full-width">
+                    <tr id="first_row_head">
+                    <th colspan="${colspan}" data-sorter="false" class="sorter-false" id="header_ind_set">${indikatorauswahl.getSelectedIndikatorText_Lang()} (${zeit_slider.getTimeSet()})</th>
+                    </tr>
+                    <tr class="header" id="second_row_head">
+                        <th class="th_head" data-sorter="false"></th>
+                        <th class="th_head" id="tr_rang" data-sorter="false">lfd. Nr.</th>
+                        <th class="th_head ags sort-arrow">AGS</th>
+                        <th class="th_head gebietsname sort-arrow">Gebietsname</th>
+                        <th id="tabel_header_raumgl" class="th_head sort-arrow">${value_text}</th>`;
+
+                if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
+                    html += '<th class="th_head grundakt_head" id="grundakt_head">Mittlere Grund- aktualität</th>';
+                }
+
+                return html+"</tr></thead>";
+            },
+            createTableBody=function() {
+                let html = `
+                    <tbody id="tBody_selection" class="tBody_value_table"></tbody>
+                    <tbody id="tBody_value_table" class="tBody_value_table">
+                `,
+                i=0;
+                $.each(layer_array,function(key,value){
+                    //set the counter
+                    i+=1;
+
+                    //set the variables
+                    let ags = value.ags,
+                        grundakt_value = value.grundakt,
+                        value_int = value.value,
+                        fc = value.fc,
+                        des= value.des,
+                        hc = value.hc,
+                        name = value.gen,
+                        ind = indikatorauswahl.getSelectedIndikator(),
+                        einheit = indikatorauswahl.getIndikatorEinheit(),
+                        exclude=function(){
+                            if($.inArray(des,table.excludedAreas)!==-1){
+                                return 'style="display:none"';
+                            }
+                            else{
+                                return "";
+                            }
+                        },
+                        //'icon container' for trend and indicator-comparing inside a digramm
+                        img_trend = `<img class="indsingle_entwicklungsdiagr dev_chart_compare ${exclude.class_performance} mobile_hidden chart oneTime disbale_performance" 
+                                                    data-name="${value.gen}" 
+                                                    data-ags="${ags}" 
+                                                    data-ind="${ind}" 
+                                                    data-wert="${value_int}" 
+                                                    data-einheit="${einheit}" 
+                                                    data-title="Veränderung der Indikatorwerte für die Gebietseinheit" 
+                                                    title="Veränderung der Indikatorwerte für die Gebietseinheit" 
+                                                    id="indikatoren_diagramm_ags${ags}" 
+                                                    style="margin-left: .5vh;"
+                                                    src="${dev_chart.icon.single.path}"/>`,
+                        img_trend_ind = `<img class="ind_entwicklungsdiagr dev_chart_trend ${exclude.class_performance} mobile_hidden chart oneTime disbale_performance" 
+                                                    data-name="${value.gen}" 
+                                                    data-ags="${ags}" 
+                                                    data-ind="${ind}" 
+                                                    data-wert="${value_int}" 
+                                                    data-einheit="${einheit}" 
+                                                    style="margin-left: .5vh;"
+                                                    data-title="Veränderung des Indikatorwertes für die Gebietseinheit" 
+                                                    title="Veränderung des Indikatorwertes für die Gebietseinheit"
+                                                    id="indikatoren_diagramm_ags_ind${ags}" 
+                                                    src="${dev_chart.icon.multiple.path}"/>`,
+                        img_gebiets_profil = ` <img data-name="${value.gen}" 
+                                                        data-ags="${ags}" 
+                                                        data-ind="${ind}" 
+                                                        data-wert="${value_int}" 
+                                                        data-einheit="${einheit}" 
+                                                        title="Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren" 
+                                                        class="indikatoren_gebietsprofil chart"  
+                                                        id="indikatoren_gebietsprofil${ags}" 
+                                                        style="margin-left: .2vh;"
+                                                        src="frontend/assets/icon/indikatoren.png"/>`,
+                        img_stat = ` <img data-name="${value.gen}" 
+                                                 data-ags="${ags}" 
+                                                 data-ind="${ind}" 
+                                                 data-wert="${value_int}" 
+                                                 data-einheit="${einheit}" 
+                                                 title="Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators" 
+                                                 class="indikatoren_diagramm_ags histogramm_ags" 
+                                                 id="diagramm_ags${ags}" 
+                                                 src="frontend/assets/icon/histogramm.png"/>`,
+                        value_td = function(){
+                            if(hc !== '0'){
+                                //split the hc
+                                let hc_arr = hc.split("||"),
+                                    hc_text = hc_arr[0],
+                                    hc_value = hc_arr[1];
+                                return `<img className="hc_icon" src="frontend/assets/hinweis/hinweis_${hc_value}.png" title="${hc_text}"/><b> ${value.value_comma}</b>`;
+                            }
+                            else if(fc !== '0'){
+                                //split the fc
+                                let fc_arr = fc.split("||"),
+                                    fc_name = fc_arr[2],
+                                    fc_beschreibung = fc_arr[3];
+                                return `<b title="${fc_beschreibung}">${fc_name}</b>`;
+                            }else{
+                                return `<b>${value.value_comma}</b>${img_stat+img_trend + img_trend_ind}`;
+                            }
+                        },
+                        grundaktualitaet_td=function(){
+                            if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
+                                return `<td class="val-grundakt indicator_main">${grundakt_value}</td>`;
+                            }
+                            else{
+                                return '';
+                            }
+                        };
+
+                    try {
+                        if (name === layer_array[i].gen && base_raumgliederung.getBaseRaumgliederungId() !== "bld") {
+                            if (value.krs) {
+                                name = name + " (" + value.krs + ")";
+                            } else {
+                                name = name + " (" + des + ")";
+                            }
+                        }
+                    }catch(err){}
+
+                    html += `<tr ${exclude()} id="${ags}" class="tr">
+                                        <td>
+                                            <input id="checkbox_${ags}" type="checkbox" class="select_check disbale_performance mobile_hidden" data-ags="${ags}">
+                                        </td>
+                                        <td class="count_ags_table selectable"></td>
+                                        <td class="td_ags">${ags}</td>
+                                        <td class="td_name" data-des="${des}">
+                                            ${img_gebiets_profil}
+                                            ${ name}
+                                        </td>
+                                        <td class="val-ags" 
+                                            data-name="${value.gen}" 
+                                            data-sort-value="${value_int}" 
+                                            data-val="${value_int}">
+                                            ${value_td()}
+                                        </td>
+                                        ${grundaktualitaet_td()}
+                                    </tr>`;
+                });
+                return html+"</tbody>";
+            },
+            createTableFooter=function(){
+                //germany values
+                let stat_array = indikator_json.getStatistikArray(),
+                    ags_ind_array = [],
+                    value_g = false,
+                    grundakt_val = false;
+
+                let ags_footer = function(){
+                        //ags_values
+                        if (typeof raumgliederung.getSelectionId() !=='undefined') {
+                            let tfoot_ags='';
+                            $.each(ags_ind_array, function (key, value) {
+                                $.each(value, function (key_found, value_found) {
+                                    let value_set = value_found.value_ags,
+                                        grundakt_val = value_found.ags_grundakt,
+                                        ags = key_found,
+                                        name = value_found.gen,
+                                        img_trend = `<img data-name="${value.gen}" 
+                                                      data-ags="${ags}" 
+                                                      data-ind="${indikatorauswahl.getSelectedIndikator()}" 
+                                                      data-wert="${value_set}" 
+                                                      data-einheit="${indikatorauswahl.getIndikatorEinheit()}" 
+                                                      title="Veränderung der Indikatorwerte für die Gebietseinheit" 
+                                                      style="margin-left: .5vh;"
+                                                      class="indsingle_entwicklungsdiagr disbale_performance" 
+                                                      id="indikatoren_diagramm_ags${ags}" 
+                                                      src="${dev_chart.icon.multiple.path}" />`,
+                                        img_trend_ind = `<img data-name="${value.gen}" 
+                                                          data-ags="${ags}" 
+                                                          data-ind="${indikatorauswahl.getSelectedIndikator()}" 
+                                                          data-wert="${value_set}" 
+                                                          data-einheit="${indikatorauswahl.getIndikatorEinheit()}" 
+                                                          title="Veränderung des Indikatorwertes für die Gebietseinheit" 
+                                                          class="ind_entwicklungsdiagr disbale_performance" 
+                                                          id="indikatoren_diagramm_ags_ind${ags}"
+                                                          style="margin-left: .5vh;" 
+                                                          src="${dev_chart.icon.single.path}"/>`;
+
+                                    tfoot_ags += `<tfoot class="tfoot full-width">
+                                                <tr id="tfoot_${ags}">
+                                                    <th></th>
+                                                    <th colspan="2"></th>
+                                                    <th class="td_name">
+                                                        <img data-name="${value.gen}" 
+                                                             data-ags="${ags}" 
+                                                             data-ind="${indikatorauswahl.getSelectedIndikator()}" 
+                                                             title="Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren" 
+                                                             class="indikatoren_gebietsprofil" 
+                                                             src="frontend/assets/icon/indikatoren.png"/>
+                                                         <b>${name}</b>
+                                                    </th>
+                                                    <th class="val-ags" 
+                                                        data-name="${value.gen}" 
+                                                        data-val="${value_g}" 
+                                                        data-ind="${indikatorauswahl.getSelectedIndikator()}">
+                                                        <b>${value_set}</b>
+                                                        <img data-name="Bundesrepublik" 
+                                                             data-ags="${ags}" 
+                                                             data-ind="${indikatorauswahl.getSelectedIndikator()}" 
+                                                             data-wert="${value_set}" 
+                                                             data-einheit="${indikatorauswahl.getIndikatorEinheit()}" 
+                                                             title="Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators" 
+                                                             class="indikatoren_diagramm_ags histogramm_ags" 
+                                                             id="diagramm_ags_${ags}" 
+                                                             src="frontend/assets/icon/histogramm.png"/>
+                                                        ${img_trend_ind+img_trend}
+                                                     </th>`;
+                                    if (indikatorauswahl.getSelectedIndiktorGrundaktState()) {
+                                        tfoot_ags += `<th class="td_akt indicator_main">${grundakt_val}</th>`;
+                                    }
+                                });
+                            });
+                            return tfoot_ags;
+                        }else{
+                            return ' ';
+                        }
+                    },
+                    brd_footer=function(){
+                        //get the stat values
+                        $.each(stat_array, function (key) {
+                            $.each(stat_array[key], function (key_set, value_set) {
+                                if (key_set === 'wert_brd') {
+                                    value_g = value_set;
+                                } else if (key_set === 'grundakt_brd') {
+                                    grundakt_val = value_set;
+                                } else {
+                                    let obj = {};
+                                    obj[key_set] = value_set;
+                                    ags_ind_array.push(obj);
+                                }
+                            });
+                        });
+                        let img_trend = `<img data-name="Bundesrepublik" 
+                                      data-ags="99" 
+                                      data-ind="${indikatorauswahl.getSelectedIndikator()}" 
+                                      data-wert="${value_g}" 
+                                      data-einheit="${indikatorauswahl.getIndikatorEinheit()}" 
+                                      title="Veränderung der Indikatorwerte für die Gebietseinheit" 
+                                      class="indsingle_entwicklungsdiagr disbale_performance" 
+                                      id="indikatoren_diagramm_ags99" 
+                                      style="margin-left: .5vh;" 
+                                      src="${dev_chart.icon.multiple.path}" />`,
+                            img_trend_ind = `<img data-name="Bundesrepublik" 
+                                          data-ags="99" 
+                                          data-ind="${indikatorauswahl.getSelectedIndikator()}" 
+                                          data-wert="${value_g}" 
+                                          data-einheit="${indikatorauswahl.getIndikatorEinheit()}" 
+                                          title="Veränderung des Indikatorwertes für die Gebietseinheit" 
+                                          class="ind_entwicklungsdiagr disbale_performance" 
+                                          id="indikatoren_diagramm_ags_ind99" 
+                                          style="margin-left: .5vh;" 
+                                          src="${dev_chart.icon.single.path}"/>`,
+                            tfoot_brd = `<tfoot class="tfoot full-width">
+                                    <tr id="tfoot_99">
+                                        <th></th>
+                                        <th colspan="2"></th>
+                                        <th class="td_name">
+                                            <img data-name="Bundesrepublik" 
+                                                 data-ags="99" 
+                                                 data-ind="${indikatorauswahl.getSelectedIndikator()}" 
+                                                 title="Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren" 
+                                                 class="indikatoren_gebietsprofil" src="frontend/assets/icon/indikatoren.png"/>
+                                             <b>Bundesrepublik</b>
+                                        </th>
+                                        <th class="val-ags" 
+                                            data-name="Bundesrepublik" 
+                                            data-val="${value_g}" 
+                                            data-ind="${indikatorauswahl.getSelectedIndikator()}">
+                                            <b>${value_g}</b>
+                                            <img data-name="Bundesrepublik" 
+                                                 data-ags="99" 
+                                                 data-ind="${indikatorauswahl.getSelectedIndikator()}" 
+                                                 data-wert="${value_g}" 
+                                                 data-einheit="${indikatorauswahl.getIndikatorEinheit()}" 
+                                                 title="Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators" 
+                                                 class="indikatoren_diagramm_ags histogramm_ags" 
+                                                 id="diagramm_ags_99" 
+                                                 src="frontend/assets/icon/histogramm.png"/>
+                                            ${img_trend_ind+img_trend}
+                                        </th>`;
+
+                        if (indikatorauswahl.getSelectedIndiktorGrundaktState()) {
+                            tfoot_brd += `<th class="td_akt indicator_main">${grundakt_val}</th>`;
+                        }
+                        return tfoot_brd;
+                    };
+                return `${brd_footer()+ags_footer()}</tr></tfoot>`;
+            };
+
         html_table += createTableHeader()+createTableBody()+createTableFooter()+'</table><table id="header-fixed"></table>';
 
         this.clear();
         this.append(html_table);
-        this.init();
+        this.controller.set();
         this.setRang();
-        this.setStickTableHeader();
-        this.setTableSorter();
-
+        this.setSelection();
+        this.controller.setTableSorter();
         this.expandState=false;
+        exclude.setPerformanceElements();
+        progressbar.remove();
 
-        //remove progress bar if still visible
-        if($('#progress_div').is(':visible') || tableObject.is(':visible')){
-            progressbar.remove();
-        }
         if(view_state.getViewState()==='mw'){
             main_view.resizeSplitter(table.getWidth());
         }
@@ -62,171 +375,9 @@ const table = {
         filter_panel.init();
 
         //disable charts for community level
-        if(raumgliederung.getSelectedId()==='gem' || raeumliche_analyseebene.getSelectionId()==="gem"){
+        if(raumgliederung.getSelectionId()==='gem' || raeumliche_analyseebene.getSelectionId()==="gem"){
             helper.disableElement(".dev_chart_compare","Steht für die Gemeindeebene nicht zur Verfügung");
             helper.disableElement(".dev_chart_trend","Steht für die Gemeindeebene nicht zur Verfügung");
-        }
-
-        //create the main Table header
-        function createTableHeader(){
-            let value_text = `Wert (${indikatorauswahl.getIndikatorEinheit()})`,
-                colspan = 4;
-            if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
-                colspan=5;
-            }
-
-            let html = `<thead id="thead" class="full-width">
-                <tr id="first_row_head">
-                <th colspan="${colspan}" data-sorter="false" class="sorter-false expand" id="header_ind_set">${indikatorauswahl.getSelectedIndikatorText_Lang()+' ('+zeit_slider.getTimeSet()}</th>
-                </tr>
-                <tr class="header" id="second_row_head">
-                <th class="th_head" id="tr_rang">lfd. Nr.</th>
-                <th class="th_head ags">AGS</th>
-                <th class="th_head gebietsname">Gebietsname</th>
-                <th id="tabel_header_raumgl" class="th_head">${value_text}</th>`;
-
-            if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
-                html += '<th class="th_head grundakt_head" id="grundakt_head">Mittlere Grund- aktualität</th>';
-            }
-
-            return html+"</tr></thead>";
-        }
-        function createTableBody() {
-            let html = '<tbody id="tBody_value_table">',
-                i=0,
-                x = 0;
-            $.each(layer_array,function(key,value){
-                //set the counter
-                if(i<(layer_array.length)-2) {i+=1;}
-
-                //set the variables
-                let ags = value.ags,
-                    grundakt_value = value.grundakt,
-                    wert = '<b>'+value.value_comma+'</b>',
-                    value_int = value.value,
-                    fc = value.fc,
-                    des= value.des,
-                    hc = value.hc,
-                    name = value.gen,
-                    raumgl = raeumliche_analyseebene.getSelectionId(),
-                    ind = indikatorauswahl.getSelectedIndikator(),
-                    einheit = indikatorauswahl.getIndikatorEinheit(),
-                    //'icon container' for trend and indicator-comparing inside a digramm
-                    img_trend = '<img class="indsingle_entwicklungsdiagr dev_chart_compare" data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" title="Veränderung der Indikatorwerte für die Gebietseinheit" class="indsingle_entwicklungsdiagr" id="indikatoren_diagramm_ags' + ags + '" src="frontend/assets/icon/indikatoren_diagr.png"/>',
-                    img_trend_ind = '<img class="ind_entwicklungsdiagr dev_chart_trend" data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" title="Veränderung des Indikatorwertes für die Gebietseinheit" class="ind_entwicklungsdiagr" id="indikatoren_diagramm_ags_ind' + ags + '" src="frontend/assets/icon/indikatoren_verlauf.png"/>';
-
-                if(name === layer_array[i].gen){
-                    if(value.krs){
-                        name = name+" ("+value.krs+")";
-                    }else {
-                        name = name + " (" + des + ")";
-                    }
-                }
-                //disbale diagramm views for mobile devices
-                if(main_view.getMobileState()) {
-                    img_trend = '';
-                    img_trend_ind = '';
-                }
-
-                if($.inArray(des,table.excludedAreas)===-1) {
-                    html += '<tr id="' + ags + '">';
-                }else{
-                    html += '<tr style="display:none;" id="' + ags + '">';
-                }
-
-                // handle error codes and notes
-                if(hc ==='0' && fc==='0'){
-                    html += '<td class="count_ags_table"></td><td class="td_ags">' + ags + '</td><td class="td_name" data-des="'+des+'"><img data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" title="Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren" class="indikatoren_gebietsprofil" id="indikatoren_gebietsprofil' + ags + '" src="frontend/assets/icon/indikatoren.png"/>' + name + '</td><td class="val-ags" data-name="' + value.gen + '" data-sort-value="'+value_int+'" data-val="' + value_int + '">' + wert + '<img data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + ind + '" data-wert="' + value_int + '" data-einheit="' + einheit + '" title="Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators" class="indikatoren_diagramm_ags" class="histogramm_ags" id="diagramm_ags' + ags + '" src="frontend/assets/icon/histogramm.png"/>' + img_trend + img_trend_ind + '</td>';
-                }
-                else if (hc !== '0') {
-                    //split the hc
-                    let hc_arr = hc.split("||");
-                    let hc_value = hc_arr[1];
-                    let hc_text = hc_arr[0];
-                    html += '<td class="count_ags_table"></td><td class="td_ags">'+ags + '</td><td class="td_name" data-des="'+des+'"><img data-name="'+name+'" data-ags="'+ags+'" data-ind="'+ind+'" data-wert="'+wert+'" data-einheit="'+einheit+'" title="Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren" class="indikatoren_gebietsprofil" id="indikatoren_gebietsprofil'+ags+'" src="frontend/assets/icon/indikatoren.png"/>'+name+'</td><td class="val-ags" data-name="'+name+'" data-sort-value="'+value_int+'" data-val="' +value_int+'"><img class="hc_icon" src="frontend/assets/hinweis/hinweis_'+hc_value+'.png" title="' +hc_text+'"/>' +wert+'<img data-name="'+name+'" data-ags="'+ags+'" data-ind="'+ind+'" data-sort-value="'+value_int+'" data-wert="'+wert+'" data-einheit="'+einheit+'" title="Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators" class="histogramm_ags" src="frontend/assets/icon/histogramm.png"/>'+img_trend+img_trend_ind+'</td>';
-                }
-                else if (fc !== '0') {
-                    //split the fc
-                    let fc_arr = fc.split("||");
-                    let fc_value = fc[0];
-                    let fc_name = fc_arr[2];
-                    let fc_color = fc_arr[1];
-                    let fc_beschreibung = fc_arr[3];
-                    html += '<td class="count_ags_table"></td><td class="td_ags">' +ags+ '</td><td class="td_name" data-des="'+des+'">' +name+'</td><td  style="text-align: right;">' +fc_name+'</td>';
-                }
-                if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
-                    html +='<td class="val-grundakt indicator_main">'+grundakt_value+'</td>';
-                }
-
-                html +='</tr>';
-            });
-            return html+"</tbody>";
-        }
-        function createTableFooter(){
-            //germany values
-            let stat_array = indikator_json.getStatistikArray(),
-                ags_ind_array = [],
-                value_g,grundakt_val;
-
-            //ags_values
-            $.each(stat_array,function(key,value){
-                $.each(stat_array[key],function(key_set,value_set)
-                {
-                    if (key_set === 'wert_brd') {
-                        value_g = value_set;
-                    }
-                    else if (key_set === 'grundakt_brd') {
-                        grundakt_val = value_set;
-                    }else{
-                        let obj = {};
-                        obj[key_set] = value_set;
-                        ags_ind_array.push(obj);
-                    }
-                });
-            });
-            function setAGSFooter() {
-                //ags_values
-                if (typeof raumgliederung.getSelectedId() !=='undefined') {
-                    let tfoot_ags='';
-                    $.each(ags_ind_array, function (key, value) {
-                        $.each(value, function (key_found, value_found) {
-                            let value_set = value_found.value_ags;
-                            let grundakt_val = value_found.ags_grundakt;
-                            let ags = key_found;
-                            let name = value_found.gen;
-
-                            let img_trend = '<img data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + indikatorauswahl.getSelectedIndikator() + '" data-wert="' + value_set + '" data-einheit="' + indikatorauswahl.getIndikatorEinheit() + '" title="Veränderung der Indikatorwerte für die Gebietseinheit" class="indsingle_entwicklungsdiagr" id="indikatoren_diagramm_ags' + ags + '" src="frontend/assets/icon/indikatoren_diagr.png" />';
-                            let img_trend_ind = '<img data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + indikatorauswahl.getSelectedIndikator() + '" data-wert="' + value_set + '" data-einheit="' + indikatorauswahl.getIndikatorEinheit() + '" title="Veränderung des Indikatorwertes für die Gebietseinheit" class="ind_entwicklungsdiagr" id="indikatoren_diagramm_ags_ind' + ags + '" src="frontend/assets/icon/indikatoren_verlauf.png"/>';
-
-                            tfoot_ags += '<tfoot class="tfoot full-width"><tr id="tfoot_'+ags+'">' +
-                                '<th colspan="2"></th>' +
-                                '<th class="td_name"><img data-name="' + value.gen + '" data-ags="' + ags + '" data-ind="' + indikatorauswahl.getSelectedIndikator() + '" title="Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren" class="indikatoren_gebietsprofil" src="frontend/assets/icon/indikatoren.png"/> <b>' + name + '</b></th>' +
-                                '<th class="val-ags" data-name="' + value.gen + '" data-val="' + value_g + '" data-ind="' + indikatorauswahl.getSelectedIndikator() + '"><b>' + value_set + '</b><img data-name="Bundesrepublik" data-ags="' + ags + '" data-ind="' + indikatorauswahl.getSelectedIndikator() + '" data-wert="' + value_set + '" data-einheit="' + indikatorauswahl.getIndikatorEinheit() + '" title="Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators" class="indikatoren_diagramm_ags" class="histogramm_ags" id="diagramm_ags_' + ags + '" src="frontend/assets/icon/histogramm.png"/>' + img_trend + img_trend_ind + '</th>';
-                            if (indikatorauswahl.getSelectedIndiktorGrundaktState()) {
-                                tfoot_ags += '<th class="td_akt indicator_main">' + grundakt_val + '</th>';
-                            }
-                        });
-                    });
-                    return tfoot_ags;
-                }else{
-                    return ' ';
-                }
-            }
-            function setBRDFooter(value_g,grundakt_val) {
-                let img_trend = '<img data-name="Bundesrepublik" data-ags="99" data-ind="' + indikatorauswahl.getSelectedIndikator() + '" data-wert="' + value_g + '" data-einheit="' + indikatorauswahl.getIndikatorEinheit() + '" title="Veränderung der Indikatorwerte für die Gebietseinheit" class="indsingle_entwicklungsdiagr" id="indikatoren_diagramm_ags99" src="frontend/assets/icon/indikatoren_diagr.png" />';
-                let img_trend_ind = '<img data-name="Bundesrepublik" data-ags="99" data-ind="' + indikatorauswahl.getSelectedIndikator() + '" data-wert="' + value_g + '" data-einheit="' + indikatorauswahl.getIndikatorEinheit() + '" title="Veränderung des Indikatorwertes für die Gebietseinheit" class="ind_entwicklungsdiagr" id="indikatoren_diagramm_ags_ind99" src="frontend/assets/icon/indikatoren_verlauf.png"/>';
-
-                let tfoot_brd = '<tfoot class="tfoot full-width"><tr id="tfoot_99">' +
-                    '<th colspan="2"></th>' +
-                    '<th class="td_name"><img data-name="Bundesrepublik" data-ags="99" data-ind="' + indikatorauswahl.getSelectedIndikator() + '" title="Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren" class="indikatoren_gebietsprofil" src="frontend/assets/icon/indikatoren.png"/> <b>Bundesrepublik</b></th>' +
-                    '<th class="val-ags" data-name="Bundesrepublik" data-val="' + value_g + '" data-ind="' + indikatorauswahl.getSelectedIndikator() + '"><b>' + value_g + '</b><img data-name="Bundesrepublik" data-ags="99" data-ind="' + indikatorauswahl.getSelectedIndikator() + '" data-wert="' + value_g + '" data-einheit="' + indikatorauswahl.getIndikatorEinheit() + '" title="Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators" class="indikatoren_diagramm_ags" class="histogramm_ags" id="diagramm_ags_99" src="frontend/assets/icon/histogramm.png"/>' + img_trend + img_trend_ind + '</th>';
-
-                if (indikatorauswahl.getSelectedIndiktorGrundaktState()) {
-                    tfoot_brd += '<th class="td_akt indicator_main">' + grundakt_val + '</th>';
-                }
-                return tfoot_brd;
-            }
-            return setBRDFooter(value_g,grundakt_val)+setAGSFooter()+"</tr></tfoot>";
         }
     },
     clear:function(){
@@ -234,7 +385,9 @@ const table = {
         this.getScrollableAreaDOMObject().empty();
     },
     append:function(html_string){
-        this.getScrollableAreaDOMObject().append(html_string);
+      table.controller.destroyStickyTableHeader();
+      this.getScrollableAreaDOMObject().append(html_string);
+      table.controller.setStickTableHeader();
     },
     expand:function(){
         const table = this;
@@ -248,8 +401,51 @@ const table = {
             footer_brd = $('#tfoot_99'),
             def = $.Deferred();
 
+        //function
+        let getDifferenceDiv=function(value_ind,value_ags){
+            //create the difference view
+            let dif_val = (value_ags-value_ind).toFixed(2),
+                class_glyphicon = 'negativ';
+            if (value_ind<value_ags){
+                class_glyphicon='positiv';
+            }else if(value_ags==value_ind){
+                class_glyphicon='';
+            }
+            return `<div class="dif_val_div">
+                        <b>${dif_val.replace('.',',')}</b>
+                        <span class="glyphicon glyphicon-circle-arrow-right ${class_glyphicon}"></span>
+                    </div>`;
+            },
+            //function to get the order state inside the table, based on the given number
+            getExpandValue=function(id,key_set){
+                let return_val;
+                $.each(expand_array,function(key,value){
+                    if(value.id===id){
+                        if(key_set) {
+                            return_val = value[key_set];
+                        }else{
+                            return_val=value;
+                        }
+                    }
+                });
+                return return_val;
+            },
+            //function to create the difference div, value ind = expand value
+            //get the dufference between the year's
+            getDiff_Grundakt=function(values_ind,values_set){
+                //create the Date object Date(year,months)
+                let date_set = new Date(parseFloat(values_set[0]),parseFloat(values_set[1])),
+                    date_ind = new Date(parseFloat(values_ind[0]),parseFloat(values_ind[1])),
+                    //solution to calc the difference from http://www.splessons.com/how-do-i-find-the-difference-between-two-dates-using-jquery/
+                    diff_date = date_ind - date_set,
+                    years = Math.floor(diff_date/31536000000),
+                    months = Math.floor((diff_date % 31536000000)/2628000000);
+                return `${years} <b>Jahr(e)</b><br/>${months} <b>Monat(e)</b>`;
+                //return (years-(months/12)).toFixed(1).toString().replace('.',',');
+            };
+
         //reset the colspan to originial
-        if(!indikatorauswahl.getSelectedIndiktorGrundaktState()){table.setColspanHeader(4);}
+        if(!indikatorauswahl.getSelectedIndiktorGrundaktState()){table.setColspanHeader(5);}
 
         function defCalls(){
             let requests = [];
@@ -284,59 +480,62 @@ const table = {
                     rowspan_head = parseFloat(colspan_th.attr("colspan"));
 
                 //expand elements inside the map indicator table (S00AG, B00AG, ABS)
-                if(count==10){
+                if(count===10){
                     //expand the header of the table
                     colspan_th.attr("colspan",(rowspan_head+1));
                     let einheit_txt = '('+einheit+')';
                     if(id==="B00AG"){
                         einheit_txt = einheit;
                     }
-                    second_header_row.append('<th class="th_head '+class_expand+' header">'+name+' '+einheit_txt+'</th>');
+                    second_header_row.append(`<th class="th_head ${class_expand} header">${name} ${einheit_txt}</th>`);
                     //expand the body
                     $.each(values_expand.values,function(key,value){
                         table_body.find('tr').each(function(){
                             //the ags is automatically the key
                             if($(this).attr("id")===key){
-                                $(this).append('<td class="val-ags '+class_expand+'">'+value.value_round+'</td>');
+                                $(this).append(`<td class="val-ags ${class_expand}">${value.value_round}</td>`);
                             }
                         })
                     });
                     //expand the footer
                     let obj_brd = getExpandValue(id);
                     let obj_ags = [{ags:"99"}];
-                    footer_brd.append('<td id="99_expand_'+id+'" class="val-ags '+class_expand+'"></td>');
+                    footer_brd.append(`<td id="99_expand_${id}" class="val-ags ${class_expand}"></td>`);
+                    //grab the data for brd and bld
                     $.when(request_manager.getTableExpandValues(obj_brd,obj_ags)).done(function(data){
-                        let data_array = data;
-                        let value_brd = data_array['values']['99']['value_round'];
+                        let value_brd = data['values']['99']['value_round'];
                         $('#99_expand_'+id).text(value_brd);
                     });
                     //if finer spatial choice -> expand the table footer above the brd part
-                    if(typeof raumgliederung.getSelectedId()!=='undefined'){
+                    if(typeof raumgliederung.getSelectionId()!=='undefined'){
                         //get the selection from the dropdown as string
                         let selection = $('#dropdown_grenzen_container').dropdown('get value').split(',');
                         //append the footer
                         $.each(selection,function(key,value){
                             let obj_ags_bld = [{ags:value}];
-                            $('#tfoot_'+value).append('<td id="'+value+'_expand_'+id+'" class="val-ags '+class_expand+'"></td>');
+                            $('#tfoot_'+value).append(`<td id="${value}_expand_${id}" class="val-ags ${class_expand}"></td>`);
                             $.when(request_manager.getTableExpandValues(obj_brd,obj_ags_bld)).done(function(data){
-                                let data_array_bld = data;
-                                let value_bld = data_array_bld['values'][value]['value_round'];
-                                $('#'+value+'_expand_'+id).text(value_bld);
+                                let value_bld = data['values'][value]['value_round'];
+                                $(`#${value}_expand_${id}`).text(value_bld);
                             });
                         });
                     }
                 }
                 //expand with BRD ord BLD as new columns outside the table
-                else if(count ==15){
+                else if(count==15){
                     //epand the header
-                    let header_text_first_row = "Differenz zum Bundesland",
-                        header_text_second_row = "Bundeslandwert (Name)("+indikatorauswahl.getIndikatorEinheit()+")";
+                    let header_text_first_row = "Differenz",
+                        header_text_second_row = "Bld-Wert ("+indikatorauswahl.getIndikatorEinheit()+")",
+                        //get only the difference Value for data sorting
+                        getDifferenceValue=function(value_ind,value_ags){
+                            return (value_ags-value_ind);
+                        };
                     if(id==='brd'){
-                        header_text_first_row = 'Differenz zur Bundesrepublik';
-                        header_text_second_row = 'Wert für Bundesrepublik';
+                        header_text_second_row = 'Wert für BRD';
                     }
-                    first_header_row.append('<th colspan="2" class="'+grey_border+' '+class_expand+' sorter-false expand">'+name+'</th>');
-                    second_header_row.append('<th id="expand_values" class="'+grey_border+' '+class_expand+'">'+header_text_first_row+'</th><th class="'+class_expand+'">'+header_text_second_row+'</th>');
+                    first_header_row.append(`<th colspan="2" class="${grey_border} ${class_expand} sorter-false expand">${name}</th>`);
+                    second_header_row.append(`<th class="${grey_border} ${class_expand}">${header_text_first_row}</th>
+                                              <th class="${class_expand}">${header_text_second_row}</th>`);
 
                     //expand the table body
                     $.each(values_expand.values,function(key,value_json){
@@ -345,14 +544,18 @@ const table = {
                                 bld_text = ' ('+value_json.bld+')';
                             if (key === ags_subst || id ==='brd') {
                                 if(id==='brd'){bld_text='';}
-                                let value_bld = parseFloat(value_json.value_round);
-                                let value_ags = parseFloat($(this).find('.val-ags').find('b').text());
-                                $(this).append('<td class="'+grey_border+' '+class_expand+'" data-sort-value="'+getDifferenceValue(value_bld,value_ags)+'">'+getDifferenceDiv(value_bld,value_ags)+'</td><td class="val-ags '+class_expand+'">'+value_json.value_round+bld_text+'</td>');
+                                let value_bld = parseFloat(value_json.value_round.replace(",",".")),
+                                    value_ags = parseFloat($(this).find('.val-ags').find('b').text().replace(",","."));
+
+                                $(this).append(`<td class="${grey_border} ${class_expand} expand_brd_bld" 
+                                                    data-sort-value="${getDifferenceValue(value_bld,value_ags)}">
+                                                    ${getDifferenceDiv(value_bld,value_ags)}</td>
+                                                <td class="val-ags ${class_expand}">${value_json.value_round+bld_text}</td>`);
                             }
                         });
                     });
                     //expand the table footer
-                    $('#table_ags').find('.tfoot').find('tr').each(function(){$(this).append('<th class="'+grey_border+' '+class_expand+'" colspan="2"></th>')})
+                    $('#table_ags').find('.tfoot').find('tr').each(function(){$(this).append(`<th class="${grey_border} ${class_expand}" colspan="2"></th>`)})
                 }
                 //time shift expand
                 else if(count==20){
@@ -427,7 +630,7 @@ const table = {
                         }
                     });
                     //if finer spatial choice -> expand the table footer above the brd part
-                    if(typeof raumgliederung.getSelectedId()!=='undefined'){
+                    if(typeof raumgliederung.getSelectionId()!=='undefined'){
                         //get the selection from the dropdown as string
                         let selection = $('#dropdown_grenzen_container').dropdown('get value').split(',');
                         //append the footer
@@ -488,7 +691,7 @@ const table = {
                         $('#99_expand_'+time_set).text(value_brd);
                     });
                     //if finer spatial choice -> expand the table footer above the brd part
-                    if(typeof raumgliederung.getSelectedId()!=='undefined'){
+                    if(typeof raumgliederung.getSelectionId()!=='undefined'){
                         //get the selection from the dropdown as string
                         let selection = $('#dropdown_grenzen_container').dropdown('get value').split(',');
                         //append the footer
@@ -526,7 +729,7 @@ const table = {
                         $('#99_expand_ind').text(value_brd);
                     });
                     //if finer spatial choice -> expand the table footer above the brd part
-                    if(typeof raumgliederung.getSelectedId()!=='undefined'){
+                    if(typeof raumgliederung.getSelectionId()!=='undefined'){
                         //get the selection from the dropdown as string
                         let selection = $('#dropdown_grenzen_container').dropdown('get value').split(',');
                         //append the footer
@@ -543,52 +746,10 @@ const table = {
                 }
             });
             progressbar.remove();
-            table.setTableSorter();
+            table.controller.setTableSorter();
             table.expandState= true;
             main_view.resizeSplitter(table.getWidth()+80);
         });
-        //function to get the order state inside the table, based on the given number
-        function getExpandValue(id,key_set){
-            let return_val;
-            $.each(expand_array,function(key,value){
-                if(value.id===id){
-                    if(key_set) {
-                        return_val = value[key_set];
-                    }else{
-                        return_val=value;
-                    }
-                }
-            });
-            return return_val;
-        }
-        //get only the difference Value for data sorting
-        function getDifferenceValue(value_ind,value_ags){
-               return (value_ags-value_ind).toFixed(2);
-        }
-        //function to create the difference div, value ind = expand value
-        function getDifferenceDiv(value_ind,value_ags){
-            //create the difference view
-            let dif_val = (value_ags-value_ind).toFixed(2),
-                class_glyphicon = 'negativ';
-            if (value_ind<value_ags){
-                class_glyphicon='positiv';
-            }else if(value_ags==value_ind){
-                class_glyphicon='';
-            }
-            return '<div class="dif_val_div"><span class="glyphicon glyphicon-circle-arrow-right '+class_glyphicon+'"></span><b>'+dif_val.replace('.',',')+'</b></div>';
-        }
-        //get the dufference between the year's
-        function getDiff_Grundakt(values_ind,values_set){
-            //create the Date object Date(year,months)
-            let date_set = new Date(parseFloat(values_set[0]),parseFloat(values_set[1])),
-                date_ind = new Date(parseFloat(values_ind[0]),parseFloat(values_ind[1])),
-                //solution to calc the difference from http://www.splessons.com/how-do-i-find-the-difference-between-two-dates-using-jquery/
-                diff_date = date_ind - date_set,
-                years = Math.floor(diff_date/31536000000),
-                months = Math.floor((diff_date % 31536000000)/2628000000);
-            return `${years} <b>Jahr(e)</b><br/>${months} <b>Monat(e)</b>`;
-            //return (years-(months/12)).toFixed(1).toString().replace('.',',');
-        }
     },
     setExpandState:function(_state){
         this.expandState = _state;
@@ -604,62 +765,6 @@ const table = {
     },
     setColspanHeader:function(val){
         this.getColSpanRow().attr("colspan",val);
-    },
-    setTableSorter:function(){
-        // these default equivalents were obtained from a table of equivalents
-        $.tablesorter.characterEquivalents = {
-            'a' : '\u00e1\u00e0\u00e2\u00e3\u00e4\u0105\u00e5', // áàâãäąå
-            'A' : '\u00c1\u00c0\u00c2\u00c3\u00c4\u0104\u00c5', // ÁÀÂÃÄĄÅ
-            'c' : '\u00e7\u0107\u010d', // çćč
-            'C' : '\u00c7\u0106\u010c', // ÇĆČ
-            'e' : '\u00e9\u00e8\u00ea\u00eb\u011b\u0119', // éèêëěę
-            'E' : '\u00c9\u00c8\u00ca\u00cb\u011a\u0118', // ÉÈÊËĚĘ
-            'i' : '\u00ed\u00ec\u0130\u00ee\u00ef\u0131', // íìİîïı
-            'I' : '\u00cd\u00cc\u0130\u00ce\u00cf', // ÍÌİÎÏ
-            'o' : '\u00f3\u00f2\u00f4\u00f5\u00f6\u014d', // óòôõöō
-            'O' : '\u00d3\u00d2\u00d4\u00d5\u00d6\u014c', // ÓÒÔÕÖŌ
-            'ss': '\u00df', // ß (s sharp)
-            'SS': '\u1e9e', // ẞ (Capital sharp s)
-            'u' : '\u00fa\u00f9\u00fb\u00fc\u016f', // úùûüů
-            'U' : '\u00da\u00d9\u00db\u00dc\u016e' // ÚÙÛÜŮ
-        };
-        // modify the above defaults as follows
-        $.extend( $.tablesorter.characterEquivalents, {
-            "ae" : "\u00e6", // expanding characters æ Æ
-            "AE" : "\u00c6",
-            "oe" : "\u00f6\u0153", // œ Œ
-            "OE" : "\u00d6\u0152",
-            "d"  : "\u00f0",  // Eth (ð Ð)
-            "D"  : "\u00d0",
-            "o"  : "\u00f3\u00f2\u00f4\u00f5", // remove ö because it's in the oe now
-            "O"  : "\u00d3\u00d2\u00d4\u00d5"  // remove Ö because it's in the OE now
-        });
-
-        this.getDOMObject()
-            .tablesorter()
-            .trigger("update")
-            .bind("sortEnd",function () {
-                table.setRang();
-            });
-    },
-    destroyTableSorter:function(){
-        this.getDOMObject().trigger("destroy");
-    },
-    setStickTableHeader:function(){
-        const table = this.getDOMObject();
-        table.stickyTableHeaders({
-            fixedOffset: $('#thead'),
-            scrollableArea: $('.scrollable-area')
-        });
-    },
-    destroyStickyTableHeader:function(){
-        this.getDOMObject().stickyTableHeaders('destroy');
-    },
-    reinitializeStickyTableHeader:function(){
-        this.destroyStickyTableHeader();
-        if(this.getWidth()<right_view.getWidth()){
-            this.setStickTableHeader();
-        }
     },
     isOpen:function(){
         let state = true;
@@ -696,6 +801,8 @@ const table = {
     controller:{
         set:function(){
             const tableObject = table.getTableBodyObject();
+            let table_body = $('#tBody_value_table'),
+                table_selection = $('#tBody_selection');
 
             //on click table head
             tableObject
@@ -772,11 +879,10 @@ const table = {
                 .unbind()
                 .on('keyup', function() {
                     let value = $(this).val().toLowerCase(),
-                        selector = tableObject.find('tr');
+                        selector = table_body.find('tr');
                     if(value.length >2) {
                         selector.each(function () {
                             if ($(this).find('.td_name').text().toLocaleLowerCase().includes(value)) {
-                                console.log($(this));
                                 $(this).show();
                             }else{
                                 $(this).hide();
@@ -788,39 +894,148 @@ const table = {
                 });
 
             //Hover
-            $("#tBody_value_table")
+            table_body
                 .unbind()
                 .mouseenter(function() {
                     $(this).delegate('tr', 'mouseover mouseleave', function (e) {
                         if (e.type === 'mouseover') {
-                            $(this).addClass("hover");
                             let ags = $(this).find('.td_ags').text();
                             ags.trim();
                             indikator_json_group.highlight(ags,false);
                         }
                         else {
-                            $(this).removeClass("hover");
-                            indikator_json_group.resetHightlight();
-                        }
-                    });
-                    $(this).delegate('tr', 'click', function (e) {
-                        if (e.type === 'click') {
-                            $(this).addClass("hover");
-                            let ags = $(this).find('.td_ags').text();
-                            ags.trim();
-                            indikator_json_group.highlight(ags,true);
-                        }
-                        else {
-                            $(this).removeClass("hover");
                             indikator_json_group.resetHightlight();
                         }
                     });
                 });
+            //add the scroll funcionality
             table.getScrollableAreaDOMObject()
                 .unbind()
                 .on("scroll",function(){
                     table.onScroll();
                 });
+
+            // selection for allowed spatial extends
+            if(exclude.checkPerformanceAreas()) {
+                //set selection by check
+                $(document).on("change",".select_check",function(){
+                       let ags = $(this).data("ags").toString();
+                       table.selection.push(ags);
+                       table.setSelection();
+                });
+                //remove selection by uncheck
+                $(document).on("change",".select_uncheck",function(){
+                        let ags = $(this).data("ags").toString();
+                        table.removeSelection(ags);
+                    });
+            }
+        },
+        setTableSorter:function(){
+            // these default equivalents were obtained from a table of equivalents
+            $.tablesorter.characterEquivalents = {
+                'a' : '\u00e1\u00e0\u00e2\u00e3\u00e4\u0105\u00e5', // áàâãäąå
+                'A' : '\u00c1\u00c0\u00c2\u00c3\u00c4\u0104\u00c5', // ÁÀÂÃÄĄÅ
+                'c' : '\u00e7\u0107\u010d', // çćč
+                'C' : '\u00c7\u0106\u010c', // ÇĆČ
+                'e' : '\u00e9\u00e8\u00ea\u00eb\u011b\u0119', // éèêëěę
+                'E' : '\u00c9\u00c8\u00ca\u00cb\u011a\u0118', // ÉÈÊËĚĘ
+                'i' : '\u00ed\u00ec\u0130\u00ee\u00ef\u0131', // íìİîïı
+                'I' : '\u00cd\u00cc\u0130\u00ce\u00cf', // ÍÌİÎÏ
+                'o' : '\u00f3\u00f2\u00f4\u00f5\u00f6\u014d', // óòôõöō
+                'O' : '\u00d3\u00d2\u00d4\u00d5\u00d6\u014c', // ÓÒÔÕÖŌ
+                'ss': '\u00df', // ß (s sharp)
+                'SS': '\u1e9e', // ẞ (Capital sharp s)
+                'u' : '\u00fa\u00f9\u00fb\u00fc\u016f', // úùûüů
+                'U' : '\u00da\u00d9\u00db\u00dc\u016e' // ÚÙÛÜŮ
+            };
+            // modify the above defaults as follows
+            $.extend( $.tablesorter.characterEquivalents, {
+                "ae" : "\u00e6", // expanding characters æ Æ
+                "AE" : "\u00c6",
+                "oe" : "\u00f6\u0153", // œ Œ
+                "OE" : "\u00d6\u0152",
+                "d"  : "\u00f0",  // Eth (ð Ð)
+                "D"  : "\u00d0",
+                "o"  : "\u00f3\u00f2\u00f4\u00f5", // remove ö because it's in the oe now
+                "O"  : "\u00d3\u00d2\u00d4\u00d5"  // remove Ö because it's in the OE now
+            });
+
+            table.getDOMObject()
+                .tablesorter()
+                .bind("sortEnd",function () {
+                    table.setRang();
+                });
+        },
+        updateTableSorter:function(){
+            table.getDOMObject().trigger("update");
+        },
+        sortTable:function(_column){
+            table.getDOMObject().find("th:contains("+_column+")").trigger("sorton");
+        },
+        destroyTableSorter:function(){
+            table.getDOMObject().trigger("destroy");
+        },
+        setStickTableHeader:function(){
+            table.getDOMObject().stickyTableHeaders({
+                fixedOffset: $('#thead'),
+                scrollableArea: $('.scrollable-area')
+            });
+        },
+        destroyStickyTableHeader:function(){
+            table.getDOMObject().stickyTableHeaders('destroy');
+        },
+        reinitializeStickyTableHeader:function(){
+            table.controller.destroyStickyTableHeader();
+            if(table.getWidth()<right_view.getWidth()){
+                table.controller.setStickTableHeader();
+            }
+        },
+    },
+    setSelection:function(){
+        if(this.selection.length >0 && exclude.checkPerformanceAreas()) {
+            let html_array = [];
+            $.each(table.selection,function(key,select){
+                let ags = select,
+                    elem=$(`#${ags}`);
+                $clone = elem.clone();
+                $clone
+                    .addClass("selected")
+                    .attr("id",ags+"check")
+                    .find(".select_check")
+                    .removeClass("select_check")
+                    .prop("checked",true)
+                    .addClass("select_uncheck");
+                indikator_json_group.highlight(ags, false);
+                $('#tBody_selection').append($clone);
+                elem.remove();
+            });
+            table.controller.updateTableSorter();
+            table.getScrollableAreaDOMObject().scrollTop(0);
+            table.setRang();
         }
+    },
+    removeSelection:function(ags){
+        let elem = $(`#${ags}check`);
+        table.selection = $.grep(table.selection, function (val) {
+            return val != ags;
+        });
+        $clone_change = elem.clone();
+        $clone_change
+            .removeClass("selected")
+            .attr("id",ags)
+            .find(".select_uncheck")
+            .removeClass("select_uncheck")
+            .addClass("select_check");
+        indikator_json_group.resetHightlight();
+        $("#tBody_value_table").append($clone_change);
+        elem.remove();
+        //wait until element exists in table
+        table.controller.updateTableSorter();
+        $('.th_head.gebietsname').click();
+        table.setRang();
+    },
+    clearSelection:function(){
+        this.selection=[];
+        $('#tBody_selection').empty();
     }
 };

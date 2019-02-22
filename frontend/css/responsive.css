@@ -1,0 +1,108 @@
+@keyframes pulse{
+    0%{
+        transform: scale(5.5);
+        opacity: .2;
+    }
+    50%{
+        opacity: .8;
+    }
+    100%{
+        transform: scale(.1);
+        opacity: 1;
+    }
+}
+@media only screen and (max-width : 1280px) {
+    .navbar-text{
+        margin-left: 5px !important;
+    }
+}
+
+/*Styles for screen 515px and lower*/
+@media only screen and (max-width : 1024px) {
+    .indikator_header{
+        left: 20% !important;
+        white-space: normal;
+        width: 200px !important;
+    }
+    .hr_time{
+        display: none;
+    }
+    #header_slider_zeit{
+        display: none;
+    }
+    #legende_l{
+        display: none;
+    }
+    #legende_button_l{
+        display: block !important;
+        left: 0;
+    }
+    #content #dropdown_raumgl .spatial_choice .label_spatial_choice {
+        font-size: 1.5rem !important;
+    }
+    #content #dropdown_raumgl .spatial_choice #spatial_choice_checkbox_container label:before{
+        width: 3.5rem !important;
+        height: 2.5rem !important;
+        background: #8CB91B !important;
+    }
+    #content #dropdown_raumgl .spatial_choice #spatial_choice_checkbox_container label:after{
+        width: 1.5rem !important;
+        height: 2.5rem !important;
+    }
+    #export_map{
+        display:none !important;
+    }
+}
+/* media queries*/
+@media only screen and (max-width : 700px) {
+    #progress_div{
+        right: 5% !important;
+        left: 5% !important;
+    }
+    .hr_time{
+        display: none !important;
+    }
+    #header_slider_zeit{
+        display: none !important;
+    }
+    .modus_list li{
+        width: 30% !important;
+        padding: 0 !important;
+    }
+    .legende #datenalter_container{
+        display: none !important;
+    }
+    #vergleich_dialog{
+        width: 90% !important;
+        max-height: 600px !important;
+        min-height: 300px !important;
+    }
+    .mobile_hidden{
+        display: none !important;
+    }
+
+}
+@media only screen and (max-width : 500px) {
+    #vergleich_dialog{
+        width: 90% !important;
+        height: 80% !important;
+    }
+    #klassenbestzung_vergleich{
+        display: none !important;
+    }
+    #interact_div{
+        display: none !important;
+    }
+    #scrollable-area{
+        width: 100% !important;
+    }
+    #scrollable-area #table_ags{
+        margin-right: 60px !important;
+    }
+    #layer_control .maps .float-right{
+        width:100%;
+    }
+    .mobile_hidden{
+        display: none !important;
+    }
+}

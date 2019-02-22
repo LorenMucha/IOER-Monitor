@@ -1,10 +1,12 @@
 const dev_chart={
+    chart_compare_selector:"#dev_chart_compare",
+    chart_selector:"#dev_chart",
     endpoint_id:"entwicklungsdiagramm_content",
     text:{
         de:{
             title:{
-                false:"Indikatorwertentwicklung",
-                true:"Indikatorvergleich"
+                false:"Wertentwicklung",
+                true:"Entwicklungs- vergleich"
             },
             info:"Dieses Diagramm stellt die Entwicklung der Indikatoren dar.",
             indicator:"verfügbare Indikatoren",
@@ -14,7 +16,9 @@ const dev_chart={
             pnt:"alle Stützpunkte",
             trend:"Prognosewerte",
             unit:"Einheit",
-            chart:"Entwicklungsdiagramm für Gebietseinheit"
+            chart:"Entwicklungsdiagramm für Gebietseinheit",
+            set_choice: function(){return `Bitte ${base_raumgliederung.getBaseRaumgliederungText(true)} angeben`},
+            cancel:"Abbrechen"
         },
         en:{
             title:"Trend chart",
@@ -26,8 +30,28 @@ const dev_chart={
             pnt: "all base points",
             trend:"Forecast values",
             unit:"Unit",
-            chart:"Development diagram for territorial unit"
+            chart:"Development diagram for territorial unit",
+            set_choice: function(){return `Please set ${base_raumgliederung.getBaseRaumgliederungText(true)}`},
+            cancel:"Cancel"
         }
+    },
+    icon:{
+      single:{
+          path:"frontend/assets/icon/trend20.png"
+      },
+      multiple:{
+          path:"frontend/assets/icon/trend_compare20.png"
+      }
+    },
+    init:function(){
+        if(raeumliche_visualisierung.getRaeumlicheGliederung()==="raster"){
+            helper.disableElement(this.chart_selector,"vergleichen Sie 2 Indikatoren oder Zeitschnitte miteinander");
+            helper.disableElement(this.chart_compare_selector,"vergleichen Sie 2 Indikatoren oder Zeitschnitte miteinander");
+        }else{
+            helper.enableElement(this.chart_selector,$(this.chart_selector).data("title"));
+            helper.enableElement(this.chart_compare_selector,$(this.chart_compare_selector).data("title"));
+        }
+        this.controller.set();
     },
     open:function(){
         let lan = language_manager.getLanguage(),
@@ -80,17 +104,24 @@ const dev_chart={
                             <h3 class="Hinweis_diagramm" id="diagramm_loading_info">Lädt Diagramm......</h3>
                             <svg id="visualisation" height="100"></svg>
                         </div>
-                        <div id="tooltip"></div>
+                        <div id="tooltip" style="pointer-events: none;"></div>
                     </div>
                 </div>
                 </div>
             </div>
         `);
         //settings for the manager
-        dialog_manager.instructions.endpoint = `${this.endpoint_id}`;
-        dialog_manager.instructions.html= html;
-        dialog_manager.instructions.title=dev_chart.text[lan].title[this.chart.settings.ind_vergleich];
-        dialog_manager.instructions.modal=false;
+        let instructions = {
+            endpoint:`${this.endpoint_id}`,
+            html:html,
+            title:dev_chart.text[lan].title[this.chart.settings.ind_vergleich],
+            modal:false,
+            close:function(){
+                dev_chart.chart.settings.state_stueztpnt=false;
+                dev_chart.chart.settings.state_prognose=false;
+            }
+        };
+        dialog_manager.setInstruction(instructions);
         dialog_manager.create();
         this.chart.create();
 
@@ -101,7 +132,7 @@ const dev_chart={
             ind:"",
             name:"",
             ind_vergleich:false,
-            state_stueztpnt : true,
+            state_stueztpnt : false,
             state_prognose :false
         },
         ind_array_chart:[],
@@ -113,7 +144,8 @@ const dev_chart={
                 diagram = $('#diagramm'),
                 margin = {top: 20, right: 60, bottom: 30, left: 60},
                 chart_width = diagram.width() - margin.left - margin.right,
-                chart_height = 400 - (array.length * 30);
+                chart_height = 400 - (array.length * 30),
+                margin_top = 0;
 
             //let chart_height = $('.ui-dialog').height()*(1.5/3);
             let x = d3.scaleTime().range([0, chart_width]),
@@ -132,8 +164,6 @@ const dev_chart={
                 $('#Hinweis_diagramm_empty').hide();
             }
 
-            //set dynamic the chart dimensions
-            diagram.css("height", $('#entwicklungsdiagramm_content').height() - $('#diagramm_options').height() - 70 + (array.length * 30));
             //clean the legend
             $('.legende_single_part_container').remove();
 
@@ -174,9 +204,9 @@ const dev_chart={
                 chart.merge_data = [];
                 let i = 0;
                 $.each(array, function (key, val) {
-                    let obj = {"id": val.id, "values": arr[i][0]};
+                    let obj = {id: val.id, values: arr[i][0]};
                     if (array.length == 1) {
-                        obj = {"id": val.id, "values": arr[0]};
+                        obj = {id: val.id, values: arr[0]};
                     }
                     chart.merge_data.push(obj);
                     i++;
@@ -195,11 +225,12 @@ const dev_chart={
                 });
                 let minYear = helper.getMinArray(data, "year"),
                     maxYear = helper.getMaxArray(data, "year"),
-                    maxValue = parseInt(Math.round(helper.getMaxArray(data, "value")) + 1),
-                    minValue = parseInt(Math.round(helper.getMinArray(data, "value")) - 1),
+                    maxValue = (helper.getMaxArray(data, "value")+.5).toFixed(1),
+                    minValue = (helper.getMinArray(data, "value")-.5).toFixed(1),
                     min_date = new Date(minYear - 1, 0, 1),
                     max_date = new Date(maxYear + 1, 0, 1),
                     current_year = helper.getCurrentYear();
+
                 //reset max year if prognose is unset
                 if (!chart.settings.state_prognose) {
                     max_date = new Date(current_year + 2, 0, 1);
@@ -211,7 +242,6 @@ const dev_chart={
                 }
 
                 y.domain(d3.extent([minValue, maxValue]));
-
 
                 g.append("g")
                     .attr("class", "axis axis--x")
@@ -228,7 +258,7 @@ const dev_chart={
 
                 g.append("g")
                     .attr("class", "axis axis--y")
-                    .call(d3.axisLeft(y).ticks(6).tickFormat(function (d) {
+                    .call(d3.axisLeft(y).ticks(8).tickFormat(function (d) {
                         if (chart.settings.ind_vergleich) {
                             if (d == 0) {
                                 if (array.length== 1) {
@@ -243,14 +273,7 @@ const dev_chart={
                         } else {
                             return d;
                         }
-                    }))
-                    .append("text")
-                    .attr("class", "axis-title")
-                    .attr("transform", "rotate(-90)")
-                    .attr("y", 6)
-                    .attr("dy", ".71em")
-                    .style("text-anchor", "end")
-                    .attr("fill", "#4E60AA");
+                    }));
             }
 
             //fill the path values
@@ -266,18 +289,33 @@ const dev_chart={
 
             //add the data
             function appendData(data, color) {
-                let color_set = color;
-                g.append("path")
-                    .data(data)
-                    .attr("class", "path_line")
-                    .attr("id", data[0].id + "_path")
-                    .attr('stroke', color_set)
-                    .attr("stroke-dasharray", ("7, 3"))
-                    .attr("fill", "none")
-                    .attr("d", line(data));
+                let values_line = [],
+                    values_future=[],
+                    set=function(array,_dash_array){
+                        g.append("path")
+                            .data(array)
+                            .attr("class", "path_line")
+                            .attr('stroke', color)
+                            .attr("stroke-dasharray",_dash_array)
+                            .attr("fill", "none")
+                            .attr("d", line(array));
+                };
+                $.each(data,function(key,value){
+                    if(value.year <(new Date).getFullYear()){
+                        values_line.push(value);
+                    }else{
+                        values_future.push(value);
+                    }
+                });
+                set(values_line,("7,3"));
+                if(values_future.length>0){
+                    values_future.push(values_line[(values_line.length-1)]);
+                    values_future = values_future.sort(function(a,b){
+                       return a.year>b.year ? 1:-1;
+                    });
+                    set(values_future,("1,3"));
+                }
             }
-
-            let margin_top = 0;
 
             function setLegende(data, color) {
                 legend.append('g')
@@ -300,9 +338,10 @@ const dev_chart={
             }
 
             function createCircle(data, color) {
-                let color_set = color;
-                let format_month = d3.timeFormat("%m");
-                let format_year = d3.timeFormat("%Y");
+                let color_set = color,
+                    format_month = d3.timeFormat("%m"),
+                    format_year = d3.timeFormat("%Y"),
+                    tooltip = $('#tooltip');
                 for (let i = 0; i < data.length; i++) {
                     let circle = g.append("g");
                     circle.append("circle")
@@ -326,15 +365,75 @@ const dev_chart={
                         .attr("data-month", data[i].month)
                         .attr("data-einheit", data[i].einheit)
                         .attr("data-color", color_set)
-                        .attr("transform", "translate(" + x(data[i].date) + "," + y(data[i].value) + ")");
-                }
-                //bind the mouseover events
-                $('.circle').on("mouseover",function(){
-                    chart.controller.handleMouseOver($(this));
-                })
-                    .on("mouseout",function(){
-                        chart.controller.handleMouseOut($(this));
+                        .attr("transform", "translate(" + x(data[i].date) + "," + y(data[i].value) + ")")
+                        .on("mouseenter",function(){
+                            //handle what happens on moueover
+                            const chart = dev_chart.chart,
+                                elem = $(this);
+
+                            let ind = elem.data('ind'),
+                                year = elem.data('year'),
+                                month = elem.data('month'),
+                                value = elem.data('value'),
+                                real_value = elem.data('realvalue'),
+                                color = elem.data('color'),
+                                einheit = elem.data('einheit'),
+                                x = elem.position().left-document.getElementById('visualisation').getBoundingClientRect().x +10,
+                                y = elem.position().top-document.getElementById('visualisation').getBoundingClientRect().y + 80,
+                                html = '',
+                                text_value = "Wert: " + real_value + " "+einheit;
+
+                            elem.attr("r",7.5);
+
+                            //the tooltip for ind vergleich
+                            if (dev_chart.chart.settings.ind_vergleich) {
+                                let data = [],
+                                    ind_before = function(merge_data,ind,year){
+                                        let array = [],
+                                            res = false;
+                                        for (let i = 0; i <merge_data.length; i++) {
+                                            if (merge_data[i].id === ind) {
+                                                array.push(merge_data[i])
+                                            }
+                                        }
+                                        for (let i = 0; i < array.length; i++) {
+                                            if (array[i].id === ind) {
+                                                if (array[i].year == year) {
+                                                    res= i - 1;
+                                                }
+                                            }
+                                        }
+                                        return res;
+                                    };
+                                $.each(chart.merge_data,function(x,y){
+                                    if (y.id === ind) {
+                                        data.push(y.values);
+                                    }
+                                });
+                                //check if the oldest year is hover
+                                let index = ind_before(data[0],ind, year);
+                                if (index == -1) {
+                                    html = text_value + "<br/>" + "Stand: " + month + "/" + year;
+                                } else {
+                                    //the text part
+                                    let date_before = "von " + data[0][index].month + "/" +data[0][index].year + " bis " + month + "/" + year;
+                                    let text_value_dev = "Entwicklung: " + (value - data[0][index].value).toFixed(2) + " "+einheit;
+                                    html = text_value + `<br/>${text_value_dev}<br/>${date_before}`;
+                                }
+                            } else {
+                                html = text_value + `<br/> Stand: ${month} / ${year}`;
+                            }
+
+                            tooltip
+                                .html(html)
+                                .css({"left": x, "top": y, "color": color, "border": "1px solid" + color})
+                                .show();
+                        })
+                        .on("mouseout",function(){
+                            $(this).attr("r", 5.5);
+                            tooltip.hide();
                     });
+                }
             }
 
             function parseTime(data) {
@@ -349,7 +448,8 @@ const dev_chart={
         },
         create:function(){
             const chart = dev_chart.chart;
-            let selector = $(`#${dev_chart.endpoint_id}`);
+            let selector = $(`#${dev_chart.endpoint_id}`),
+                indikatorauswahl_chart = $('#indicator_ddm_diagramm');
             chart.controller.clearChartArray();
             $('#default_diagramm_choice').text(indikatorauswahl.getSelectedIndikatorText());
             if(chart.settings.ind_vergleich) {
@@ -358,11 +458,13 @@ const dev_chart={
                     let kat_auswahl_diagramm =$('#kat_auswahl_diagramm');
                     indikatorauswahl.cloneMenu('kat_auswahl_diagramm', 'link_kat_diagramm', 'right',['X'],false);
                     //remove items which have not the simular unit
-                    $('#indicator_ddm_diagramm .submenu .item').each(function(){
-                        if(indikatorauswahl.getIndikatorEinheit() !== $(this).data('einheit')){
-                            $(this).remove();
-                        }
-                    });
+                    indikatorauswahl_chart
+                        .find('.submenu .item')
+                        .each(function(){
+                            if(indikatorauswahl.getIndikatorEinheit() !== $(this).data('einheit')){
+                                $(this).remove();
+                            }
+                        });
                     //clear empty categories
                     $('.link_kat_diagramm').each(function(){
                         let test = ($(this).find('.item').text()).replace(/\s+/g, '');
@@ -372,15 +474,15 @@ const dev_chart={
                     });
                     kat_auswahl_diagramm.find('.item').each(function(){$(this).css("color","rgba(0,0,0,.87)")});
                     //remove selected Indicatopr from the list
-                    kat_auswahl_diagramm.find("#"+indikatorauswahl.getSelectedIndikator()+"_item").remove();
+                    helper.disableElement(`#kat_auswahl_diagramm #${indikatorauswahl.getSelectedIndikator()}_item`);
                     chart.ind_array_chart.push({"id": chart.settings.ind});
                 }
             }else{
                 selector.find('#indikator_choice_container_diagramm').remove();
                 chart.ind_array_chart.push({"id": chart.settings.ind});
             }
-            chart.controller.set();
             chart.init();
+            chart.controller.set();
         },
         controller:{
             set:function(){
@@ -393,12 +495,13 @@ const dev_chart={
                 $('#diagrmm_gebiets_typ').text(" "+indikatorauswahl.getIndikatorEinheit());
                 //set the selcted value
                 ind_auswahl
+                    .unbind()
                     .dropdown({
                         'maxSelections': 2,
                         onAdd: function (addedValue, addedText, $addedChoice) {
                             chart.ind_array_chart.push({"id": addedValue});
                             chart.init();
-                            $(this).blur();
+                            $(this).dropdown("hide");
                         },
                         onLabelRemove: function (value) {
                             chart.ind_array_chart = helper.removefromarray(chart.ind_array_chart, value);
@@ -413,23 +516,27 @@ const dev_chart={
                 //options-------------------------
                 //1. alle Stützpkt
                 $('#alle_stpkt')
+                    .unbind()
                     .prop('checked', false)
                     .change(function(){
                         if (this.checked) {
-                            chart.settings.state_stueztpnt = false;
+                            chart.settings.state_stueztpnt = true;
                             chart.init();
                         }else{
-                            chart.settings.state_stueztpnt = true;
+                            chart.settings.state_stueztpnt = false;
                             chart.init();
                         }
                     });
+
                 if($.inArray(2025,indikatorauswahl.getAllPossibleYears())!==-1){
                     $('#prognose_container').show();
                 }else{
                     $('#prognose_container').hide();
                 }
+
                 //2. Prognose
                 $('#prognose')
+                    .unbind()
                     .prop('checked', false)
                     .change(function(){
                         if (this.checked) {
@@ -448,79 +555,18 @@ const dev_chart={
                                 height = container.height();
                             //workaround for firefox Bug
                             container.attr("height",height).attr("width",width);
-                            $(this).blur();
+                            $(this).dropdown("hide");
                             if (value === 'png') {
-                                svgString2Image(width, height, '.container_diagramm #diagramm svg', saveIMAGE);
+                                Export_Helper.svgString2Image(width, height, '.container_diagramm #diagramm svg', Export_Helper.saveIMAGE);
                             } else if (value === 'pdf') {
-                                svgString2DataURL(width, height, '.container_diagramm #diagramm svg',savePDF);
+                                Export_Helper.svgString2DataURL(width, height, '.container_diagramm #diagramm svg',{header:"Indikatorentwicklung für "+chart.settings.name,sub_header:""},Export_Helper.savePDF);
                             }
                         }
                     });
                 setTimeout(function(){
                     download.dropdown("hide");
                 },500);
-            },
-            // Create Event Handlers for mouse
-            handleMouseOver:function(elem) {
-                const chart = dev_chart.chart;
-                elem.attr("r",7.5);
-                console.log(elem.data("ind"));
-                let ind = elem.data('ind'),
-                    year = elem.data('year'),
-                    month = elem.data('month'),
-                    value = elem.data('value'),
-                    real_value = elem.data('realvalue'),
-                    color = elem.data('color'),
-                    einheit = elem.data('einheit'),
-                    x = elem.position().left-document.getElementById('visualisation').getBoundingClientRect().x +10,
-                    y = elem.position().top-document.getElementById('visualisation').getBoundingClientRect().y + 80,
-                    html = '',
-                    text_value = "Wert: " + real_value + " "+einheit;
-                //the tooltip for ind vergleich
-                if (dev_chart.chart.settings.ind_vergleich) {
-                    let data = [],
-                        ind_before = function(merge_data,ind,year){
-                            let array = [];
-                            for (let i = 0; i <merge_data.length; i++) {
-                                if (merge_data[i].id === ind) {
-                                    array.push(merge_data[i])
-                                }
-                            }
-                            for (let i = 0; i < array.length; i++) {
-                                if (array[i].id === ind) {
-                                    if (array[i].year == year) {
-                                        return i - 1;
-                                    }
-                                }
-                            }
-                        };
-                    $.each(chart.merge_data,function(x,y){
-                        if (y.id === ind) {
-                            data.push(y.values);
-                        }
-                    });
-                    //check if the oldest year is hover
-                    let index = ind_before(data[0],ind, year);
-                    if (index == -1) {
-                        html = text_value + "<br/>" + "Stand: " + month + "/" + year;
-                    } else {
-                        //the text part
-                        let date_before = "von " + data[0][index].month + "/" +data[0][index].year + " bis " + month + "/" + year;
-                        let text_value_dev = "Entwicklung: " + (value - data[0][index].value).toFixed(2) + " "+einheit;
-                        html = text_value + "<br/>" + text_value_dev + "<br/>" + date_before;
-                    }
-                } else {
-                    html = text_value + "<br/> Stand: " + month + "/" + year;
-                }
 
-                $('#tooltip')
-                    .html(html)
-                    .css({"left": x, "top": y, "color": color, "border": "1px solid" + color})
-                    .show();
-            },
-            handleMouseOut:function(elem) {
-                elem.attr("r", 5.5);
-                $('#tooltip').hide();
             },
             clear:function(){
                 $('#visualisation').empty();
@@ -533,5 +579,83 @@ const dev_chart={
                 dev_chart.chart.merge_data = [];
             }
         }
+    },
+    controller:{
+        set:function(){
+                let chart_array = [],
+                    id_input="search_ags",
+                    set_autocomplete = function () {
+                        chart_array = indikator_json_group.getAGSArray();
+                        auto_complete.autocomplete(document.getElementById(id_input), chart_array);
+                    },
+                    get_ags=function(){
+                        return $(`#${id_input}`).data("id");
+                    },
+                    get_name=function(){
+                        return $(`#${id_input}`).val();
+                    },
+                    lan = language_manager.getLanguage(),
+                    set_swal=function(callback){
+                        swal({
+                            title: `${dev_chart.text[lan].set_choice()}`,
+                            text: `<div class="form-group" style="display: unset !important;">
+                                <input type="text" id="${id_input}" class="form-control" tabindex="3" placeholder="Gebiet...">
+                           </div>`,
+                            showCancelButton: true,
+                            cancelButtonText: `${dev_chart.text[lan].cancel}`,
+                            html: true
+                        }, function (isConfirm) {
+                            if (isConfirm) {
+                                callback();
+                            }
+
+                        });
+                        //on enter also open the chart
+                        $(`#${id_input}`)
+                            .unbind()
+                            .keypress(function(e){
+                                var keycode = (e.keyCode ? e.keyCode : e.which);
+                                if (keycode == '13') {
+                                    callback();
+                                }
+                            });
+                        set_autocomplete()
+                    };
+                //call on select inside the toolbar
+                $(document).on("click", dev_chart.chart_selector, function () {
+                    let callback = function () {
+                        if(get_ags()) {
+                            dev_chart.chart.settings.ags = get_ags();
+                            dev_chart.chart.settings.name = get_name();
+                            dev_chart.chart.settings.ind = indikatorauswahl.getSelectedIndikator();
+                            dev_chart.chart.settings.ind_vergleich = false;
+                            dev_chart.open();
+                        }
+                    };
+                    try {
+                        set_swal(callback);
+                    }catch(err){
+                       alert_manager.alertError();
+                    }
+                });
+
+            $(document).on("click", dev_chart.chart_compare_selector, function () {
+                let callback = function () {
+                    if(get_ags()) {
+                        dev_chart.chart.settings.ags = get_ags();
+                        dev_chart.chart.settings.name = get_name();
+                        dev_chart.chart.settings.ind = indikatorauswahl.getSelectedIndikator();
+                        dev_chart.chart.settings.ind_vergleich = true;
+                        dev_chart.open();
+                    }
+                };
+                try {
+                    set_swal(callback);
+                }catch(err){
+                    alert_manager.alertError();
+                }
+            });
+        }
     }
 };
+

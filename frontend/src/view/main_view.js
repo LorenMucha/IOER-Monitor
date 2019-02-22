@@ -2,12 +2,11 @@ const main_view = {
     splitter:'',
     splitter_width:false,
     initializeFirstView:function(){
-        map_infos.hide();
         start_map.set();
     },
     restoreView:function(){
         legende.resize();
-        if (this.getWidth() <= 1280) {
+        if (this.getWidth() <= 1280 || this.getHeight()<=800) {
             this.initResponsiveView();
         }
         else if (this.getWidth() <= 1400) {
@@ -33,10 +32,9 @@ const main_view = {
                     toolbar.close();
                 },
                 onDragEnd: function (event) {
-                    table.reinitializeStickyTableHeader();
-                    map_infos.resize();
+                    table.controller.reinitializeStickyTableHeader();
                     legende.resize();
-                    map.invalidateSize()
+                    map.invalidateSize();
                 }
             });
     },
@@ -57,8 +55,7 @@ const main_view = {
                 legende.close();
             }
             legende.resize();
-            table.reinitializeStickyTableHeader();
-            map_infos.resize();
+            table.controller.reinitializeStickyTableHeader();
             map.invalidateSize();
         }
     },
@@ -95,7 +92,6 @@ const main_view = {
         $('.content').css("overflow-y","");
         $('#overflow_content').css("height","99%");
         //reset the bootom padding of the time slider
-        table.getScrollableAreaDOMObject().css("height","85%");
         indikatorauswahl.fill();
         indikatorauswahl.getDOMObject()
             .dropdown('refresh');
@@ -109,7 +105,7 @@ const main_view = {
     initResponsiveView:function(){
         view_state.setViewState("responsive");
         main_view.getWidth();
-        if(main_view.getWidth()<=500) {
+        if(main_view.getWidth()<=500 || main_view.getHeight() <=700) {
             $('#overflow_content').css("height", "");
             $('.content')
                 .css("overflow-y","auto");
@@ -122,9 +118,7 @@ const main_view = {
         legende.close();
         //resize
         indikatorauswahl.fill();
-        table.getScrollableAreaDOMObject().css("height","90%");
         if(raeumliche_visualisierung.getRaeumlicheGliederung()==='gebiete'){
-            panner.init();
             //bind the scroll handeler
             //reset the bootom padding of the time slider
             $('#rightPane').css("width","");

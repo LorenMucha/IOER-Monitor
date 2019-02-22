@@ -60,7 +60,7 @@ const gebietsauswahl = {
             indikator_json.addToMap(value, klassengrenzen.getKlassen());
         });
         $.each(this.getMapLayerGrund(), function (key, value) {
-            grundakt_layer.addToMap(value, grundakt_layer.getKlassen());
+            grundakt_layer.controller.addGeoJSONLayer({jsonFile:value, klassen:grundakt_layer.getKlassen()});
         });
         indikator_json_group.fitBounds();
     },
@@ -91,8 +91,8 @@ const gebietsauswahl = {
         this.setMapLayer(mapLayer);
         this.setMapLayerGrund(mapLayer_grund);
         this.setSelection(ags_array);
-        if(raumgliederung.getSelectedId()) {
-            indikator_json.init(raumgliederung.getSelectedId());
+        if(raumgliederung.getSelectionId()) {
+            indikator_json.init(raumgliederung.getSelectionId());
 
         }else{
             this.addSelectedLayersToMap();
@@ -146,6 +146,7 @@ const gebietsauswahl = {
                 .unbind()
                 .dropdown({
                     onAdd: function (addedValue, addedText, $addedChoice) {
+                        console.log("add",addedValue);
                         //close after each choice
                         menu.dropdown('hide');
                         indikator_json_group.clean();
@@ -170,17 +171,16 @@ const gebietsauswahl = {
                                     }
                                 });
                             });
-                        } catch (err) {
-
-                        }
+                        } catch (err) {}
                         gebietsauswahl.setMapLayer(mapLayer);
                         gebietsauswahl.setMapLayerGrund(mapLayer_grund);
                         gebietsauswahl.setSelection(ags_array);
-                        if(raumgliederung.getSelectedId() && !page_init){
-                            indikator_json.init(raumgliederung.getSelectedId());
+                        if(raumgliederung.getSelectionId() && !page_init){
+                            indikator_json.init(raumgliederung.getSelectionId());
                         }else {
+                            //add the selected spatial areas to the map
                             gebietsauswahl.addSelectedLayersToMap();
-                            table.create();
+                            table.fill();
                             raumgliederung.init();
                         }
                     },
@@ -209,6 +209,7 @@ const gebietsauswahl = {
                     gebietsauswahl.clear();
                     indikator_json_group.fitBounds();
                     raumgliederung.hide();
+                    table.clearSelection();
                 });
         }
     }

@@ -32,5 +32,8 @@ const progressbar ={
         this.getTextContainer()
             .empty()
             .text(html_string)
+    },
+    isVisible:function(){
+        return this.getContainer().is(":visible");
     }
 };

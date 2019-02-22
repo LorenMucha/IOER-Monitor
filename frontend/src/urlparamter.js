@@ -59,8 +59,8 @@ const urlparamter={
         window.history.pushState(param, paramVal, new_url);
 
     },
-    getURL_SVG:function(){
-        if(view_state.getProductionState()){
+    getURLMonitor:function(){
+        if(view_state.getProductionState() || location.hostname === "localhost"){
             return "https://monitor.ioer.de/monitor_test/";
         }else{
             return "https://monitor.ioer.de/";

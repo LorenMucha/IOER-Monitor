@@ -1,25 +1,21 @@
 const toolbar = {
+    //array which stores the pinned menus
+    pinned:[],
     getDOMObject:function(){
         $elem = $('#toolbar');
         return $elem;
     },
     state:false,
     open:function(){
-        this.state=true;
-        if(main_view.getMobileState()){
-            this.getDOMObject().removeClass('toolbar_close');
-        }else{
-            this.getDOMObject().removeClass('toolbar_close',500);
-            map_infos.resize();
-        }
+        toolbar.state=true;
+        this.getDOMObject().removeClass('toolbar_close',500);
     },
     close:function(){
-        this.state=false;
+        toolbar.state=false;
         if(main_view.getMobileState()){
             this.getDOMObject().addClass('toolbar_close');
         }else{
             this.getDOMObject().addClass('toolbar_close',500);
-            map_infos.resize();
         }
     },
     init:function(){
@@ -27,6 +23,7 @@ const toolbar = {
         this.state=true;
         this.create();
         this.controller.set();
+        exclude.setSpatialExtendelements();
     },
     getHeight:function(){
         return this.getDOMObject().height();
@@ -56,7 +53,7 @@ const toolbar = {
                                 <i class="large angle down icon" data-ddm="drop_kat"></i>
                                 <span>Indikator</span>
                             </div>
-                            <div class="pin">
+                            <div class="pin mobile_hidden">
                                 <i class="glyphicon glyphicon-pushpin" title="Menü anheften" data-ddm="drop_kat"></i>
                             </div>
                         </div>
@@ -67,6 +64,11 @@ const toolbar = {
                                     <i class="dropdown icon"></i>
                                     <div class="default text" id="ind_choice_info">Bitte wählen Sie einen Indikator</div>
                                     <div  id="kat_auswahl" class="menu"></div>
+                                </div>
+                                <div class="slider_container_time bottom_elements" id="slider_zeit_container">
+                                    <span><b>Zeitschnitt</b></span>
+                                    <hr class="hr"/>
+                                    <div class="zeit_slider" id="zeit_slider"></div>
                                 </div>
                                 <button class="btn btn-primary btn_dropdown kennblatt" onclick="kennblatt.open();">Kennblatt</button>
                             </div>
@@ -79,7 +81,7 @@ const toolbar = {
                                 <i class="large angle down icon" data-ddm="dropdown_raumgl"></i>
                                 <span>Räumliche Gliederung</span>
                             </div>
-                            <div class="pin">
+                            <div class="pin mobile_hidden">
                                 <i class="glyphicon glyphicon-pushpin" title="Menü anheften" data-ddm="dropdown_raumgl"></i>
                             </div>
                         </div>
@@ -122,7 +124,7 @@ const toolbar = {
                             </div>
                             <!-- Range Slider Raster-->
                             <div id="spatial_range_raster">
-                                <span class="span">Rasterweite in m</span>
+                                <span><b>Rasterweite in m</b></span>
                                 <hr class="hr"/>
                                 <div id="slider_raum_container">
                                     <div id="raum_slider"></div>
@@ -135,13 +137,16 @@ const toolbar = {
                                 <i class="large angle down icon" data-ddm="dropdown_layer"></i>
                                 <span>Kartengestaltung</span>
                             </div>
-                            <div class="pin">
+                            <div class="pin mobile_hidden">
                                 <i class="glyphicon glyphicon-pushpin" title="Menü anheften" data-ddm="dropdown_layer"></i>
                             </div>
                         </div>
                         <div class="dropdown_menu" id="dropdown_layer">
+                        <div class="w-100" id="map-selection">
+                                <button type="button" class="btn btn_dropdown w-100" id="map_button">Grundkarten</button>
+                            </div>
                             <div id="layer_conainer">
-                                <span class="span">Sichtbarkeit Indikator</span>
+                                <span><b>Sichtbarkeit Indikator</b></span>
                                 <hr class="hr"/>
                                 <div id="opacity_container">
                                     <div id="opacity_slider"></div>
@@ -149,8 +154,8 @@ const toolbar = {
                                     <div id="op_high">100</div>
                                 </div>
                             </div>
-                            <div id="farbwahl">
-                                <span class="span">Farbschema</span>
+                            <div id="farbwahl" class="mobile_hidden">
+                                <span><b>Farbschema</b></span>
                                 <hr class="hr"/>
                                 <div class="form-group-inline">
                                       <input type='text' name='triggerSet' id="triggerSet_min" title="Min Farbwert in Hex" placeholder="#"/>
@@ -160,11 +165,11 @@ const toolbar = {
                                 <div class="form-group">
                                       <input type='text' name='triggerSet' id="triggerSet_max" title="Max Farbwert in Hex" placeholder="#"/>
                                       <input type="color" class="form-control" id="color_max_user" placeholder="Farbname oder HEX-Wert"/>
-                                      <button type="button" class="btn btn-secondary btn-sm float-right btn-outline-dark" id="create_color_schema">Erstellen</button>
+                                      <button type="button" style="width: 7vh;" class="btn btn-secondary btn-sm float-right btn-outline-dark" id="create_color_schema">Erstellen</button>
                                 </div>
                             </div>
                             <div class="klassenbesetzung" id="klassenbesetzung">
-                                <span class="span">Klassenanzahl</span>
+                                <span><b>Klassenanzahl</b></span>
                                 <hr class="hr"/>
                                 <form id="menu_klassenbesetzung" name="menu_klassifizierung">
                                     <select class="form-control Klassifikationsmethode" name="Klassenanzahl" id="Klassenanzahl" title="Anzahl der Klassen w&auml;hlen">
@@ -176,7 +181,7 @@ const toolbar = {
                                     </select>
                                 </form>
                             </div>
-                            <span id="klassifizierung" class="span">Klassifizierung</span>
+                            <span id="klassifizierung"><b>Klassifizierung</b></span>
                             <hr class="hr"/>
                             <div class="klassifizierung">
                                 <form id="menu_klassifizierung" name="menu_klassifizierung2">
@@ -195,7 +200,7 @@ const toolbar = {
                                 </form>
                             </div>
                             <div class="klassifizierung" id="setting_klassifizierung">
-                                <span class="span">Art der Darstellung</span>
+                                <span><b>Art der Darstellung</b></span>
                                 <hr class="hr"/>
                                 <form id="menu_darstellung" name="menu_klassifizierung2">
                                     <div class="radio_left">
@@ -212,74 +217,109 @@ const toolbar = {
                                     </div>
                                 </form>
                             </div>
-                            <div class="w-100" id="map-selection">
-                                <button type="button" class="btn btn-outline-dark w-100" id="map_button">Kartenergänzungen</button>
-                            </div>
                         </div>
                         <!--Tools-------------------------->
-                        <div class="dropdown_choice" id="tools">
+                        <div class="dropdown_choice mobile_hidden" id="tools">
                             <div class="hh_sf" id="hh_sf_dropdown_werkzeug">
                                 <i class="large angle down icon" data-ddm="dropdown_werkzeug"></i>
                                 <span>Werkzeuge</span>
                             </div>
-                            <div class="pin">
+                            <div class="pin mobile_hidden">
                                 <i class="glyphicon glyphicon-pushpin" title="Menü anheften" data-ddm="dropdown_werkzeug"></i>
                             </div>
                         </div>
                         <div class="dropdown_menu" id="dropdown_werkzeug">
                             <ul class="tools">
-                                <li class="tool_li"><div class="btn_container">
-                                    <div id="measure"></div>
+                                <li><div class="btn_container">
+                                    <div id="measure" class="image cursor"></div>
                                     <div class="btn_txt" id="measure_btn">Messen</div>
                                 </div>
                                 </li>
-                                <li class="tool_li">
+                                <li>
                                     <div class="btn_container">
-                                        <div id="lupe"></div>
+                                        <div id="lupe" class="image cursor"></div>
                                         <div class="btn_txt" id="lupe_btn">Lupe</div>
                                     </div>
                                 </li>
-                                <li class="tool_li">
+                                <li>
                                     <div class="btn_container">
-                                        <div id="import"></div>
+                                        <div id="import" class="image cursor"></div>
                                         <div class="btn_txt" id="import_btn">Import</div>
+                                    </div>
+                                </li>
+                                 <li>
+                                    <div class="btn_container">
+                                        <div id="btn_glaetten" class="image cursor ${exclude.class_raster}" data-title="Glätten Sie die Rasterkarte" title="Glätten Sie die Rasterkarte"></div>
+                                        <div class="btn_txt">Glätten</div>
                                     </div>
                                 </li>
                             </ul>
                         </div>
-                        <!--export-->
-                        <div class="dropdown_choice" id="export_map">
+                        <!-- Analyse -->
+                         <div class="dropdown_choice mobile_hidden" id="analyse">
+                            <div class="hh_sf" id="hh_sf_analyse">
+                                <i class="large angle down icon" data-ddm="dropdown_analyse"></i>
+                                <span>Analyse</span>
+                            </div>
+                            <div class="pin mobile_hidden">
+                                <i class="glyphicon glyphicon-pushpin" title="Menü anheften" data-ddm="dropdown_analyse"></i>
+                            </div>
+                        </div>
+                        <div class="dropdown_menu mobile_hidden" id="dropdown_analyse">
+                            <ul class="tools w-100">
+                                <li class="w-30">
+                                    <div class="btn_container">
+                                        <div id="dev_chart" class="image ind_chart ${exclude.class_performance} ${exclude.class_gebiete} cursor oneTime" data-title="Analysieren Sie die zeitliche Entwicklung eines Indikatorwertes" title="Analysieren Sie die zeitliche Entwicklung eines Indikatorwertes"></div>
+                                        <div class="btn_txt wordbreak ${exclude.class_performance}">Werte- entwicklung</div>
+                                    </div>
+                                </li>
+                                 <li class="w-35">
+                                    <div class="btn_container">
+                                        <div id="dev_chart_compare" class="image ind_chart ${exclude.class_performance} ${exclude.class_gebiete} cursor oneTime" data-title="Analysieren Sie die zeitliche Entwicklung mehrerer Indikatorwerte" title="Analysieren Sie die zeitliche Entwicklung mehrerer Indikatorwerte"></div>
+                                        <div class="btn_txt wordbreak ${exclude.class_performance}" data-title="">Entwicklungs- vergleich</div>
+                                    </div>
+                                </li>
+                                <li class="w-30">
+                                    <div class="btn_container">
+                                        <div id="ind_compare" class="image cursor ${exclude.class_raster}" data-title="vergleichen Sie 2 Indikatoren oder Zeitschnitte miteinander" title="vergleichen Sie 2 Indikatoren oder Zeitschnitte miteinander"></div>
+                                        <div class="btn_txt wordbreak" data-title="">Karten- vergleich</div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <!--Export-->
+                        <div class="dropdown_choice mobile_hidden" id="export_map">
                             <div class="hh_sf" id="hh_sf_dropdown_ogc">
                                 <i class="large angle down icon" data-ddm="dropdown_ogc"></i>
                                 Export
                             </div>
-                            <div class="pin">
+                            <div class="pin mobile_hidden">
                                 <i class="glyphicon glyphicon-pushpin" title="Menü anheften" data-ddm="dropdown_ogc"></i>
                             </div>
                         </div>
-                        <div class="dropdown_menu" id="dropdown_ogc">
+                        <div class="dropdown_menu mobile_hidden" id="dropdown_ogc">
                             <div class="export_div"><b>Einbinden in eigenes GIS als</b></div>
-                            <hr class="hr_export"/>
+                            <hr class="hr"/>
                             <button id="wms" class="btn .btn-info btn_export raster_export" data-format="WMS" onclick="ogc_export.wms.open()">WMS</button>
                             <button id="wcs" class="btn .btn-info btn_export raster_export" data-format="WCS" onclick="ogc_export.wcs.open()">WCS</button>
                             <button id="wfs" class="btn .btn-info btn_export gebiete_export" data-format="WFS" onclick="ogc_export.wfs.open()">WFS</button>
                             <div class="export_div" id="export_map_display"><b>Export der Kartendarstellung als</b></div>
-                            <hr class="hr_export"/>
+                            <hr class="hr"/>
                             <div class="btn-group">
-                                <button type="button" class="btn .btn-info btn_export print_button" id="pdf_export_btn" data-format="pdf">PDF</button>
-                                <button type="button" class="btn .btn-info btn_export print_button" id="png_export_btn" data-format="png">PNG</button>
+                                <button type="button" class="btn .btn-info btn_export print_button" id="pdf_export_btn" data-format="pdf" onclick="map_print.open('pdf')">PDF</button>
+                                <button type="button" class="btn .btn-info btn_export print_button" id="png_export_btn" data-format="png" onclick="map_print.open('png')">PNG</button>
                             </div>
                             <div class="export_div" id="save_map_link"><b>Dauerhaftes Speichern der Karte auf dem IÖR-Server</b></div>
-                            <hr class="hr_export"/>
+                            <hr class="hr"/>
                             <button id="kartenlink" class="btn .btn-info">Kartenlink erzeugen</button>
                             <div class="export_div" id="load_map_link"><b>Kartenlink laden</b></div>
-                            <hr class="hr_export"/>
+                            <hr class="hr"/>
                             <form id="KartenlinkLaden" name="KartenlinkLaden">
                                 <input class="form-control" type="text"  id="rid" name="rid" placeholder="Kartenlink Nr.">
                             </form>
                         </div>
                         <!--Reset Map-->
-                        <button type="button" class="btn btn-primary" id="btn_reset" onclick="map_reset.reset();">
+                        <button type="button" class="btn btn-primary" id="btn_reset" onclick="MapHelper.mapReset();">
                             <i class="glyphicon glyphicon-trash drop_arrow"></i><span>Viewer zurücksetzen</span></button>
                     </div>
                     <div id="impressum">
@@ -294,7 +334,6 @@ const toolbar = {
         set:function(){
             toolbar.getDOMObject()
                 .find('.menu_m')
-                .unbind()
                 .click(function() {
                     if(toolbar.state){
                         toolbar.close();
@@ -302,9 +341,6 @@ const toolbar = {
                         toolbar.open();
                     }
                 });
-            setTimeout(function(){
-                map_infos.resize();
-            },1000);
 
             //open and close the dropdown's
             toolbar.getDOMObject()
@@ -313,12 +349,9 @@ const toolbar = {
                 .click(function(event) {
                     let ddm = $(this).find('i').data('ddm'),
                         ddm_container = $('#'+ddm);
-
+                    //check if pinned
                     if(ddm_container.hasClass('pinned')===false && !ddm_container.is(':visible')){
                         ddm_container.slideDown();
-                        if($(this).attr("id")==="indikator_auswahl"){
-                            indikatorauswahl.openMenu();
-                        }
                     }else if(ddm_container.is(':visible')===true &&ddm_container.hasClass('pinned')===false){
                         ddm_container.slideUp();
                     }
@@ -328,7 +361,9 @@ const toolbar = {
                         }
                     });
                     //set the height og the overflow content inside the menu bar
-                    if(main_view.getHeight() <= 1000 && view_state.getViewState() ==='mw') {
+                    if(main_view.getHeight() <= 1000
+                        && view_state.getViewState() ==='mw'
+                        && toolbar.pinned.length >0) {
                         let height = toolbar.getHeight() - $('#no_overflow').height() - 60;
                         $('#overflow_content').css("max-height",height+50);
                     }
@@ -340,13 +375,19 @@ const toolbar = {
                 .unbind()
                 .click(function(event){
                     let drop_menu = $(this).find('i').data('ddm'),
-                        icon =  $(this).find('i');
+                        icon =  $(this).find('i'),
+                        menu = $('#' + drop_menu),
+                        id=menu.attr("id");
                     if(icon.hasClass('arrow_pinned')){
                         icon.removeClass('arrow_pinned');
-                        $('#'+drop_menu).removeClass('pinned');
+                        menu.removeClass('pinned');
+                        toolbar.pinned = $.grep(toolbar.pinned,function(value){
+                           return value !== id;
+                        });
                     }else {
                         icon.addClass('arrow_pinned');
-                        $('#' + drop_menu).addClass('pinned');
+                        menu.addClass('pinned');
+                        toolbar.pinned.push(id);
                     }
                 });
         }

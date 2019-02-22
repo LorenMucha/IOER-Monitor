@@ -12,7 +12,7 @@ const raumgliederung = {
     removeParameter:function(){
         urlparamter.removeUrlParameter(this.param);
     },
-    getSelectedId:function(){
+    getSelectionId:function(){
         return this.getParamter();
     },
     setSelectionId:function(_val){
@@ -23,7 +23,8 @@ const raumgliederung = {
             .find('#Raumgliederung_Fein')
             .find("option:selected").text()
             .replace("- nur","")
-            .replace("-","");
+            .replace("-","")
+            .replace("ab 50 000 Ew.","");
     },
     getDOMObject:function(){
         $elem =  $('#menu_raumgl_fein');
@@ -64,8 +65,8 @@ const raumgliederung = {
                     });
                     //set the disable title
                     menu.find('option').each(function(){if($(this).is(':disabled')){$(this).attr("title","Für den Indikator nicht verfügbar")}});
-                    if(typeof raumgliederung.getSelectedId() !=='undefined'){
-                        $('#raumgl_fein'+raumgliederung.getSelectedId()).prop("selected",true);
+                    if(typeof raumgliederung.getSelectionId() !=='undefined'){
+                        $('#raumgl_fein'+raumgliederung.getSelectionId()).prop("selected",true);
                     }
                 } else {
                     menu.append('<option data-val="preset" style="color: lightgrey;" selected="true" value="empty" disabled="disabled">keine Feingliederung verfügbar</option>');

@@ -1,13 +1,18 @@
 const raster_split={
     control:'',
     button:'',
-    dialogObject:
+    selector:"#ind_compare",
+    dialog:
         {
             jahre:'',
             raumgliederung:'',
             jahre_set:'',
             raumgliederung_set:'',
             info_leave:0,
+            getButtonDomObject:function(){
+              $elem=$("#map_compare");
+              return $elem;
+            },
             getContainerObject:function(){
                 $elem=  $('#vergleich_dialog');
                 return $elem;
@@ -24,146 +29,232 @@ const raster_split={
                 $elem = $("#raum_slider_vergleich");
                 return $elem;
             },
+            create:function(){
+                $('#Modal').append(`
+                     <div id="vergleich_dialog">
+                            <div id="close_vergleich" class="close_vergleich">
+                                <span class="close" title="Dialog schließen">X</span>
+                            </div>
+                            <div class="auswahlcontainer">
+                                <span class="span">Indikator für den Vergleich</span>
+                                <hr class="hr"/>
+                                <div id="indicator_ddm_vergleich" class="ui selection dropdown indicator_ddm">
+                                    <input name="Indikatorauswahl" type="hidden"/>
+                                    <i class="dropdown icon"></i>
+                                    <div class="default text">Bitte wählen.....</div>
+                                    <div  id="kat_auswahl_vergleich" class="menu kat_auswahl_vergleich"></div>
+                                </div>
+                                <div class="ind_content">
+                                    <div id="time_range_raster_vergleich" class="vergleich_container">
+                                        <span class="span">Zeitschnitt</span>
+                                        <hr class="hr"/>
+                                        <div class="zeit_slider" id="zeit_slider_vergleich"></div>
+                                    </div>
+                                    <div id="spatial_range_raster_vergleich" class="vergleich_container">
+                                        <span class="span">Rasterweite in m</span>
+                                        <hr class="hr"/>
+                                        <div id="slider_raum_container_vergleich">
+                                            <div id="raum_slider_vergleich"></div>
+                                        </div>
+                                    </div>
+                                    <div id="klassifizierung_vergleich">
+                                        <span class="span">Klassenanzahl</span>
+                                        <hr class="hr"/>
+                                        <form id="menu_klassenanzahl_vergleich" name="menu_klassifizierung">
+                                            <select class="form-control Klassifikationsmethode" name="Klassenanzahl" id="Klassenanzahl_vergleich" title="Anzahl der Klassen wählen">
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7" selected>7</option>
+                                            </select>
+                                        </form>
+                                    </div>
+                                    <div id="klassenbestzung_vergleich">
+                                        <span class="span">Klassifizierung</span>
+                                        <hr class="hr"/>
+                                        <div class="klassifizierung">
+                                            <form id="menu_klassifizierung_vergleich" name="menu_klassifizierung2">
+                                                <div class="radio_left">
+                                                    <label class="radio-inline" id="haeufigkeit_label_vergleich">
+                                                        <input checked="checked" class="Klassifikationsmethode" name="Klassifikationsmethode" type="radio" value="gleicheAnzahl"/>
+                                                        Gleiche <br>Klassenbesetzung
+                                                    </label>
+                                                </div>
+                                                <div class="radio_right">
+                                                    <label class="radio-inline" id="gleich_label_vergleich">
+                                                        <input class="Klassifikationsmethode" name="Klassifikationsmethode" type="radio" value="gleicheBreite"/>
+                                                        Gleiche <br>Klassenbreite
+                                                    </label>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary btn_dropdown" id="create_vergleichskarte_button">Karte hinzufügen</button>
+                            </div>
+                            <div class="legende_vergleich">
+                                <div id="legende_vergleich">
+                                    <div class="legende_content ind_content">
+                                        <span class="span">Legende</span>
+                                        <hr class="hr"/>
+                                        <div class="">Einheit:<b id="legende_vergleich_einheit"></b></div>
+                                        <div id="legende_vergleich_i" class="legende_vergleich_generated"></div>
+                                        <div class="iconlegende_schraffur"></div>
+                                        <hr class="hr"/>
+                                        <div><b>Datengrundlage</b></div>
+                                        <div id="datengrundlage_content_vergleich" class="legende_vergleich_generated"></div>
+                                        <div><b>Kartenprojektion</b></div>
+                                        <div>ETRS89 / UTM Zone 32N</div>
+                                        <hr class="hr"/>
+                                        <div><b>Histogramm</b></div>
+                                        <div id="histogramm_pic_vergleich" class="legende_vergleich_generated"></div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                `);
+            },
             openDialog:function(){
-                const dialog = this;
-                let dialog_container = dialog.getContainerObject(),
-                    button_map = raster_split.getButtonObject(),
-                    dropdown_ind =  dialog.getDropdownDOMObject(),
-                    close_container = $('.close_vergleich');
+                const dialog = raster_split.dialog;
+                let button_map = raster_split.getButtonObject();
 
                 //open the dialog
                 dialog.show();
-                button_map.css("background-color",farbschema.getColorActive());
-
+                button_map.css("background-color",farbschema.getColorHexActive());
+                //clone the menu
                 if ($('#kat_auswahl_vergleich').length === 1) {
                     indikatorauswahl.cloneMenu('kat_auswahl_vergleich', 'ink_kat_vergleich', 'right',["X","G"],false);
                 }
 
-                dropdown_ind.dropdown({
-                    onChange: function (value, text, $choice) {
-                        dialog.createGUIElements(value);
-                        $('.ind_content').slideDown();
-                    }
-                });
-
-                //pre select the set indicator
-                if(!dropdown_ind.dropdown('get value')||typeof dropdown_ind.dropdown('get value') ==='undefined') {
-                    dropdown_ind.dropdown('set selected',indikatorauswahl.getSelectedIndikator());
-                }
-
-                //klassifizierungsmenu
-                $('#menu_klassifizierung_vergleich').find('input').change(function () {
-                    dialog.setLegende();
-                });
-
-                //change the number of classes
-                $('#Klassenanzahl_vergleich').change(function(){
-                    dialog.setLegende();
-                });
-
-                //destroy the function
-                close_container
-                    .find('.destroy')
-                    .unbind()
-                    .click(function(){
-                        raster_split.remove();
-                        dialog.hide();
-                        button_map.css("background-color",farbschema.getColorMain());
-                    });
-
-                //close the dialog
-                close_container
-                    .find('.close')
-                    .unbind()
-                    .click(function () {
-                        dialog.hide();
-                    });
-
-                $('#create_vergleichskarte_button').click(function(){
-                    const settings = dialog.getSettings();
-                    indikator_raster.init(null,null,"rechts",settings);
-                    dialog.hide();
-                    $('#indikator_header_rechts')
-                        .show();
-                    $('#header_rechts').text(settings[0].ind_text+" ("+settings[0].time+")");
-                    $('#header_raumgl_rechts').text(settings[0].raumgl);
-                    //Bind the leaver function
-                    if(dialog.info_leave===0){
-                        alert_manager.leaveESCInfo();
-                        dialog.info_leave=1;
-                    }
-                    $(document)
-                        .keyup(function(e) {
-                        if (e.keyCode === 27) {
-                            raster_split.remove();
-                        }
-                    });
-                });
-
-                $("#kennblatt_vergleich").click(function(){
-                    kennblatt.open();
-                });
-
+                dialog.controller.set();
 
             },
-            //Adds the essential Elements
-            createGUIElements:function(indikator_id){
-                const dialog = this;
-                let def = $.Deferred();
-                function defCalls(){
-                    let requests = [
-                        request_manager.getJahre(indikator_id),
-                        request_manager.getRaumgliederung(indikator_id)
-                    ];
-                    $.when.apply($,requests).done(function(){
-                        def.resolve(arguments);
-                    });
-                    return def.promise();
-                }
-                defCalls().done(function(arr) {
-                    //now we have access to array of data
-                    dialog.jahre = arr[0][0];
-                    dialog.raumgliederung = arr[1][0];
-                    dialog.getTimeSliderDOMObject()
-                        .unbind()
-                        .slider({
-                            orientation: "horizontal",
-                            min: 0,
-                            max: (dialog.jahre).length - 1,
-                            step: 1,
-                            value: 0,
-                            stop: function (event, ui) {
-                                dialog.setLegende();
-                                dialog.jahre_set = dialog.jahre[(ui.value)];
-                            }
-                        });
-                    dialog.jahre_set = dialog.jahre[0];
-                    pips.set(dialog.getTimeSliderDOMObject(), dialog.jahre);
+            controller:{
+                set:function(){
+                    const dialog = raster_split.dialog;
+                    let button_map = raster_split.getButtonObject(),
+                        dropdown_ind =  dialog.getDropdownDOMObject(),
+                        close_container = $('.close_vergleich');
 
-                    let labels = [];
-                    dialog.getSpatialSliderDOMObject()
-                        .unbind()
-                        .slider({
-                            orientation: "horizontal",
-                            min: 0,
-                            max: (dialog.raumgliederung).length - 1,
-                            value: 0,
-                            step: 1,
-                            stop: function (event, ui) {
-                                dialog.setLegende();
-                                dialog.raumgliederung_set = dialog.raumgliederung[(ui.value)];
+                    console.log("set controller");
+
+                    dropdown_ind
+                        .dropdown({
+                            onChange: function (value, text, $choice) {
+                                dialog.controller.createGUIElements(value);
+                                $('.ind_content').slideDown();
                             }
-                        });
-                    dialog.raumgliederung_set = dialog.raumgliederung[0];
-                    try {
-                        $.each(dialog.raumgliederung, function (key, value) {
-                            labels.push(value.replace('Raster', '').replace('m', ''));
-                        });
-                    } catch (err) {
+                    });
+
+                    //pre select the set indicator
+                    if(!dropdown_ind.dropdown('get value')||typeof dropdown_ind.dropdown('get value') ==='undefined') {
+                        dropdown_ind.dropdown('set selected',indikatorauswahl.getSelectedIndikator());
                     }
-                    pips.set(dialog.getSpatialSliderDOMObject(), labels);
-                    dialog.setLegende();
-                });
+
+                    //klassifizierungsmenu
+                    $('#menu_klassifizierung_vergleich').find('input').change(function () {
+                        dialog.setLegende();
+                    });
+
+                    //change the number of classes
+                    $('#Klassenanzahl_vergleich').change(function(){
+                        dialog.setLegende();
+                    });
+
+                    //destroy the function
+                    close_container
+                        .find('.destroy')
+                        .unbind()
+                        .click(function(){
+                            raster_split.remove();
+                            dialog.hide();
+                            button_map.css("background-color",farbschema.getColorHexMain());
+                        });
+
+                    //close the dialog
+                    close_container
+                        .find('.close')
+                        .unbind()
+                        .click(function () {
+                            dialog.hide();
+                        });
+
+                    $('#create_vergleichskarte_button').click(function(){
+                        const settings = dialog.getSettings();
+                        indikator_raster.init(null,null,"rechts",settings);
+                        dialog.hide();
+                        $('#indikator_header_rechts')
+                            .show();
+                        $('#header_rechts').text(settings[0].ind_text+" ("+settings[0].time+")");
+                        $('#header_raumgl_rechts').text(settings[0].raumgl);
+                    });
+
+                    $("#kennblatt_vergleich").click(function(){
+                        kennblatt.open();
+                    });
+                },
+                //Adds the essential Elements
+                createGUIElements:function(indikator_id) {
+                    const dialog = raster_split.dialog;
+                    let def = $.Deferred();
+
+                    function defCalls() {
+                        let requests = [
+                            request_manager.getJahre(indikator_id),
+                            request_manager.getRaumgliederung(indikator_id)
+                        ];
+                        $.when.apply($, requests).done(function () {
+                            def.resolve(arguments);
+                        });
+                        return def.promise();
+                    }
+
+                    defCalls().done(function (arr) {
+                        //now we have access to array of data
+                        dialog.jahre = arr[0][0];
+                        dialog.raumgliederung = arr[1][0];
+                        dialog.getTimeSliderDOMObject()
+                            .unbind()
+                            .slider({
+                                orientation: "horizontal",
+                                min: 0,
+                                max: (dialog.jahre).length - 1,
+                                step: 1,
+                                value: 0,
+                                stop: function (event, ui) {
+                                    dialog.setLegende();
+                                    dialog.jahre_set = dialog.jahre[(ui.value)];
+                                }
+                            });
+                        dialog.jahre_set = dialog.jahre[0];
+                        pips.set(dialog.getTimeSliderDOMObject(), dialog.jahre);
+
+                        let labels = [];
+                        dialog.getSpatialSliderDOMObject()
+                            .unbind()
+                            .slider({
+                                orientation: "horizontal",
+                                min: 0,
+                                max: (dialog.raumgliederung).length - 1,
+                                value: 0,
+                                step: 1,
+                                stop: function (event, ui) {
+                                    dialog.setLegende();
+                                    dialog.raumgliederung_set = dialog.raumgliederung[(ui.value)];
+                                }
+                            });
+                        dialog.raumgliederung_set = dialog.raumgliederung[0];
+                        try {
+                            $.each(dialog.raumgliederung, function (key, value) {
+                                labels.push(value.replace('Raster', '').replace('m', ''));
+                            });
+                        } catch (err) {
+                        }
+                        pips.set(dialog.getSpatialSliderDOMObject(), labels);
+                        dialog.setLegende();
+                    });
+                }
             },
             setLegende:function(){
                 const dialog = this;
@@ -257,7 +348,7 @@ const raster_split={
             }
         },
     getButtonObject:function(){
-        $elem = $('#vergleich_btn');
+        $elem = $('#ind_compare');
         return $elem;
     },
     getSplitterContainer:function(){
@@ -265,53 +356,14 @@ const raster_split={
         return $elem;
     },
     init:function(){
-        const controller = this;
-        //the comperative Map
-        let vergleichcontrol = new L.control({position:'topright'});
-        controller.button = vergleichcontrol;
-        vergleichcontrol.onAdd = function(map){
-            var div = L.DomUtil.create('div');
-            div.title="Zwei Indikatorkarten miteinander Vergleichen";
-            div.innerHTML = '<div class="vergleich btn_map" id="vergleich_btn"></div>';
-            let timer;
-            L.DomEvent
-                .on(div, 'dblclick', L.DomEvent.stop)
-                .on(div, 'click', L.DomEvent.stop)
-                .on(div, 'mousedown', L.DomEvent.stopPropagation)
-                .on(div, 'click', function(){
-                    controller.dialogObject.openDialog();
-                    sideByside = L.control.sideBySide(indikator_raster.raster_layer.addTo(map), null);
-                    raster_split.setController(sideByside);
-                    if(!raster_split.getState()){
-                        sideByside.addTo(map);
-                    }
-                })
-                .on(div,'mouseover',function () {
-                    if(raster_split.getState()){
-                        timer = setTimeout(function(){
-                            controller.dialogObject.openDialog();
-                        },100);
-                    }
-                })
-                .on(div,'mouseleave',function() {
-                    clearTimeout(timer);
-                });
-
-            return div;
-        };
-        try{
-            setTimeout(function(){
-                if(!main_view.getMobileState()) {
-                    vergleichcontrol.addTo(map);
-                }
-            },1000);
-        }catch(err){}
-    },
-    getController:function(){
-        return this.control;
+        raster_split.constroller.set();
+        raster_split.dialog.create();
     },
     setController:function(_controller){
         this.control = _controller;
+    },
+    getController:function(){
+        return this.control;
     },
     getButton:function(){
         return this.button;
@@ -328,9 +380,75 @@ const raster_split={
         }else{
             map.removeControl(object.getButton());
         }
-        this.getButtonObject().css("background-color",farbschema.getColorMain());
+        this.getButtonObject().css("background-color",farbschema.getColorHexMain());
+        this.dialog.getButtonDomObject().hide();
+        this.dialog.hide();
     },
     getState:function(){
         return this.getSplitterContainer().length >= 1;
+    },
+    constroller:{
+        set:function(){
+            const object = raster_split;
+            let btn_show_info = object.dialog.getButtonDomObject(),
+                click=0;
+
+            object.button = new L.control({position:'topright'});
+            //extend map with the function
+            $(document)
+                .on("click",raster_split.selector,function(){
+                    if(click==0) {
+                        object.dialog.info_leave = 1;
+                        if(object.dialog.info_leave==0){
+                            alert_manager.leaveESCInfo();
+                        }
+                        if (raeumliche_visualisierung.getRaeumlicheGliederung() === "gebiete") {
+                            raeumliche_visualisierung.setChecked();
+                        }
+                        var interval = setInterval(function () {
+                            if (indikator_raster.getRasterLayer()) {
+                                try {
+                                    clearInterval(interval);
+                                    btn_show_info.show();
+                                    let sideByside = L.control.sideBySide(indikator_raster.raster_layer.addTo(map), null);
+                                    object.setController(sideByside);
+                                    if (!object.getState()) {
+                                        sideByside.addTo(map);
+                                        object.dialog.openDialog();
+                                        object.getButtonObject().css('background-color', farbschema.getColorHexActive());
+                                    }
+                                } catch (err) {
+                                    console.error(err);
+                                    if (!window.location.href.includes("monitor_test")) {
+                                        let message = error.getErrorMessage(`function:raster_split\n Error: ${err}`);
+                                        alert_manager.alertError();
+                                        request_manager.sendMailError(message.name, message.message);
+                                    }
+                                }
+                            }
+                        }, 100);
+                        click +=1;
+                    }else{
+                        object.remove();
+                        click=0;
+                    }
+            });
+
+            //leave on ESC
+
+            $(document)
+                .keyup(function(e) {
+                    if (e.keyCode === 27) {
+                        raster_split.remove();
+                    }
+                });
+
+            //show the info dialog
+            btn_show_info
+                .unbind()
+                .click(function(){
+                   object.dialog.show();
+                });
+        }
     }
 };

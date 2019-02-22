@@ -8,6 +8,9 @@ const dialog_manager={
         close:false,
         modal:false
     },
+    setInstruction:function(_instructions){
+      this.instructions=_instructions;
+    },
     calculateWidth:function(){
         let width = main_view.getWidth();
         if($('.right_content').is(':visible') || width >=1280 && width<2000){
@@ -46,16 +49,30 @@ const dialog_manager={
            html needs to encodes or decoded for storing inside the instroduction object,
            use he from lib: https://github.com/mathiasbynens/he
             */
-            html = he.decode(manager.instructions.html);
+            html = he.decode(manager.instructions.html),
+            width=function(){
+              let width = manager.instructions.width;
+              if(width) {return width;}
+              else{return manager.calculateWidth();}
+            },
+            height=function(){
+                let height = manager.instructions.height;
+                if(height) {return height;}
+                else{return manager.calculateHeight();}
+            };
+        //close existing dialog
+        manager.close();
+        //create the dialog
         body.append(html);
         manager.content=body.find(`#${manager.instructions.endpoint}`);
         manager.content.dialog({
             title: manager.instructions.title,
             hide: 'blind',
             show: 'blind',
-            width: manager.calculateWidth(),
-            height: manager.calculateHeight(),
+            width:width(),
+            height: height(),
             modal: manager.instructions.modal,
+            resizable: false,
             open: function (ev, ui) {
                 $(this)
                     .empty()
@@ -65,10 +82,16 @@ const dialog_manager={
             },
             close:function(){
                 manager.close();
+                if(manager.instructions.close)manager.instructions.close();
             }
         });
     },
+    getContent:function(){
+      return this.content;
+    },
     close:function(){
         $('.jq_dialog').remove();
+        //reset instructions
+        //this.instructions={endpoint:"",html:"",title:"",open:false,close:false,modal:false};
     }
 };

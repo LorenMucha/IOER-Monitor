@@ -180,9 +180,14 @@ const kennblatt={
                 </div>
             </div>`);
         //settings for the manager
-        dialog_manager.instructions.endpoint = `${this.endpoint_id}`;
-        dialog_manager.instructions.html= html;
-        dialog_manager.instructions.title=header_text[language]["header"];
+        let instructions = {
+            endpoint:`${this.endpoint_id}`,
+            html:html,
+            title:header_text[language]["header"],
+            modal:true,
+            width:795
+        };
+        dialog_manager.setInstruction(instructions);
         dialog_manager.create();
         this.controller.set();
     },

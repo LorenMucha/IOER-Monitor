@@ -1,5 +1,5 @@
 <?php
-include_once '../database/MYSQL_TASKREPOSITORY.php';
+include '../database/MYSQL_TASKREPOSITORY.php';
 
 class NOTES{
     private $notes;

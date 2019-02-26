@@ -1,7 +1,7 @@
 <?php
-include_once "../models/Helper.php";
-include_once "../database/MYSQL_MANAGER.php";
-include_once "../database/POSTGRESQL_MANAGER.php";
+include "../models/Helper.php";
+include "../database/MYSQL_MANAGER.php";
+include "../database/POSTGRESQL_MANAGER.php";
 
 class Search{
     public function __construct($search_string,$option) {

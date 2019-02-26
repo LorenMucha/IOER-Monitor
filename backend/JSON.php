@@ -1,9 +1,8 @@
 <?php
-require_once('database/POSTGRESQL_TASKRESPOSITORY.php');
-require_once('database/MYSQL_TASKREPOSITORY.php');
+include_once 'database/POSTGRESQL_TASKRESPOSITORY.php';
+include_once 'database/MYSQL_TASKREPOSITORY.php';
 include_once 'models/NOTES.php';
 include_once 'models/Helper.php';
-require_once('CACHE_MANAGER.php');
 include_once 'models/Colors.php';
 include_once 'models/Errors.php';
 

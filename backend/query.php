@@ -1,16 +1,16 @@
 <?php
 header('Access-Control-Allow-Origin: *');
 header('Content-type: application/json; charset=utf-8');
-include_once "database/MYSQL_TASKREPOSITORY.php";
+include "database/MYSQL_TASKREPOSITORY.php";
 include "models/Helper.php";
 include "models/UserLink.php";
 include 'chart/Chart.php';
-include_once 'CACHE_MANAGER.php';
-include_once "Json.php";
-include_once "map/Overlay.php";
-include_once "table/TableExpand.php";
-include_once "map/Classify.php";
-include_once 'models/Search.php';
+include 'map/CacheManager.php';
+include "Json.php";
+include "map/Overlay.php";
+include "table/TableExpand.php";
+include "map/Classify.php";
+include 'models/Search.php';
 
 $q =  $_POST["values"];
 $json_obj = json_decode($q, true);
@@ -34,7 +34,7 @@ try{
     //get the JSON
     if($query==='getjson'){
         //check if the json exist in the database
-        $cache_manager = new CACHE_MANAGER($indicator,$year,$raumgliederung,$klassifizierung,$klassenanzahl);
+        $cache_manager = new CacheManager($indicator,$year,$raumgliederung,$klassifizierung,$klassenanzahl);
         try{
             if (!$cache_manager->check_cached($ags_array,$colors)) {
                 $indicator_json = new Json($indicator,$year,$raumgliederung,$ags_array);
@@ -122,6 +122,7 @@ try{
                             '"bld":"' . $row_ind->RAUMEBENE_BLD.
                             '","krs":"' . $row_ind->RAUMEBENE_KRS.
                             '","gem":"' . $row_ind->RAUMEBENE_GEM .
+                            '","vwg":"' . $row_ind->RAUMEBENE_VWG .
                             '","g50":"' . $row_ind->RAUMEBENE_G50 .
                             '","stt":"' . $row_ind->RAUMEBENE_STT .
                             '","ror":"' . $row_ind->RAUMEBENE_ROR .

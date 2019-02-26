@@ -157,15 +157,15 @@ const toolbar = {
                             <div id="farbwahl" class="mobile_hidden">
                                 <span><b>Farbschema</b></span>
                                 <hr class="hr"/>
-                                <div class="form-group-inline">
-                                      <input type='text' name='triggerSet' id="triggerSet_min" title="Min Farbwert in Hex" placeholder="#"/>
+                                <div class="form-group-inline w-100">
+                                      <input class="float-left w-50" type='text' name='triggerSet' id="triggerSet_min" title="Min Farbwert in Hex" placeholder="#"/>
                                       <input type="color" class="form-control" id="color_min_user"/>
-                                       <span class="glyphicon glyphicon-trash fa-2x destroy float-right cursor" title="Auswahl leeren" id="clear_farbwahl"></span>
+                                      <span class="glyphicon glyphicon-trash fa-2x destroy float-right cursor" title="Auswahl leeren" id="clear_farbwahl"></span>
                                 </div>
-                                <div class="form-group">
-                                      <input type='text' name='triggerSet' id="triggerSet_max" title="Max Farbwert in Hex" placeholder="#"/>
+                                <div class="form-group w-100">
+                                      <input  class="float-left w-50" type='text' name='triggerSet' id="triggerSet_max" title="Max Farbwert in Hex" placeholder="#"/>
                                       <input type="color" class="form-control" id="color_max_user" placeholder="Farbname oder HEX-Wert"/>
-                                      <button type="button" style="width: 7vh;" class="btn btn-secondary btn-sm float-right btn-outline-dark" id="create_color_schema">Erstellen</button>
+                                      <button type="button" style="width: 75px;" class="btn btn-secondary btn-sm float-right btn-outline-dark" id="create_color_schema">Erstellen</button>
                                 </div>
                             </div>
                             <div class="klassenbesetzung" id="klassenbesetzung">

@@ -273,31 +273,6 @@ color schema
     float: right;
     margin-top: 5px;
 }
-.toolbar #content #farbwahl_btn .color-line {
-    line-height: 15px;
-    width: 90%;
-    margin-left: 5px;
-    margin-right: 10px;
-    display: inline-block;
-}
-.toolbar #content #farbwahl_btn .color-line i{
-    height: 15px;
-    float: left;
-}
-.toolbar #content #color_schema{
-    width: 90%;
-    display: none;
-}
-.toolbar #content #color_schema .color-line {
-    line-height: 15px;
-    width: 100%;
-    margin-left: 10px;
-    display: inline-block;
-}
-.toolbar #content #color_schema .color-line i{
-    height: 15px;
-    float: left;
-}
 .toolbar #content .klassifizierung form{
     display: inline-block;
     width: 100%;

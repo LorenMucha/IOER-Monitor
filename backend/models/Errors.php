@@ -1,5 +1,5 @@
 <?php
-include_once '../database/MYSQL_MANAGER.php';
+include '../database/MYSQL_MANAGER.php';
 
 class Errors
 {

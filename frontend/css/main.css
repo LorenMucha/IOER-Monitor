@@ -23,6 +23,7 @@
 @import "navbar.css";
 @import "map.css";
 @import "table.css";
+@import "statistics.css";
 
 body {
     padding: 0;

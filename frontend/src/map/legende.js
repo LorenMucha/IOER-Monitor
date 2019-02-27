@@ -135,15 +135,19 @@ const legende = {
             indikator_info_container = this.getIndikatorInfoObject(),
             einheit_container = this.getEinheitObject(),
             klasseneinteilung_contaiener = this.getKlasseneinteilungObject(),
-            info_json = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()];
+            info_json = indikatorauswahl.getPossebilities()[indikatorauswahl.getSelectedIndikatorKategorie()],
+            datenalter_map = $('#dropdown_datenalter');
 
         //close datenalter
-        if(indikatorauswahl.getSelectedIndiktorGrundaktState() && exclude.checkPerformanceAreas()){
-            if( object.getDatenalterContainerObject().find('#dropdown_datenalter').is(":visible")){
-                object.getDatenalterContainerObject().find('#dropdown_datenalter').show();
+        console.log(indikatorauswahl.getSelectedIndiktorGrundaktState(),exclude.checkPerformanceAreas());
+        if(exclude.checkPerformanceAreas() && indikatorauswahl.getSelectedIndiktorGrundaktState()){
+            helper.enableElement("#datenalter",$('#datenalter').data("title"));
+            if( datenalter_map.is(":visible")){
+                datenalter_map.show();
             }
         }else{
-            object.getDatenalterContainerObject().find('#dropdown_datenalter').hide();
+            helper.disableElement("#datenalter",exclude.disable_text);
+            datenalter_map.hide();
         }
 
         /*------hole Zusatzinfos------------------------------------------------------------------------*/

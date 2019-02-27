@@ -78,8 +78,7 @@ class ChartHelper{
                 or $key==$last_key
                 or $chart_val_real!= $chart_val_before
                 //do not touch the trend values
-                or $date_real > date("Y")
-                and $date_real != $date_before
+                and intval($date_real) != intval($date_before)
                 and $this->test($real_val_test)
             ){
                 array_push($array_gl, array(

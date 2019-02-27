@@ -2,8 +2,7 @@
 include_once '../database/POSTGRESQL_MANAGER.php';
 
 class CacheManager{
-
-    protected static $instance = NULL;
+    
     private $table_name = "geojson_cache";
 
     public function __construct($indicator_id, $year, $spatial_extend, $klassifizierung, $klassenanzahl) {

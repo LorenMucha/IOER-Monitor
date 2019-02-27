@@ -33,7 +33,7 @@ const table = {
                     <button type="button" class="btn btn-primary mobile_hidden" id="btn_table">
                         <i class="glyphicon glyphicon-chevron-right" title="Tabelle mit Indikatorwerten oder Zeitschnitten erweitern"></i><span>erweitern</span></button>
                     <div title="Tabelle filtern" id="filter_table" class="filter"></div>
-                    <div title="Tabelle als CSV exportieren" id="csv_export"></div>
+                    <div title="Tabelle als CSV exportieren" id="csv_export" class="${exclude.class_performance}"></div>
                      <input id="search_input_table" placeholder="Suche nach Orten.." type="text" class="form-control search_input prompt" />
                 </div>
                 <hr class="hr"/>

@@ -20,6 +20,7 @@ const csv_export = {
             csv_export.getButtonDomObject()
                 .unbind()
                 .click(function(){
+                    console.log("export");
                     csv_export.state=true;
                     //push all table header in array
                     // Quelle:https://tableexport.v5.travismclarke.com

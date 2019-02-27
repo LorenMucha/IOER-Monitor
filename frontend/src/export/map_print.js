@@ -13,9 +13,10 @@ const map_print={
                         $('#print_legende').find('img').each(function () {
                             let image = $(this);
                             let src = image.attr("src");
+                            //ToDo rewrite on monitor.ioer
                             $.ajax({
                                 async:true,
-                                url: urlparamter.getURL_RASTER() + "backend/export_image.php",
+                                url: urlparamter.getURL_RASTER() + "php/export_image.php",
                                 data: {
                                     path: src
                                 },
@@ -42,8 +43,7 @@ const map_print={
                 },
                 open=function(){
                     //create the print map
-                    let cloned_layer, overlay,
-                        print_map = $('#print_map');
+                    let cloned_layer, overlay;
 
                     let map = L.map('print_map', {zoomControl: false}).setView([urlparamter.getUrlParameter('lat'),urlparamter.getUrlParameter('lng')],urlparamter.getUrlParameter('zoom'));
                     //scalebar
@@ -186,25 +186,20 @@ const map_print={
                             if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'raster') {
                                 leafletImage(map_print.map, function (err, canvas) {
                                     //replace the map with the image
-                                    $.when($('#print_map').hide())
-                                        .then(
-                                            $('.map_print_container')
-                                                .css({
-                                                    "background": "url(" + canvas.toDataURL() + ")",
-                                                    "background-repeat": "no-repeat",
-                                                    "background-position": "center"
-                                                }))
-                                        .then(map_print.controller.createExport());
+                                   $('#print_map')
+                                       .empty()
+                                        .css({
+                                            "background": "url(" + canvas.toDataURL() + ")",
+                                            "background-repeat": "no-repeat",
+                                            "background-position": "center"
+                                        });
+                                    //wait until background is rendered
+                                    map_print.controller.createExport();
                                 });
                             } else {
                                 map_print.controller.createExport();
                             }
-                        })
-                        .then(
-                            setTimeout(function(){
-                                dialog_manager.changeHeight(750);
-                            },500)
-                        );
+                        });
                 });
         },
         createExport:function(){
@@ -235,12 +230,6 @@ const map_print={
                             //the callback to remove the progressbar, if worker finished
                             $.when(progressbar.remove())
                                 .then($('#export_btn').show())
-                                .then(function () {
-                                    if (raeumliche_visualisierung.getRaeumlicheGliederung() === "raster") {
-                                        $('.print_map_content').css("background", "");
-                                        $('#print_map').show();
-                                    }
-                                })
                                 .then(dialog_manager.changeHeight(dialog_manager.calculateHeight()));
                         }
                     );

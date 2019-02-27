@@ -118,26 +118,22 @@ const expand_panel = {
             $('#differences_div').show();
         }
         //check if only one time possibility
-        if(jahreArray.length > 1 || indikatorauswahl.getFilteredPossibleYears()[0] > parseInt(zeit_slider.getTimeSet())) {
-            panel.getZeitschnittAuswahlContainer().show();
+        if(Math.min.apply(Math, jahreArray)!== zeit_slider.getTimeSet()
+            &&jahreArray.length > 1) {
+            helper.enableElement("#"+panel.getZeitschnittAuswahlContainer().attr("id"),"");
             panel.getHinweisTimeExpandNullObject().hide();
             panel.getHinweisOnlyOlderTimeShiftsObject().show();
             $('.time_expand_time_table').remove();
-            let min_time = Math.min.apply(Math, jahreArray);
-            if (min_time== zeit_slider.getTimeSet()) {
-                panel.getZeitschnittauswahlDDMObject().hide();
-            } else {
-                panel.getZeitschnittauswahlDDMObject().show();
-                for (let i = 0; i < jahreArray.length; i++) {
-                    if (zeit_slider.getTimeSet() > jahreArray[i]) {
-                        let div = '<div class="item time_expand_time_table" data-value="' + jahreArray[i] + '">' + jahreArray[i] + '</div>';
-                        $('#zeit_auswahl_table').append(div);
-                    }
+            for (let i = 0; i < jahreArray.length; i++) {
+                if (zeit_slider.getTimeSet() > jahreArray[i]) {
+                    let div = '<div class="item time_expand_time_table" data-value="' + jahreArray[i] + '">' + jahreArray[i] + '</div>';
+                    $('#zeit_auswahl_table').append(div);
                 }
             }
             //if not set the note
         }else{
-            panel.getZeitschnittAuswahlContainer().hide();
+            console.log("disable time slider");
+            helper.disableElement("#"+panel.getZeitschnittAuswahlContainer().attr("id"),"");
         }
         //Kenngroesen
         let spatial_extend = function(){
@@ -339,7 +335,7 @@ const expand_panel = {
                 .click(function(){
                     expand_panel.setExpandArray([]);
                     expand_panel.removeExpandColumns();
-                    $('#header_ind_set').attr("colspan",5);
+                    $('#header_ind_set').attr("colspan",6);
                     expand_panel.fill();
                     expand_panel.close();
                     table.setExpandState(false);

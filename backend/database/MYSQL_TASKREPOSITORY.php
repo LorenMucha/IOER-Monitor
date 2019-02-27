@@ -119,8 +119,8 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
                                 COALESCE((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS =i.AGS AND y.INDIKATORWERT <= ".$year."),0) as grundakt_month,
                                 z.MITTLERE_AKTUALITAET_IGNORE as grundakt_state,
                                 z.INDIKATOR_NAME as name,
-                                (SELECT FARBWERT_MAX FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$indikator_id."') as color_max,
-                                (SELECT FARBWERT_MIN FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$indikator_id."') as color_min
+                                COALESCE((SELECT FARBWERT_MAX FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$indikator_id."'),'FFCC99') as color_max,
+                                COALESCE((SELECT FARBWERT_MIN FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$indikator_id."'),'66CC99') as color_min
                                 FROM m_indikatorwerte_" . $year . " i, m_indikator_freigabe f, m_indikatoren z
                                 Where f.ID_INDIKATOR = i.ID_INDIKATOR AND f.ID_INDIKATOR =  '" . $indikator_id . "'
                                 AND f.STATUS_INDIKATOR_FREIGABE = " . $this->berechtigung . "

@@ -1,10 +1,6 @@
 <?php
-include_once 'database/POSTGRESQL_TASKRESPOSITORY.php';
-include_once 'database/MYSQL_TASKREPOSITORY.php';
-include_once 'models/NOTES.php';
-include_once 'models/Helper.php';
-include_once 'models/Colors.php';
-include_once 'models/Errors.php';
+include_once '../database/POSTGRESQL_TASKRESPOSITORY.php';
+include_once '../database/MYSQL_TASKREPOSITORY.php';
 
 class Json
 {

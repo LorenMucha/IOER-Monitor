@@ -25,7 +25,6 @@ const geolocate={
                         geolocate.active=true;
                     }else {
                         map.stopLocate();
-                        map.removeLayer(geolocate.cirle);
                         map.removeLayer(geolocate.marker);
                         geolocate.getDOMContainer().css("background-color",farbschema.getColorHexMain());
                         geolocate.active=false;
@@ -37,10 +36,9 @@ const geolocate={
         geolocate.locateElement.addTo(map);
     },
     onLocationFound:function(e) {
-        var radius = e.accuracy / 2;
+        var radius = Math.round(e.accuracy / 2);
         geolocate.marker = L.marker(e.latlng).addTo(map)
             .bindPopup(`Sie befinden sich innerhalb von ${radius}m ausgehend von diesem Punkt`).openPopup();
-        geolocate.cirle = L.circle(e.latlng, radius).addTo(map);
         geolocate.getDOMContainer().css("background-color", farbschema.getColorHexActive());
     }
 };

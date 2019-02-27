@@ -1,4 +1,6 @@
 const csv_export = {
+    ignoreClass:"tableexport-ignore",
+    state:false,
     getButtonDomObject:function(){
         $elem = $('#csv_export');
         return $elem;
@@ -8,24 +10,39 @@ const csv_export = {
     },
     controller:{
         set:function(){
+            $.fn.tableExport.formatConfig = {
+                csv:{
+                    fileExtension:".csv",
+                    separator:";",
+                    mimeType: "application/csv"
+                }
+            };
             csv_export.getButtonDomObject()
                 .unbind()
-                .click(function(e){
-                    e.preventDefault();
-                    table.destroyStickyTableHeader();
-                    let table_header = [];
+                .click(function(){
+                    csv_export.state=true;
                     //push all table header in array
-                    table.getDOMObject().find('.th_head').each(function () {
-                        table_header.push($(this).text());
-                    });
-                    // Quelle:https://github.com/zachwick/TableCSVExport
-                    table.getDOMObject().TableCSVExport({
-                        header: table_header,
-                        delivery: 'download',
-                        separator: ';',
-                        filename:indikatorauswahl.getSelectedIndikator()+"_"+gebietsauswahl.getSelectionAsString()+"_"+zeit_slider.getTimeSet()+".csv"
-                    });
-                    table.setStickTableHeader();
+                    // Quelle:https://tableexport.v5.travismclarke.com
+                    table.controller.destroyStickyTableHeader();
+                    let exportTable = table.getDOMObject()
+                        .tableExport({
+                            formats: ['csv'],
+                            headers:true,
+                            footers:false,
+                            filename:indikatorauswahl.getSelectedIndikator()+"_"+gebietsauswahl.getSelectionAsString()+"_"+zeit_slider.getTimeSet(),
+                            trimWhitespace: true,
+                            ignoreCols:[0,1],
+                            exportButtons: false,
+                            ignoreCSS:"."+csv_export.ignoreClass
+                        });
+                    let exportData = exportTable.getExportData()['table_ags']['csv'],
+                        link = window.document.createElement("a");
+                    link.setAttribute("href", "data:text/csv;charset=utf-8,%EF%BB%BF" + encodeURI(exportData.data));
+                    link.setAttribute("download", exportData.filename+exportData.fileExtension);
+                    link.click();
+                    setTimeout(function(){
+                        csv_export.state=false;
+                    },500);
                 });
         }
     }

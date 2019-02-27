@@ -214,13 +214,8 @@ const legende = {
             let options = indikator_raster.getInfos(),
                 pfad_mapfile = options[0]["pfadmapfile"],
                 layername = options[0]["layername"],
-                legende = "https://maps.ioer.de/cgi-bin/mapserv_dv?map="+pfad_mapfile+"&MODE=legend&layer="+layername+"&IMGSIZE=150+300",
-                legende_schraffur ="https://maps.ioer.de/cgi-bin/mapserv_dv?map=/mapsrv_daten/detailviewer/mapfiles/mapserv_raster.map&MODE=legend&layer=schraffur&IMGSIZE=150+30";
-            //workaround for CORS
-            //set the other params like legendenpic and staff
-            if (einheit === "proz") {
-                einheit = '%';
-            }
+                legende = "https://maps.ioer.de/cgi-bin/mapserv_dv?map="+pfad_mapfile+"&MODE=legend&layer="+layername+"&IMGSIZE=150+300";
+
             legende_colors.empty().load(legende, function () {
                 let elements = $(this).find('img');
                 elements.each(function (key, value) {

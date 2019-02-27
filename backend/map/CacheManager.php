@@ -1,5 +1,5 @@
 <?php
-include '../database/POSTGRESQL_TASKRESPOSITORY.php';
+include_once '../database/POSTGRESQL_MANAGER.php';
 
 class CacheManager{
 

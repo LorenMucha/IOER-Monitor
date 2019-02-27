@@ -211,6 +211,7 @@ const dev_chart={
                     chart.merge_data.push(obj);
                     i++;
                 });
+                console.log(chart.merge_data);
                 $('#diagramm_loading_info').hide();
                 scaleChart();
                 createPath();

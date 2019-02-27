@@ -21,7 +21,6 @@ const request_manager={
                 colors()+
                 '},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+
                 '"},"query":"getJSON"}');
-
         return this.sendRequestPHP({"file":json,"query":"getGeoJSON","type":"POST","debug":false});
     },
     //check if a indicator is possible to view in the the given kind of visualization (gebiete/raster)
@@ -84,6 +83,7 @@ const request_manager={
     },
     getTrendValues:function(indicator_id,ags,settings){
         let json = JSON.parse('{"ind":{"id":"'+indicator_id+'","ags_array":"'+ags+'"},"set":'+JSON.stringify(settings)+',"query":"getTrend"}');
+        console.log(JSON.stringify(json));
         return this.sendRequestPHP({"file":json,"query":"getTrend","type":"POST","debug":false});
     },
     handleLink:function (setting){
@@ -94,7 +94,7 @@ const request_manager={
         let json = {
             type:"GET",
             debug:false,
-            endpoint:"email/",
+            endpoint:"monitor/mail",
             query:"send Mail",
             data: {
                 name:name,
@@ -108,7 +108,7 @@ const request_manager={
         let json = {
             type:"GET",
             debug:false,
-            endpoint:"email/error",
+            endpoint:"monitor/error_mail",
             query:"send Mail",
             data: {
                 name:name,
@@ -168,6 +168,7 @@ const request_manager={
             if(!window.location.href.includes("monitor_test")) {
                 this.sendMailError(message.name, message.message);
             }
+            console.error(url,function_name,url);
         }
     }
 };

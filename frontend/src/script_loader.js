@@ -6,7 +6,6 @@ const script_loader={
         "frontend/lib/jquery/plugin/jquery.stickytableheaders.min.js",
         "frontend/lib/jquery/plugin/jquery.progressTimer.js",
         "frontend/lib/jquery/plugin/jquery.splitter.js",
-        "frontend/lib/jquery/plugin/jquery.tabletoCSV.js",
         "frontend/lib/jquery/plugin/he.js",
         //spectrum
         "frontend/lib/spectrum/spectrum.js",
@@ -42,7 +41,9 @@ const script_loader={
         "frontend/lib/d3/FileSaver.min.js",
         //Sweet Alert
         "frontend/lib/sweetalert/sweetalert-dev.js",
-        //Export2PDF
+        //Export
+        "frontend/lib/export/FileSaver.js",
+        "frontend/lib/export/tableexport.min.js",
         "frontend/lib/export/jspdf.min.js",
         "frontend/lib/export/html2canvas.js",
         "frontend/lib/export/html2pdf.bundle.min.js",

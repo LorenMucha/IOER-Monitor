@@ -24,7 +24,7 @@ class Chart{
         $values = $this->createValueArray();
         $helper = new ChartHelper($values);
         //smooth array if all_points is false
-        if(!$this->all_points) {
+        if(!$this->all_points and count($values)>=2) {
            return $helper->smoothArray();
         }else{
             return $values;
@@ -37,15 +37,21 @@ class Chart{
         //create the value array
         foreach($this->time_array as $key=>$t) {
             $ind_values = MYSQL_TASKREPOSITORY::get_instance()->getIndicatorValuesByAGS($t["time"], $this->indicator_id, $this->ags);
+
             $val = $ind_values[0];
             $this->rundung = $val->rundung;
+            $color= "66CC99";
             if($key==0) {
                 $this->min_value = round($ind_values[0]->value, $this->rundung);
             }else if($key==count($this->time_array)-1) {
                 $this->max_value = round($ind_values[(count($ind_values) - 1)]->value, $this->rundung);
             }
 
-            if ($val->einheit and $val->name) {
+            if(!is_null($val->color_max)){
+               $color = $val->color_max;
+            }
+
+            if ($val->name) {
                 //extract the values
                 if ($val->grundakt_state == 0 and (int)$t["time"] <= date("Y")) {
                     $this->grundakt_state = true;
@@ -57,7 +63,7 @@ class Chart{
                         "month" => $val->grundakt_month,
                         "id" => $this->indicator_id,
                         "name" => $val->name,
-                        "color" => "#" . $val->color_max,
+                        "color" => "#" . $color,
                         "einheit" => $val->einheit,
                         "time_real" => $t["time"]
                     ));
@@ -70,7 +76,7 @@ class Chart{
                         "month" => "1",
                         "id" => $this->indicator_id,
                         "name" => $val->name,
-                        "color" => "#" . $val->color_max,
+                        "color" => "#" . $color,
                         "einheit" => $val->einheit
                     ));
                 }

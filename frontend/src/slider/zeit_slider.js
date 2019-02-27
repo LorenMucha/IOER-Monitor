@@ -98,6 +98,6 @@ const zeit_slider={
         this.getContainerDOMObject().hide();
     },
     getTimeSet:function(){
-        return urlparamter.getUrlParameter(this.parameter);
+        return parseInt(urlparamter.getUrlParameter(this.parameter));
     }
 };

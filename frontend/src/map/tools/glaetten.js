@@ -48,7 +48,6 @@ const glaetten = {
     controller:{
         set:function(){
             const controller = glaetten;
-            console.log(controller.getParamter());
             if(!controller.getParamter() || typeof controller.getParamter()==="undefined"){
                 controller.setParamter(0);
             }

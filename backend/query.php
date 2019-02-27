@@ -1,12 +1,17 @@
 <?php
 header('Access-Control-Allow-Origin: *');
 header('Content-type: application/json; charset=utf-8');
-include "database/MYSQL_TASKREPOSITORY.php";
-include "models/Helper.php";
+include_once "database/MYSQL_TASKREPOSITORY.php";
+include_once "database/POSTGRESQL_MANAGER.php";
+include_once "database/POSTGRESQL_TASKRESPOSITORY.php";
+include_once "models/Helper.php";
+include "models/Errors.php";
+include 'models/NOTES.php';
+include 'models/Colors.php';
 include "models/UserLink.php";
 include 'chart/Chart.php';
+include "map/Json.php";
 include 'map/CacheManager.php';
-include "Json.php";
 include "map/Overlay.php";
 include "table/TableExpand.php";
 include "map/Classify.php";

@@ -58,11 +58,11 @@ const table = {
                     <th colspan="${colspan}" data-sorter="false" class="sorter-false" id="header_ind_set">${indikatorauswahl.getSelectedIndikatorText_Lang()} (${zeit_slider.getTimeSet()})</th>
                     </tr>
                     <tr class="header" id="second_row_head">
-                        <th class="th_head" data-sorter="false"></th>
-                        <th class="th_head" id="tr_rang" data-sorter="false">lfd. Nr.</th>
-                        <th class="th_head ags sort-arrow">AGS</th>
-                        <th class="th_head gebietsname sort-arrow">Gebietsname</th>
-                        <th id="tabel_header_raumgl" class="th_head sort-arrow">${value_text}</th>`;
+                        <th class="th_head" data-export="false"></th>
+                        <th class="th_head" id="tr_rang" data-export="false">lfd. Nr.</th>
+                        <th class="th_head ags sort-arrow" data-export="true">AGS</th>
+                        <th class="th_head gebietsname sort-arrow" data-export="true">Gebietsname</th>
+                        <th id="tabel_header_raumgl" class="th_head sort-arrow" data-export="true">${value_text}</th>`;
 
                 if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
                     html += '<th class="th_head grundakt_head" id="grundakt_head">Mittlere Grund- aktualität</th>';
@@ -146,16 +146,16 @@ const table = {
                                 let hc_arr = hc.split("||"),
                                     hc_text = hc_arr[0],
                                     hc_value = hc_arr[1];
-                                return `<img className="hc_icon" src="frontend/assets/hinweis/hinweis_${hc_value}.png" title="${hc_text}"/><b> ${value.value_comma}</b>`;
+                                return `<img className="hc_icon" src="frontend/assets/hinweis/hinweis_${hc_value}.png" title="${hc_text}"/><b class=""> ${value.value_comma}</b>`;
                             }
                             else if(fc !== '0'){
                                 //split the fc
                                 let fc_arr = fc.split("||"),
                                     fc_name = fc_arr[2],
                                     fc_beschreibung = fc_arr[3];
-                                return `<b title="${fc_beschreibung}">${fc_name}</b>`;
+                                return `<b title="${fc_beschreibung}" class="">${fc_name}</b>`;
                             }else{
-                                return `<b>${value.value_comma}</b>${img_stat+img_trend + img_trend_ind}`;
+                                return `<b class="">${value.value_comma}</b>${img_stat+img_trend + img_trend_ind}`;
                             }
                         },
                         grundaktualitaet_td=function(){
@@ -178,10 +178,10 @@ const table = {
                     }catch(err){}
 
                     html += `<tr ${exclude()} id="${ags}" class="tr">
-                                        <td>
+                                        <td class="${csv_export.ignoreClass}">
                                             <input id="checkbox_${ags}" type="checkbox" class="select_check disbale_performance mobile_hidden" data-ags="${ags}">
                                         </td>
-                                        <td class="count_ags_table selectable"></td>
+                                        <td class="count_ags_table selectable ${csv_export.ignoreClass}"></td>
                                         <td class="td_ags">${ags}</td>
                                         <td class="td_name" data-des="${des}">
                                             ${img_gebiets_profil}

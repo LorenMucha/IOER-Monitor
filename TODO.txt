@@ -1,0 +1,21 @@
+
+ Get JSON from Map/Tools/indikator_json.js/ getJSONFile()
+
+ dialog_manager takes the HTML + settings and injects them into html file
+
+
+GET BASE TILES
+let raumgliederung_txt = base_raumgliederung.getBaseRaumgliederungId()
+
+GET INDICATOR UNIT:
+einheit:indikatorauswahl.getIndikatorEinheit()
+
+GET SPATIAL CHOICE
+raeumliche_ausdehnung:gebietsauswahl.getSelectionAsString()
+
+GET SELCTED INDICATOR
+indikator:indikatorauswahl.getSelectedIndikator(),
+
+GET TIMESET
+jahr:zeit_slider.getTimeSet(),
+

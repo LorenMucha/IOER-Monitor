@@ -209,7 +209,7 @@ const gebietsauswahl = {
                     gebietsauswahl.clear();
                     indikator_json_group.fitBounds();
                     raumgliederung.hide();
-                    table.clearSelection();
+                    TableSelection.clearSelection();
                 });
         }
     }

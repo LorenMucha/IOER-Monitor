@@ -81,4 +81,18 @@ class Export_Helper{
         }
         return new Blob([u8arr], {type:mime});
     }
+    static downloadFile(data,filename,extension){
+        let a = document.createElement("a"),
+            url="data:text/csv;charset=utf-8,%EF%BB%BF" + encodeURI(data);
+        document.body.appendChild(a);
+        a.style = "display: none";
+        a.href = url;
+        a.download = filename+extension;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        setTimeout(function(){
+            csv_export.state=false;
+            a.remove();
+        },500);
+    }
 }

@@ -93,12 +93,12 @@ const filter_panel = {
             filter_panel.getFilterCheckBoxObject().checkbox({
                 onChecked:function(){
                     filter_panel.showDes($(this).data('value'));
-                    setTimeout(function(){table.setRang();},500);
+                    setTimeout(function(){TableHelper.setRang();},500);
                     filter_panel.close();
                 },
                 onUnchecked: function() {
                     filter_panel.removeDes($(this).data('value'));
-                    setTimeout(function(){table.setRang();},500);
+                    setTimeout(function(){TableHelper.setRang();},500);
                     filter_panel.close();
                 }
             });

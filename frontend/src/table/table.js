@@ -30,10 +30,10 @@ const table = {
                     <span title="Tabelle schließen" class="glyphicon glyphicon-remove checker" id="close_checker"></span>
                 </div>
                 <div id="interact_div">
-                    <button type="button" class="btn btn-primary mobile_hidden" id="btn_table">
+                    <button type="button" class="btn btn-primary mobile_hidden ${exclude.class_performance}" id="btn_table">
                         <i class="glyphicon glyphicon-chevron-right" title="Tabelle mit Indikatorwerten oder Zeitschnitten erweitern"></i><span>erweitern</span></button>
                     <div title="Tabelle filtern" id="filter_table" class="filter"></div>
-                    <div title="Tabelle als CSV exportieren" id="csv_export" class="${exclude.class_performance}"></div>
+                    <div title="Tabelle als CSV exportieren" id="csv_export" data-id="csv_export" data-title="Tabelle als CSV exportieren"></div>
                      <input id="search_input_table" placeholder="Suche nach Orten.." type="text" class="form-control search_input prompt" />
                 </div>
                 <hr class="hr"/>
@@ -90,7 +90,7 @@ const table = {
                         name = value.gen,
                         ind = indikatorauswahl.getSelectedIndikator(),
                         einheit = indikatorauswahl.getIndikatorEinheit(),
-                        exclude=function(){
+                        exclude_area=function(){
                             if($.inArray(des,table.excludedAreas)!==-1){
                                 return 'style="display:none"';
                             }
@@ -141,6 +141,7 @@ const table = {
                                                  id="diagramm_ags${ags}" 
                                                  src="frontend/assets/icon/histogramm.png"/>`,
                         value_td = function(){
+                        //Todo HC werden vom Backend nicht weitergegeben
                             if(hc !== '0'){
                                 //split the hc
                                 let hc_arr = hc.split("||"),
@@ -177,7 +178,7 @@ const table = {
                         }
                     }catch(err){}
 
-                    html += `<tr ${exclude()} id="${ags}" class="tr">
+                    html += `<tr ${exclude_area()} id="${ags}" class="tr">
                                         <td class="${csv_export.ignoreClass}">
                                             <input id="checkbox_${ags}" type="checkbox" class="select_check disbale_performance mobile_hidden" data-ags="${ags}">
                                         </td>
@@ -222,7 +223,7 @@ const table = {
                                                       data-einheit="${indikatorauswahl.getIndikatorEinheit()}" 
                                                       title="Veränderung der Indikatorwerte für die Gebietseinheit" 
                                                       style="margin-left: .5vh;"
-                                                      class="indsingle_entwicklungsdiagr disbale_performance" 
+                                                      class="indsingle_entwicklungsdiagr" 
                                                       id="indikatoren_diagramm_ags${ags}" 
                                                       src="${dev_chart.icon.multiple.path}" />`,
                                         img_trend_ind = `<img data-name="${value.gen}" 
@@ -231,7 +232,7 @@ const table = {
                                                           data-wert="${value_set}" 
                                                           data-einheit="${indikatorauswahl.getIndikatorEinheit()}" 
                                                           title="Veränderung des Indikatorwertes für die Gebietseinheit" 
-                                                          class="ind_entwicklungsdiagr disbale_performance" 
+                                                          class="ind_entwicklungsdiagr" 
                                                           id="indikatoren_diagramm_ags_ind${ags}"
                                                           style="margin-left: .5vh;" 
                                                           src="${dev_chart.icon.single.path}"/>`;
@@ -296,7 +297,7 @@ const table = {
                                       data-wert="${value_g}" 
                                       data-einheit="${indikatorauswahl.getIndikatorEinheit()}" 
                                       title="Veränderung der Indikatorwerte für die Gebietseinheit" 
-                                      class="indsingle_entwicklungsdiagr disbale_performance" 
+                                      class="indsingle_entwicklungsdiagr ${exclude.class_performance}" 
                                       id="indikatoren_diagramm_ags99" 
                                       style="margin-left: .5vh;" 
                                       src="${dev_chart.icon.multiple.path}" />`,
@@ -306,7 +307,7 @@ const table = {
                                           data-wert="${value_g}" 
                                           data-einheit="${indikatorauswahl.getIndikatorEinheit()}" 
                                           title="Veränderung des Indikatorwertes für die Gebietseinheit" 
-                                          class="ind_entwicklungsdiagr disbale_performance" 
+                                          class="ind_entwicklungsdiagr ${exclude.class_performance}" 
                                           id="indikatoren_diagramm_ags_ind99" 
                                           style="margin-left: .5vh;" 
                                           src="${dev_chart.icon.single.path}"/>`,
@@ -349,15 +350,15 @@ const table = {
 
         html_table += createTableHeader()+createTableBody()+createTableFooter()+'</table><table id="header-fixed"></table>';
 
-        this.clear();
-        this.append(html_table);
-        this.controller.set();
-        this.setRang();
-        this.setSelection();
-        this.controller.setTableSorter();
-        this.expandState=false;
-        exclude.setPerformanceElements();
-        progressbar.remove();
+        $.when(this.clear())
+            .then(this.append(html_table))
+            .then(this.controller.set())
+            .then(TableHelper.setRang())
+            .then(TableSelection.setSelection())
+            .then(TableHelper.setTableSorter())
+            .then(this.expandState=false)
+            .then(exclude.setPerformanceElements())
+            .then(progressbar.remove());
 
         if(view_state.getViewState()==='mw'){
             main_view.resizeSplitter(table.getWidth());
@@ -385,9 +386,9 @@ const table = {
         this.getScrollableAreaDOMObject().empty();
     },
     append:function(html_string){
-      table.controller.destroyStickyTableHeader();
+      TableHelper.destroyStickyTableHeader();
       this.getScrollableAreaDOMObject().append(html_string);
-      table.controller.setStickTableHeader();
+      TableHelper.setStickTableHeader();
     },
     expand:function(){
         const table = this;
@@ -402,7 +403,10 @@ const table = {
             def = $.Deferred();
 
         //function
-        let getDifferenceDiv=function(value_ind,value_ags){
+        let getDifferenceValue=function(value_ind,value_ags){
+                return (value_ags-value_ind).toFixed(2);
+            },
+            getDifferenceDiv=function(value_ind,value_ags){
             //create the difference view
             let dif_val = (value_ags-value_ind).toFixed(2),
                 class_glyphicon = 'negativ';
@@ -445,7 +449,7 @@ const table = {
             };
 
         //reset the colspan to originial
-        if(!indikatorauswahl.getSelectedIndiktorGrundaktState()){table.setColspanHeader(5);}
+        if(!indikatorauswahl.getSelectedIndiktorGrundaktState()){TableHelper.setColspanHeader(5);}
 
         function defCalls(){
             let requests = [];
@@ -746,35 +750,13 @@ const table = {
                 }
             });
             progressbar.remove();
-            table.controller.setTableSorter();
+            TableHelper.setTableSorter();
             table.expandState= true;
             main_view.resizeSplitter(table.getWidth()+80);
         });
     },
     setExpandState:function(_state){
         this.expandState = _state;
-    },
-    setRang:function(){
-        let i=0;
-        this.getContainer().find('.count_ags_table').each(function(){
-            if($(this).closest('tr').css("display")!=='none') {
-                i +=1;
-                $(this).text(i);
-            }
-        });
-    },
-    setColspanHeader:function(val){
-        this.getColSpanRow().attr("colspan",val);
-    },
-    isOpen:function(){
-        let state = true;
-        if ($('.right_content').is(':hidden')) {
-            state = false;
-        }
-        return state;
-    },
-    isExpand:function(){
-        return this.expandState;
     },
     onScroll:function(){
         if(view_state.getViewState()==='responsive') {
@@ -802,7 +784,7 @@ const table = {
         set:function(){
             const tableObject = table.getTableBodyObject();
             let table_body = $('#tBody_value_table'),
-                table_selection = $('#tBody_selection');
+                TableSelectionion = $('#tBody_selection');
 
             //on click table head
             tableObject
@@ -810,7 +792,7 @@ const table = {
                 .unbind()
                 .click(function(){
                     setTimeout(function () {
-                        table.setRang();
+                        TableHelper.setRang();
                     }, 1000);
                 });
             //trigger Update tablesorter and set the 'rang text'
@@ -847,32 +829,34 @@ const table = {
                     openStatistik(ags,name,wert);
                 });
             //development chart single ind
-            $('.ind_entwicklungsdiagr')
-                .unbind()
-                .click(function () {
-                    let ags = $(this).data('ags');
-                    let name = $(this).data('name');
-                    let ind = indikatorauswahl.getSelectedIndikator();
-                    dev_chart.chart.settings.ags = ags;
-                    dev_chart.chart.settings.name=name;
-                    dev_chart.chart.settings.ind=indikatorauswahl.getSelectedIndikator();
-                    dev_chart.chart.settings.ind_vergleich=false;
-                    dev_chart.open();
-                });
+            if(exclude.checkPerformanceAreas()) {
+                $('.ind_entwicklungsdiagr')
+                    .unbind()
+                    .click(function () {
+                        let ags = $(this).data('ags');
+                        let name = $(this).data('name');
+                        let ind = indikatorauswahl.getSelectedIndikator();
+                        dev_chart.chart.settings.ags = ags;
+                        dev_chart.chart.settings.name = name;
+                        dev_chart.chart.settings.ind = indikatorauswahl.getSelectedIndikator();
+                        dev_chart.chart.settings.ind_vergleich = false;
+                        dev_chart.open();
+                    });
 
-            //development chart single indicator
-            $('.indsingle_entwicklungsdiagr')
-                .unbind()
-                .click(function () {
-                    let ags = $(this).data('ags');
-                    let name = $(this).data('name');
-                    let ind = indikatorauswahl.getSelectedIndikator();
-                    dev_chart.chart.settings.ags = ags;
-                    dev_chart.chart.settings.name=name;
-                    dev_chart.chart.settings.ind=indikatorauswahl.getSelectedIndikator();
-                    dev_chart.chart.settings.ind_vergleich=true;
-                    dev_chart.open();
-                });
+                //development chart single indicator
+                $('.indsingle_entwicklungsdiagr')
+                    .unbind()
+                    .click(function () {
+                        let ags = $(this).data('ags');
+                        let name = $(this).data('name');
+                        let ind = indikatorauswahl.getSelectedIndikator();
+                        dev_chart.chart.settings.ags = ags;
+                        dev_chart.chart.settings.name = name;
+                        dev_chart.chart.settings.ind = indikatorauswahl.getSelectedIndikator();
+                        dev_chart.chart.settings.ind_vergleich = true;
+                        dev_chart.open();
+                    });
+            }
 
             //Live Search in Table
             $('#search_input_table')
@@ -920,122 +904,17 @@ const table = {
                 //set selection by check
                 $(document).on("change",".select_check",function(){
                        let ags = $(this).data("ags").toString();
-                       table.selection.push(ags);
-                       table.setSelection();
+                       //table.selection.push(ags);
+                    TableSelection.addAgs(ags);
+                    TableSelection.setSelection();
+                       //table.setSelection();
                 });
                 //remove selection by uncheck
                 $(document).on("change",".select_uncheck",function(){
                         let ags = $(this).data("ags").toString();
-                        table.removeSelection(ags);
+                        TableSelection.removeSelection(ags);
                     });
             }
         },
-        setTableSorter:function(){
-            // these default equivalents were obtained from a table of equivalents
-            $.tablesorter.characterEquivalents = {
-                'a' : '\u00e1\u00e0\u00e2\u00e3\u00e4\u0105\u00e5', // áàâãäąå
-                'A' : '\u00c1\u00c0\u00c2\u00c3\u00c4\u0104\u00c5', // ÁÀÂÃÄĄÅ
-                'c' : '\u00e7\u0107\u010d', // çćč
-                'C' : '\u00c7\u0106\u010c', // ÇĆČ
-                'e' : '\u00e9\u00e8\u00ea\u00eb\u011b\u0119', // éèêëěę
-                'E' : '\u00c9\u00c8\u00ca\u00cb\u011a\u0118', // ÉÈÊËĚĘ
-                'i' : '\u00ed\u00ec\u0130\u00ee\u00ef\u0131', // íìİîïı
-                'I' : '\u00cd\u00cc\u0130\u00ce\u00cf', // ÍÌİÎÏ
-                'o' : '\u00f3\u00f2\u00f4\u00f5\u00f6\u014d', // óòôõöō
-                'O' : '\u00d3\u00d2\u00d4\u00d5\u00d6\u014c', // ÓÒÔÕÖŌ
-                'ss': '\u00df', // ß (s sharp)
-                'SS': '\u1e9e', // ẞ (Capital sharp s)
-                'u' : '\u00fa\u00f9\u00fb\u00fc\u016f', // úùûüů
-                'U' : '\u00da\u00d9\u00db\u00dc\u016e' // ÚÙÛÜŮ
-            };
-            // modify the above defaults as follows
-            $.extend( $.tablesorter.characterEquivalents, {
-                "ae" : "\u00e6", // expanding characters æ Æ
-                "AE" : "\u00c6",
-                "oe" : "\u00f6\u0153", // œ Œ
-                "OE" : "\u00d6\u0152",
-                "d"  : "\u00f0",  // Eth (ð Ð)
-                "D"  : "\u00d0",
-                "o"  : "\u00f3\u00f2\u00f4\u00f5", // remove ö because it's in the oe now
-                "O"  : "\u00d3\u00d2\u00d4\u00d5"  // remove Ö because it's in the OE now
-            });
-
-            table.getDOMObject()
-                .tablesorter()
-                .bind("sortEnd",function () {
-                    table.setRang();
-                });
-        },
-        updateTableSorter:function(){
-            table.getDOMObject().trigger("update");
-        },
-        sortTable:function(_column){
-            table.getDOMObject().find("th:contains("+_column+")").trigger("sorton");
-        },
-        destroyTableSorter:function(){
-            table.getDOMObject().trigger("destroy");
-        },
-        setStickTableHeader:function(){
-            table.getDOMObject().stickyTableHeaders({
-                fixedOffset: $('#thead'),
-                scrollableArea: $('.scrollable-area')
-            });
-        },
-        destroyStickyTableHeader:function(){
-            table.getDOMObject().stickyTableHeaders('destroy');
-        },
-        reinitializeStickyTableHeader:function(){
-            table.controller.destroyStickyTableHeader();
-            if(table.getWidth()<right_view.getWidth()){
-                table.controller.setStickTableHeader();
-            }
-        },
-    },
-    setSelection:function(){
-        if(this.selection.length >0 && exclude.checkPerformanceAreas()) {
-            let html_array = [];
-            $.each(table.selection,function(key,select){
-                let ags = select,
-                    elem=$(`#${ags}`);
-                $clone = elem.clone();
-                $clone
-                    .addClass("selected")
-                    .attr("id",ags+"check")
-                    .find(".select_check")
-                    .removeClass("select_check")
-                    .prop("checked",true)
-                    .addClass("select_uncheck");
-                indikator_json_group.highlight(ags, false);
-                $('#tBody_selection').append($clone);
-                elem.remove();
-            });
-            table.controller.updateTableSorter();
-            table.getScrollableAreaDOMObject().scrollTop(0);
-            table.setRang();
-        }
-    },
-    removeSelection:function(ags){
-        let elem = $(`#${ags}check`);
-        table.selection = $.grep(table.selection, function (val) {
-            return val != ags;
-        });
-        $clone_change = elem.clone();
-        $clone_change
-            .removeClass("selected")
-            .attr("id",ags)
-            .find(".select_uncheck")
-            .removeClass("select_uncheck")
-            .addClass("select_check");
-        indikator_json_group.resetHightlight();
-        $("#tBody_value_table").append($clone_change);
-        elem.remove();
-        //wait until element exists in table
-        table.controller.updateTableSorter();
-        $('.th_head.gebietsname').click();
-        table.setRang();
-    },
-    clearSelection:function(){
-        this.selection=[];
-        $('#tBody_selection').empty();
     }
 };

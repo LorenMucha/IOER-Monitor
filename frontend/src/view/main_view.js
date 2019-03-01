@@ -32,7 +32,7 @@ const main_view = {
                     toolbar.close();
                 },
                 onDragEnd: function (event) {
-                    table.controller.reinitializeStickyTableHeader();
+                    TableHelper.reinitializeStickyTableHeader();
                     legende.resize();
                     map.invalidateSize();
                 }
@@ -51,11 +51,11 @@ const main_view = {
                 width= 470;
             }
             this.splitter.position(width);
-            if(table.isExpand()){
+            if(TableHelper.isTableExpand()){
                 legende.close();
             }
             legende.resize();
-            table.controller.reinitializeStickyTableHeader();
+            TableHelper.reinitializeStickyTableHeader();
             map.invalidateSize();
         }
     },

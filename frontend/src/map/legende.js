@@ -54,7 +54,7 @@ const legende = {
             legende_container = this.getDOMObject();
         //only for Multiview
         if(view_state.getViewState()==="mw"){
-            if(table.isOpen()){
+            if(TableHelper.isTableOpen()){
                 show_button_grp.css("right", right_view.getWidth()+35);
                 legende_container.css("right",right_view.getWidth()+30);
                 close_icon.css("right",right_view.getWidth()+73);
@@ -139,7 +139,6 @@ const legende = {
             datenalter_map = $('#dropdown_datenalter');
 
         //close datenalter
-        console.log(indikatorauswahl.getSelectedIndiktorGrundaktState(),exclude.checkPerformanceAreas());
         if(exclude.checkPerformanceAreas() && indikatorauswahl.getSelectedIndiktorGrundaktState()){
             helper.enableElement("#datenalter",$('#datenalter').data("title"));
             if( datenalter_map.is(":visible")){

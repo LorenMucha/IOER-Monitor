@@ -155,7 +155,7 @@ const raeumliche_analyseebene = {
                 .unbind()
                 .change(function () {
                     if(!raumgliederung.getSelectionId()) {
-                        table.clearSelection();
+                        TableSelection.clearSelection();
                     }
                     changed = true;
                     let choice = $(this).val();

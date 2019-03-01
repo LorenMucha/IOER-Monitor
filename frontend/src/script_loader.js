@@ -42,6 +42,7 @@ const script_loader={
         //Sweet Alert
         "frontend/lib/sweetalert/sweetalert-dev.js",
         //Export
+        "frontend/lib/export/Blob.js",
         "frontend/lib/export/FileSaver.js",
         "frontend/lib/export/tableexport.min.js",
         "frontend/lib/export/jspdf.min.js",
@@ -101,10 +102,12 @@ const script_loader={
         "frontend/src/map/tools/center_map.js",
         "frontend/src/map/tools/geolocate.js",
         //table
+        "frontend/src/table/TableSelection.js",
         "frontend/src/table/table.js",
         "frontend/src/table/expand_panel.js",
         "frontend/src/table/filter_panel.js",
         "frontend/src/table/csv_export.js",
+        "frontend/src/table/TableHelper.js",
         //slider
         "frontend/src/slider/opacity_slider.js",
         "frontend/src/slider/rasterweite_slider.js",
@@ -123,6 +126,7 @@ const script_loader={
         "frontend/src/export/Export_Helper.js",
         //other elements
         "frontend/src/request_manager.js",
+        "frontend/src/alert_manager.js",
         "frontend/src/config.js",
         "frontend/src/search.js",
         "frontend/src/webtour.js",

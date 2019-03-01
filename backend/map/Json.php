@@ -67,7 +67,7 @@ class Json
                             }
 
                             //get the hc text
-                            if (!empty($note_id)) {
+                            if ($note_id!=0) {
                                 $text_hc = NOTES::get_instance()->getNoteText($note_id) . "||" . $note_id;
                             } else {
                                 $text_hc = "0";

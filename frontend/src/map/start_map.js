@@ -18,6 +18,7 @@ const start_map= {
         this.layer.addTo(map);
         let bounds = this.layer.getBounds();
         map.fitBounds(bounds);
+        map_header.hide();
 
         $('.kennblatt').hide();
         legende.close();

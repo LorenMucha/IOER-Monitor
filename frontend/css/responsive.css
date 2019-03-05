@@ -52,6 +52,19 @@
     #export_map{
         display:none !important;
     }
+    .pin{
+        display: none;
+    }
+    .choice_panel{
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+    #entwicklungsdiagramm_content #diagramm #visualisation{
+        height:500px !important;
+    }
+    .right_content #tabelle_erweitern{
+        width:300px !important;
+    }
 }
 /* media queries*/
 @media only screen and (max-width : 700px) {

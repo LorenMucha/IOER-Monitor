@@ -83,7 +83,6 @@ const request_manager={
     },
     getTrendValues:function(indicator_id,ags,settings){
         let json = JSON.parse('{"ind":{"id":"'+indicator_id+'","ags_array":"'+ags+'"},"set":'+JSON.stringify(settings)+',"query":"getTrend"}');
-        console.log(JSON.stringify(json));
         return this.sendRequestPHP({"file":json,"query":"getTrend","type":"POST","debug":false});
     },
     handleLink:function (setting){

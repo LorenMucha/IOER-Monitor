@@ -5,6 +5,7 @@ const indikatorauswahl ={
     filtered_years:'',
     paramter:'ind',
     previous_indikator:'',
+    responsive:false,
     schema:{
         //collection of icons which stands for each category https://semantic-ui.com/elements/icon.html
         "N":{"name":"Nachhaltigkeit","icon":"<i class='leaf icon'></i>","color":false},
@@ -21,9 +22,6 @@ const indikatorauswahl ={
         "E":{"name":"Energie","icon":"<i class='adjust icon'></i>","color":false},
         "M":{"name":"Materiallager","icon":"<i class='cubes icon'></i>","color":false},
         "X":{"name":"Relief","icon":"<i class='align right icon'></i>","color":false}
-    },
-    getPreviousIndikator:function(){
-        return this.previous_indikator;
     },
     getSelectedIndikator:function(){
         return urlparamter.getUrlParameter(this.paramter);
@@ -100,8 +98,10 @@ const indikatorauswahl ={
                 }
                 //create the cat choices
                 if(main_view.getHeight()>=700) {
+                    menu.responsive=false;
                     html += `<div id="kat_item_${cat_id}" class="ui left pointing dropdown link item link_kat" data-value="${cat_id}" style="${background_color}">${icon_set}<i class="dropdown icon"></i>${cat_name()}<div id="submenu${cat_id}" class="menu submenu upward">`;
                 }else{
+                    menu.responsive=true;
                     html += `<div class="header">
                                 <i class="tags icon"></i>${cat_name()}</div>
                             <div class="divider"></div>`
@@ -245,27 +245,18 @@ const indikatorauswahl ={
         this.getSelectedIndikatorText();
         return $('#'+this.getSelectedIndikator()+"_item").attr("data-name");
     },
-    //function to clone the inidcator dropdown menu to reuse it for example inside table expand or chart
+    //function to clone the indicator dropdown menu to reuse it for example inside table expand or chart
     cloneMenu:function(appendToId,newClassId,orientation,exclude_kat,possible_indicators){
+        let elem_id = $(`#${appendToId}`);
+        let menu_clone = $('.toolbar #kat_auswahl > div').clone();
 
-        let target_ddm = $('.link_kat');
-        if(target_ddm.length===0){
-            target_ddm = $('.link_sub');
-        }
+        //get the responsive menu
 
-        target_ddm.each(function(){
-            $(this)
-                .clone()
-                .appendTo('#'+appendToId)
-                .removeClass('link_kat')
-                .addClass(newClassId);
-        });
-
-        $('.'+newClassId)
+        menu_clone
+            .removeClass('link_kat')
+            .addClass(newClassId)
             .each(function() {
                 let element = $(this);
-                let kat = $(this).attr("value");
-                let time = zeit_slider.getTimeSet();
                 //add  the needed classes and change the id
                 element
                     .find('i')
@@ -275,23 +266,17 @@ const indikatorauswahl ={
                     .addClass(orientation)
                     .addClass('transition')
                     .removeAttr("id")
-                    .attr('id', 'submenu'+kat+newClassId)
-                    .find('.item').each(function(){
-                    //if true clone only indicators which times are possible with the indicator set times
-                    if(possible_indicators){
-                        let times_values = $(this).data("times").toString().split(',');
-                        let kat_name = $(this).data("kat");
-                        let time = zeit_slider.getTimeSet().toString();
-                        if($.inArray(time,times_values)===-1){
-                            $(this).remove();
+                    .find('.item')
+                    .each(function(){
+                        //if true clone only indicators which times are possible with the indicator set times
+                        if(possible_indicators){
+                            let times_values = $(this).data("times").toString().split(',');
+                            let time = zeit_slider.getTimeSet().toString();
+                            if($.inArray(time,times_values)===-1){
+                                $(this).remove();
+                            }
                         }
-                    }
-                })
-            })
-        .each(function(){
-            if($(this).find('.item').length ==0){
-                $(this).remove();
-            }
+                    });
         });
 
         //set the align css for the menu
@@ -299,17 +284,39 @@ const indikatorauswahl ={
         if(orientation==='left'){
             text_align = 'right';
         }
-        $('#'+appendToId+' >.item').css('text-align',text_align);
+        menu_clone.find('.item').children().css('text-align',text_align);
+        //add the element to the given id
+        elem_id
+            .html(menu_clone);
 
-        //remove a excluded Kat
+        //exlude categories for cloning
         if(exclude_kat){
             if(exclude_kat instanceof Array){
                 $.each(exclude_kat,function(key,value){
-                    $('.' + newClassId + "[value=" + value + "]").remove();
+                    elem_id.find(`#kat_item_${value}`).remove();
                 });
             }else {
-                $('.' + newClassId + "[value=" + exclude_kat + "]").remove();
+                elem_id.find(`#kat_item_${exclude_kat}`).remove();
             }
+        }
+        //if menu is fully added -> remove empty categories, no need for responisve menu without categories view
+        if(!this.responsive) {
+            var interval = setInterval(function () {
+                //if all indictaor values are ready
+                if (elem_id.find('.submenu').length >= 2) {
+                    clearInterval(interval);
+                    elem_id
+                        .find('.submenu')
+                        .each(function () {
+                            let length = $(this).find(".item").length;
+                            if (length === 0) {
+                                let set = $(this).parent();
+                                console.log(set.attr("id"));
+                                set.remove();
+                            }
+                        });
+                }
+            }, 50);
         }
     },
     openMenu:function(){

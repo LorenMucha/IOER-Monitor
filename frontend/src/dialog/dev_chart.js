@@ -211,7 +211,7 @@ const dev_chart={
                     chart.merge_data.push(obj);
                     i++;
                 });
-                console.log(chart.merge_data);
+
                 $('#diagramm_loading_info').hide();
                 scaleChart();
                 createPath();
@@ -457,22 +457,15 @@ const dev_chart={
                 $('#indikator_choice_container_diagramm').show();
                 if (chart.ind_array_chart.length==0) {
                     let kat_auswahl_diagramm =$('#kat_auswahl_diagramm');
-                    indikatorauswahl.cloneMenu('kat_auswahl_diagramm', 'link_kat_diagramm', 'right',['X'],false);
+                    indikatorauswahl.cloneMenu('kat_auswahl_diagramm', 'link_kat_diagramm', 'right','X',false);
                     //remove items which have not the simular unit
                     indikatorauswahl_chart
                         .find('.submenu .item')
                         .each(function(){
-                            if(indikatorauswahl.getIndikatorEinheit() !== $(this).data('einheit')){
+                                 if(indikatorauswahl.getIndikatorEinheit() !== $(this).data('einheit')){
                                 $(this).remove();
                             }
                         });
-                    //clear empty categories
-                    $('.link_kat_diagramm').each(function(){
-                        let test = ($(this).find('.item').text()).replace(/\s+/g, '');
-                        if(parseInt(test.length)<=2 && $.isNumeric(test.length)){
-                            $(this).remove();
-                        }
-                    });
                     kat_auswahl_diagramm.find('.item').each(function(){$(this).css("color","rgba(0,0,0,.87)")});
                     //remove selected Indicatopr from the list
                     helper.disableElement(`#kat_auswahl_diagramm #${indikatorauswahl.getSelectedIndikator()}_item`);

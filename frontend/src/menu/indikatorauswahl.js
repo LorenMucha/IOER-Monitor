@@ -311,7 +311,6 @@ const indikatorauswahl ={
                             let length = $(this).find(".item").length;
                             if (length === 0) {
                                 let set = $(this).parent();
-                                console.log(set.attr("id"));
                                 set.remove();
                             }
                         });

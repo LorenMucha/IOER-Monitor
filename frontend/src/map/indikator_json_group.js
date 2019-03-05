@@ -22,7 +22,7 @@ const indikator_json_group = {
     },
     resetHightlight:function(){
         try {
-            let ags_selection = table.selection;
+            let ags_selection = TableSelection.getSelection();
             jsongroup.eachLayer(function (layer) {
                 layer.eachLayer(function (layer) {
                     let ags = layer.feature.properties.ags,

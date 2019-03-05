@@ -4,9 +4,12 @@ class TableSelection{
         selection.push(_ags);
     }
     static removeAgs(_ags){
-        selection = $.grep(this.selection, function (val) {
+        selection = $.grep(selection, function (val) {
             return val != _ags;
         });
+    }
+    static getSelection(){
+        return selection;
     }
     static setSelection(){
         if(selection.length >0 && exclude.checkPerformanceAreas()) {
@@ -42,7 +45,9 @@ class TableSelection{
             .find(".select_uncheck")
             .removeClass("select_uncheck")
             .addClass("select_check");
+
         indikator_json_group.resetHightlight();
+
         $("#tBody_value_table").append(clone_change);
         elem.remove();
         //wait until element exists in table

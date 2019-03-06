@@ -196,6 +196,7 @@ const indikator_json = {
         });
 
         $(document).on('click','#pop_up_diagramm_ags_'+id_popup,function(){
+            console.log("Starting: onClick Statistics");
             statistics.chart.settings.ags=ags;
             statistics.chart.settings.name=gen;
             statistics.chart.settings.ind=indikatorauswahl.getSelectedIndikator();

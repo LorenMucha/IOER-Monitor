@@ -79,6 +79,7 @@ const script_loader={
         "frontend/src/menu/farbliche_darstellungsart.js",
         "frontend/src/menu/navbar.js",
         "frontend/src/menu/farbschema.js",
+        "frontend/src/menu/MenuHelper.js",
         //map
         "frontend/src/map/layer_control.js",
         "frontend/src/map/map_controller.js",

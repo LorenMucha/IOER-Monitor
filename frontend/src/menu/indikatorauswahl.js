@@ -99,7 +99,15 @@ const indikatorauswahl ={
                 //create the cat choices
                 if(main_view.getHeight()>=700) {
                     menu.responsive=false;
-                    html += `<div id="kat_item_${cat_id}" class="ui left pointing dropdown link item link_kat" data-value="${cat_id}" style="${background_color}">${icon_set}<i class="dropdown icon"></i>${cat_name()}<div id="submenu${cat_id}" class="menu submenu upward">`;
+                    html += `<div id="kat_item_${cat_id}"
+                                  title="${main_view.getHeight() >= 800 ? '':'durch erneutes anklicken ändern sie die horizontale Positionierung des Sub-Menü'}"
+                                  class="ui left pointing dropdown link item link_kat" 
+                                  data-value="${cat_id}"
+                                  style="${background_color}">
+                                ${icon_set}
+                                <i class="dropdown icon"></i>
+                                ${cat_name()}
+                                <div id="submenu${cat_id}" class="menu submenu upward">`;
                 }else{
                     menu.responsive=true;
                     html += `<div class="header">
@@ -128,7 +136,15 @@ const indikatorauswahl ={
                             return set;
                         };
 
-                    html += `<div class="${markierung_class()} item link_sub" id="${ind_id}_item" data-times="${times}" data-einheit="${einheit}" data-value="${ind_id}" data-kat="${cat_id}" data-name="${ind_name()}" data-sort="1" data-actuality="${grundakt_state}">`;
+                    html += `<div class="${markierung_class()} item link_sub" 
+                                    id="${ind_id}_item" 
+                                    data-times="${times}" 
+                                    data-einheit="${einheit}" 
+                                    data-value="${ind_id}" 
+                                    data-kat="${cat_id}" 
+                                    data-name="${ind_name()}" 
+                                    data-sort="1" 
+                                    data-actuality="${grundakt_state}">`;
                     html += ind_name() + "</div>";
                 });
                 html +='</div></div>';
@@ -326,6 +342,13 @@ const indikatorauswahl ={
             indikatorauswahl.getDOMObject()
                 .dropdown('refresh')
                 .dropdown({
+                    onShow:function(){
+                        $('.link_kat')
+                            .unbind()
+                            .click(function(){
+                                MenuHelper.setUpward($(this).find('.submenu'));
+                            });
+                    },
                     onChange: function (value, text, $choice) {
                         //clean the search field
                         $('#search_input_indikatoren').val('');

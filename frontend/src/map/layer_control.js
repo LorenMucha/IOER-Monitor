@@ -395,6 +395,7 @@ const layer_control={
             progressbar.setHeaderText("Lade Layer");
 
             $.when(request_manager.getZusatzlayer(_id)).done(function(json){
+                console.log(json);
                 let layer = control.zusatzlayer[_id],
                     lan= language_manager.getLanguage(),
                     name = control.text[lan][_id];

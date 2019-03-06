@@ -6,16 +6,18 @@ const urlparamter={
         return param_arr[1];
     },
     setUrlParameter:function(key, value){
-        let url = window.location.href;
-        //add the ? if not allready set
-        if (url.toString().indexOf("?") <= 0) {
-            url += "?";
+        if(typeof value !== "undefined") {
+            let url = window.location.href;
+            //add the ? if not allready set
+            if (url.toString().indexOf("?") <= 0) {
+                url += "?";
+            }
+            //add the & if not exists
+            if (url[url.length - 1] !== '&' && url[url.length - 1] !== '?') {
+                url += "&";
+            }
+            window.history.pushState(key, value, url + key + "=" + value + "&");
         }
-        //add the & if not exists
-        if(url[url.length-1] !== '&' && url[url.length-1] !== '?'){
-            url += "&";
-        }
-        window.history.pushState(key, value, url + key + "=" + value + "&");
     },
     removeUrlParameter:function(key_rm){
         let url = window.location.href,
@@ -52,12 +54,13 @@ const urlparamter={
         }
     },
     updateURLParameter:function(param, paramVal){
-        let url = window.location.href,
-            string_setted = param+"="+this.getUrlParameter(param),
-            new_set = param+"="+paramVal,
-            new_url = url.toString().replace(string_setted,new_set);
-        window.history.pushState(param, paramVal, new_url);
-
+        if(typeof paramVal !== "undefined") {
+            let url = window.location.href,
+                string_setted = param + "=" + this.getUrlParameter(param),
+                new_set = param + "=" + paramVal,
+                new_url = url.toString().replace(string_setted, new_set);
+            window.history.pushState(param, paramVal, new_url);
+        }
     },
     getURLMonitor:function(){
         if(view_state.getProductionState() || location.hostname === "localhost"){

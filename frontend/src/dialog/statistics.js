@@ -168,7 +168,7 @@ const statistics = {
                 diagram = $('#statistics_content #diagramm'),
                 chart_width = diagram.width() - margin.left - margin.right,
                 chart_height = $('.ui-dialog').height() * (1.5 / 3) - 100;
-            this.controller.showVisualisation(1, svg, chart_width, chart_height, margin);
+            this.controller.showVisualisation(2, svg, chart_width, chart_height, margin);
         },
         controller: {
             showVisualisation: function (selection, svg, chart_width, chart_height, margin) {
@@ -237,7 +237,7 @@ const statistics = {
         for (let elem in geoJSON.features) {
             let object = geoJSON["features"][elem]["properties"];
             // checks if Object has "value_comma" property and it is not empty, then fetches the value
-            if (object.hasOwnProperty("value_comma") && object.value_comma != "") {
+            if (object.hasOwnProperty("value_comma") && object.value_comma !== "") {
                 //create object:
                 let obj = {name: object.gen, value: this.parseFloatWithComma(object.value_comma), ags: object.ags};
                 if (typeof obj.value == "number") {
@@ -594,7 +594,7 @@ const statistics = {
         g.append("path")
             .datum(data)
             .attr("fill", "none")
-            .attr("stroke", "steelblue")
+            .attr("stroke", farbschema.getColorHexMain())
             .attr("stroke-width", 1.5)
             .attr("stroke-linejoin", "round")
             .attr("stroke-linecap", "round")

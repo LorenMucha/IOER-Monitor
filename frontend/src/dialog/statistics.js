@@ -1,6 +1,6 @@
 const statistics = {
     endpoint_id: "statistics_content",
-
+    chart_selector:"#statistics",
     text: {
         de: {
             title: "Statistik",
@@ -70,8 +70,6 @@ const statistics = {
         this.chart.data = this.getDistributionFunctionValues(this.chart.data);
         this.chart.data = this.getDeviationValues(this.chart.data, this.chart.settings.statistics.average);
 
-        console.log(this.getDensityFunctionClassValues(this.chart.data,25));
-
         let chart = this.chart;
         const timeStamp = zeit_slider.getTimeSet();
 
@@ -123,6 +121,15 @@ const statistics = {
                           
                     </table>
                     </div>
+                    <div id="chart_ddm_diagramm" class="ui selection multiple dropdown">
+                                <i class="dropdown icon"></i>
+                        <ul class="dropdown-menu">
+                      <li><a href="#1">Item 1</a></li>
+                       <li><a href="#2">Item 2</a></li>
+                      <li><a href="#3">Item 3</a></li>
+                      </ul>
+                  
+                    </div>
                     <div id="container_diagramm" class="container_diagramm">
                         <div id="diagramm">
                             <h3 class="Hinweis_diagramm" id="Hinweis_diagramm_empty">${this.text[lan].no_choice}</h3>
@@ -158,6 +165,7 @@ const statistics = {
             allValuesObjectArray: {},
             areaCount: "",
             areaType: {},
+            selectedChart:"valueChart",
             statistics: {
                 min: ",",
                 max: ",",
@@ -175,72 +183,80 @@ const statistics = {
             let svg = d3.select("#statistics_content #visualisation"),
                 margin = {top: 20, right: 60, bottom: 30, left: 60},
                 diagram = $('#statistics_content #diagramm'),
+                chart_auswahl = $('#chart_ddm_diagramm'),
                 chart_width = diagram.width() - margin.left - margin.right,
                 chart_height = $('.ui-dialog').height() * (1.5 / 3) - 100;
-            this.controller.showVisualisation(2, svg, chart_width, chart_height, margin);
+            //set up the dropdown menu
+            chart_auswahl.dropdown({
+                "closeOnClick":true,
+            });
+            chart_auswahl.click(function(){
+                chart_auswahl.dropdown("toggle");
+            });
+
+            this.controller.showVisualisation(statistics.chart.settings.selectedChart, svg, chart_width, chart_height, margin);
         },
         controller: {
+
             showVisualisation: function (selection, svg, chart_width, chart_height, margin) {
                 console.log("Starting visualisation: Controller start");
                 // TODO REINIS diese Variabeln definitionen sinnvoll???
-                let data = statistics.chart.data,
-                    chart = statistics.chart;
-
-                if (selection == 1) {
-                    // Bar graph of Values Ascending!!!!!
-                    console.log("Starting visualisation: Selection: 1");
-
-                    let parameters={data:data,
-                        xAxisName:chart.settings.areaType,
-                        yAxisName:chart.settings.indText,
-                        xValue:"ags",
-                        yValue:"value",
+                let chart = statistics.chart,
+                    parameters={data:[],
+                        xAxisName:"",
+                        yAxisName:"",
+                        xValue:"",
+                        yValue:"",
                         selectedValue:chart.settings.ags,
                         indUnit:chart.settings.indUnit,
                         mean:chart.settings.statistics.average,
+                        median:chart.settings.statistics.median,
                         svg:svg,
                         chart_width:chart_width,
                         chart_height:chart_height,
                         margins:margin
                     };
+
+                if (selection === "valueChart") {
+                    // Bar graph of Values Ascending!!!!!
+                    console.log("Starting visualisation: Selection: 1");
+                    let dataSorted = statistics.sortObjectAscending(chart.data, "value", "ags");
+                    parameters.data=dataSorted;
+                    parameters.xAxisName=chart.settings.areaType;
+                    parameters.yAxisName=chart.settings.indText;
+                    parameters.xValue="ags";
+                    parameters.yValue="value";
+
                     statistics.drawOrderedValuesChart(parameters);
 
                 }
-                else if(selection==2){
+                else if(selection=== "densityChart"){
                     // Bar graph of Density function!
                     console.log("Starting visualisation: Selection: Wahrscheinlichkeitsdichte");
                     //todo REINIS add the ClassCount selector!!
-                    let classCount= 70,
-                        classData =statistics.getDensityFunctionClassValues(data,classCount),
-                        parameters={data:classData,
-                            xAxisName:(statistics.text[chart.settings.lan].deviation+ ", "+ chart.settings.indUnit),
-                            yAxisName:statistics.text[chart.settings.lan].amount,
-                            xValue:"averageValue",
-                            yValue:"count",
-                            selectedValue:chart.settings.ags,
-                            indUnit:statistics.text[chart.settings.lan].areas,
-                            mean:chart.settings.statistics.average,
-                            svg:svg,
-                            chart_width:chart_width,
-                            chart_height:chart_height,
-                            margins:margin
-                        };
+                    let classCount= 25,
+                        classData =statistics.getDensityFunctionClassValues(chart.data,classCount);
+                    parameters.data=classData;
+                    parameters.xAxisName=(statistics.text[chart.settings.lan].deviation);
+                    parameters.yAxisName=statistics.text[chart.settings.lan].amount;
+                    parameters.xValue="averageValue";
+                    parameters.yValue="count";
+                    console.log(classData);
+                    statistics.drawDensityFunctionChart(parameters);
+                }
 
-                    statistics.drawOrderedValuesChart(parameters);
-                }
-                /*
-                else if(selection==3){
+                else if(selection==="distributionChart"){
                     // Line graph, distribution Function !!!!!
-                    console.log("Starting visualisation: Selection: 2")
-                    let dataSorted = statistics.sortObjectAscending(data, "distFuncValue", "ags");
-                    console.log(dataSorted);
-                    xAxisName = chart.settings.indText;
-                    yAxisName = statistics.text[chart.settings.lan].probability;
-                    indUnit = chart.settings.indUnit;
-                    // TODO REINIS finish THIS! Graph for Verteilungsfunktion!
-                    statistics.drawLineGraph(dataSorted, xAxisName, yAxisName, indUnit, selectedAgs, mean, svg, chart_width, chart_height, margin)
+                    let dataSorted = statistics.sortObjectAscending(chart.data, "distFuncValue", "ags");
+                    parameters.data=dataSorted;
+                    parameters.xAxisName=chart.settings.indText;
+                    parameters.yAxisName=statistics.text[chart.settings.lan].probability;
+                    parameters.xValue="value";
+                    parameters.yValue="distFuncValue";
+
+                    statistics.drawLineGraph(parameters)
                 }
-                */
+
 
 
                 else {console.log("No graphical option chosen!")}
@@ -349,7 +365,7 @@ const statistics = {
 
         let median = 0,
             numsLen = values.length;
-        values.sort();
+        values.sort(function(a, b){return a - b});
         if (numsLen % 2 === 0) { // is even
             // average of two middle numbers
             median = (values[numsLen / 2 - 1] + values[numsLen / 2]) / 2;
@@ -421,32 +437,36 @@ const statistics = {
 
     getDensityFunctionClassValues: function(data,classCount) {
         let densityFunctionObjectArray = [];
-        if (classCount <= (data.length / 2)) {
-            data = this.sortObjectAscending(data, "deviation", "ags");
-            console.log("Starting Density Calculations: Data Sorted");
-            let min = data[0].deviation,
-                max = data[data.length-1].deviation+1,
-                difference = max - min,
-                classSize = difference / classCount,
-                classLowerLimit = min;
-            console.log("Upper Limit: "+max);
-            for (let i = 0; i < classCount; i++) {
-                let counter = 0,
-                    classElementValues=[],
-                    classUpperLimit = classLowerLimit + classSize;
-                for (let elem in data) {
-                    if (data[elem].deviation >= classLowerLimit && data[elem].deviation < classUpperLimit) {
-                        counter++;
-                        classElementValues.push(data[elem].deviation);
-                    }
-                }
-                let averageClassValue=this.calculateAverage(classElementValues),
-                    className=`${this.roundNumber(classLowerLimit)} : ${this.roundNumber(classUpperLimit)}`,
-                    classObject = {name:className, upperLimit:classUpperLimit, count:counter, averageValue:averageClassValue};
-                classLowerLimit=classUpperLimit;
-                densityFunctionObjectArray.push(classObject);
-            }
+        ultimaCounter=0;
+        if (classCount > (data.length / 2)){
+            classCount=data.length/2
         }
+
+        data = this.sortObjectAscending(data, "deviation", "ags");
+        let min = data[0].deviation,
+            max = data[data.length-1].deviation,
+            difference = max - min,
+            classSize = difference / classCount,
+            classLowerLimit = min;
+        console.log("max class deviation value: "+max);
+        for (let i = 0; i < classCount; i++) {
+            let counter = 0,
+                classElementValues=[],
+                classUpperLimit = classLowerLimit + classSize;
+            for (let elem in data) {
+                if (data[elem].deviation >= classLowerLimit && data[elem].deviation <= classUpperLimit) {
+                    counter++;
+                    classElementValues.push(data[elem].deviation);
+                    ultimaCounter++;
+                }
+            }
+            let averageClassValue=this.calculateAverage(classElementValues),
+                className=`${this.roundNumber(classLowerLimit)} : ${this.roundNumber(classUpperLimit)}`,
+                classObject = {name:className, upperLimit:classUpperLimit, count:counter, averageValue:averageClassValue};
+            classLowerLimit=classUpperLimit;
+            densityFunctionObjectArray.push(classObject);
+        }
+
         return densityFunctionObjectArray;
     },
 
@@ -467,7 +487,6 @@ const statistics = {
 
         let lan = language_manager.getLanguage(),
             maxValue = d3.max(data, function (d, i) {
-                console.log("yValue: " + d[yValue]);
                 return d[yValue];
             }),
             minValue = d3.min(data, function (d, i) {
@@ -509,7 +528,6 @@ const statistics = {
             })
             .attr("y", function (d) {
                 let max = Math.max(0, d[yValue]);
-                console.log("Max value" + max);
                 return yScale(Math.max(0, d[yValue]));
             })
             .attr('width', xScale.bandwidth())
@@ -532,8 +550,8 @@ const statistics = {
             })
             .on("mouseover", function (d) {
                 let html = d.name + "<br/>" + d[yValue] + " " + indUnit;
-                let x = xScale(d[xValue]),//(d3.event.pageX - document.getElementById('visualisation').getBoundingClientRect().x) - 100,
-                    y = yScale(d[yValue]) - 40//(d3.event.pageY - document.getElementById('visualisation').getBoundingClientRect().y) - 60;
+                let x = xScale(d[xValue]),
+                    y = yScale(d[yValue]) - 40
                 //Change Color
                 d3.select(this).style("fill", "green");
 
@@ -544,17 +562,13 @@ const statistics = {
             })
             .on("mouseout", function (d) {
                 // change tooltip
-                if (selectedObject != null) {
-                    let html = selectedObject.name + "<br/>" + selectedObject[yValue] + " " + indUnit,
-                        x = xScale(selectedObject[xValue]),
-                        y = yScale(selectedObject[yValue]) - 40;
-                    $("#tooltip")
-                        .html(html)
-                        .css({"left": x, "top": y});
-                } else {
-                    $("#tooltip")
-                        .hide();
-                }
+
+                let html = selectedObject.name + "<br/>" + selectedObject[yValue] + " " + indUnit,
+                    x = xScale(selectedObject[xValue]),
+                    y = yScale(selectedObject[yValue]) - 40;
+                $("#tooltip")
+                    .html(html)
+                    .css({"left": x, "top": y});
                 //Adjust Bar color
                 let color = "";
                 {
@@ -568,13 +582,13 @@ const statistics = {
             });
 
 // Add initial Tooltip
-        if (selectedObject != null) {
 
-            $("#tooltip")
-                .html(selectedObject[name] + "<br/>" + selectedObject[yValue] + " " + indUnit)
-                .css({"left": xScale(selectedObject[xValue]), "top": yScale(selectedObject[yValue]) - 40})
-                .show();
-        }
+
+        $("#tooltip")
+            .html(selectedObject.name + "<br/>" + selectedObject[yValue] + " " + indUnit)
+            .css({"left": xScale(selectedObject[xValue]), "top": yScale(selectedObject[yValue]) - 40})
+            .show();
+
 
 // Draw the Average line in Graph
         g.append("line")          // attach a line
@@ -595,23 +609,13 @@ const statistics = {
 
         //Initialise both Axis
         //determine if Axis should have ticks
-        let xAxis = d3.axisBottom(xScale);
-        console.log("Typof xValue: "+typeof (data[0][xValue]));
-        console.log("xValue: "+ (data[0][xValue]));
-        if (typeof (data[0][xValue]) == "number") {
+        let xAxis = d3.axisBottom(xScale)
+            .tickFormat("")
+            .tickSize(0);
 
-        xAxis.tickFormat(d3.format(".2r"))
-            .tickSize(2);
-    }
-        if (data.length >50){
-            xAxis.tickValues(xScale.domain().filter(function(d,i){
-                return !(i%10)
-            }));
-        }
-        else{
-            xAxis.tickFormat("")
-                .tickSize(0);
-        }
+
+
+
 
 
         let yAxis = d3.axisLeft(yScale);
@@ -641,19 +645,184 @@ const statistics = {
 
 
     },
-    drawLineGraph: function (data, xAxisName, yAxisName, indUnit, selectedAgs, mean, svg, chart_width, chart_height, margins) {
-        let lan = language_manager.getLanguage(),
+    drawDensityFunctionChart: function (parameters) {
+        let data = parameters.data,
+            xValue = parameters.xValue,
+            yValue = parameters.yValue,
+            xAxisName = parameters.xAxisName,
+            yAxisName = parameters.yAxisName,
+            mean=parameters.mean,
+            median=parameters.median,
+            svg = parameters.svg,
+            chart_width = parameters.chart_width-parameters.margins.left-parameters.margins.right,
+            chart_height = parameters.chart_height,
+            margins = parameters.margins,
+            barWidth=chart_width / data.length,
+            lan = language_manager.getLanguage(),
+            maxYValue = d3.max(data, function (d) {
+                return d[yValue];
+            }),
+            minYValue = d3.min(data, function (d) {
+                return d[yValue]
+            }),
+            maxXValue=d3.max(data,function(d){
+                return d[xValue]
+            }),
+            minXValue=d3.min(data,function(d){
+                return d[xValue]
+            });
+
+
+        let xScale = d3.scaleLinear()
+            .domain(d3.extent([minXValue, maxXValue]))
+            .range([chart_width / data.length / 2, chart_width - chart_width / data.length / 2]);
+
+        let yScale = d3.scaleLinear()
+            .range([chart_height, 0])
+            .domain(d3.extent([minYValue, maxYValue]))
+            .nice();
+
+        // sets the Start of Chart to the right Position, creates container for chart
+        let g = svg.append("g")
+            .attr("class", "graph")
+            .attr("transform", `translate(${margins.left}, ${margins.top})`);
+
+        // Create Bars!
+        g.selectAll('rect')
+            .data(data)
+            .enter()
+            .append("rect")
+            .attr('x', function (d,i) {
+                return i*barWidth;
+            })
+            .attr("y", function (d) {
+                return yScale(Math.max(0, d[yValue]));
+            })
+            .attr('width',barWidth)
+            .attr('height', function (d) {
+                return Math.abs(yScale(d[yValue]) - yScale(0));
+            })
+            .attr("fill", "blue")
+            .attr('stroke', 'white')
+            .attr('stroke-width', function (d) {
+                if (barWidth > 30) {
+                    return 3
+                } else if (barWidth > 10) {
+                    return 1
+                } else return 0
+            })
+            .on("mouseover", function (d) {
+                let html = d.name + "<br/>" +statistics.text[lan].amount+ ": "+ d[yValue] ;
+                let x = xScale(d[xValue]),//(d3.event.pageX - document.getElementById('visualisation').getBoundingClientRect().x) - 100,
+                    y = yScale(d[yValue]) - 40//(d3.event.pageY - document.getElementById('visualisation').getBoundingClientRect().y) - 60;
+                //Change Color
+                d3.select(this).style("fill", "green");
+
+                $('#tooltip')
+                    .html(html)
+                    .css({"left": x, "top": y})
+                    .show();
+            })
+            .on("mouseout", function (d) {
+                // change tooltip
+                $("#tooltip")
+                    .hide();
+                d3.select(this).style("fill", "blue");
+
+
+            });
+
+// Draw the Average line in Graph
+        g.append("line")          // attach a line
+            .attr("class", "meanLine")
+            .style("stroke", "black")  // colour the line
+            .style("stroke-dasharray", ("3, 3"))
+            .attr("x1", xScale(0))     // x position of the first end of the line
+            .attr("y1", yScale(maxYValue))      // y position of the first end of the line
+            .attr("x2", xScale(0))     // x position of the second end of the line
+            .attr("y2", yScale(minYValue));    // y position of the second end of the line
+
+//Text for AverageLine
+        g.append("text")
+            .attr("x", xScale(0)+40)
+            .attr("y",  yScale(maxYValue) + margins.top)
+            .style("text-anchor", "middle")
+            .text(`${this.text[lan].average} ${decodeURI('%CE%BC')}`);
+
+        // Draw the median line in Graph
+        g.append("line")          // attach a line
+            .attr("class", "medianLine")
+            .style("stroke", "black")  // colour the line
+            .style("stroke-dasharray", ("2, 5"))
+            .attr("x1", xScale(median-mean))     // x position of the first end of the line
+            .attr("y1", yScale(maxYValue))      // y position of the first end of the line
+            .attr("x2", xScale(median-mean))     // x position of the second end of the line
+            .attr("y2", yScale(minYValue));    // y position of the second end of the line
+
+//Text for MedianLine
+        g.append("text")
+            .attr("x", xScale(median-mean)-30)
+            .attr("y",  yScale(maxYValue) + margins.top+40)
+            .style("text-anchor", "middle")
+            .text(`Median `);
+
+        //Initialise both Axis
+        //determine if Axis should have ticks
+        let xAxis = d3.axisBottom(xScale)
+            .tickFormat(d3.format(".2r"));
+        //.tickSize(2);
+
+        let yAxis = d3.axisLeft(yScale);
+
+        g.append('g')
+            .call(xAxis)
+            .attr('transform', 'translate(0,' + (yScale(0)) + ')');
+        g.append('g')
+            .call(yAxis);
+
+// text label for the X axis
+        g.append("text")
+            .attr("transform",
+                "translate(" + (chart_width / 2) + " ," +
+                (chart_height + margins.top + 20) + ")")
+            .style("text-anchor", "middle")
+            .text(`${xAxisName}`);
+
+// text label for the Y axis
+        g.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - margins.left)
+            .attr("x", 0 - (chart_height / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text(`${yAxisName}`);
+
+
+    },
+    drawLineGraph: function (parameters) {
+        let data = parameters.data,
+            xValue = parameters.xValue,
+            yValue = parameters.yValue,
+            xAxisName = parameters.xAxisName,
+            yAxisName = parameters.yAxisName,
+            indUnit = parameters.indUnit,
+            mean = parameters.mean,
+            svg = parameters.svg,
+            chart_width = parameters.chart_width,
+            chart_height = parameters.chart_height,
+            margins = parameters.margins,
+            lan = language_manager.getLanguage(),
             maxYValue = d3.max(data, function (d, i) {
-                return d.distFuncValue;
+                return d[yValue];
             }),
             minYValue = d3.min(data, function (d, i) {
-                return d.distFuncValue
+                return d[yValue]
             }),
             maxXValue= d3.max(data, function (d, i) {
-                return d.value;
+                return d[xValue];
             }),
             minXValue = d3.min(data, function (d, i) {
-                return d.value;
+                return d[xValue];
             });
         if (minYValue >= 0) {
             minYValue = 0
@@ -664,7 +833,6 @@ const statistics = {
             .range([0, chart_width])
             .nice();
 
-        console.log(`MaxX: ${maxXValue}; minX: ${minXValue}; max Y: ${maxYValue}; min Y: ${minYValue}.`)
         let yScale = d3.scaleLinear()
             .range([chart_height, 0])
             .domain(d3.extent([minYValue, maxYValue]))
@@ -677,10 +845,10 @@ const statistics = {
         // Create lineGraph!
         let line = d3.line()
             .x(function (d, i) {
-                return xScale(d.value);
+                return xScale(d[xValue]);
             }) // set the x values for the line generator
             .y(function (d) {
-                return yScale(d.distFuncValue);
+                return yScale(d[yValue]);
             }); // set the y values for the line generator
         //.curve(d3.curveMonotoneX) // apply smoothing to the line
 
@@ -693,8 +861,6 @@ const statistics = {
             .attr("y1", yScale(minYValue))      // y position of the first end of the line
             .attr("x2", xScale(mean))     // x position of the second end of the line
             .attr("y2", yScale(maxYValue));    // y position of the second end of the line
-
-        console.log("Line positions: "+ xScale(mean) +" "+ yScale(minYValue));
 
         //Text for AverageLine
         g.append("text")

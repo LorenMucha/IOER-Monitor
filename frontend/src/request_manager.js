@@ -21,6 +21,7 @@ const request_manager={
                 colors()+
                 '},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+
                 '"},"query":"getJSON"}');
+
         return this.sendRequestPHP({"file":json,"query":"getGeoJSON","type":"POST","debug":false});
     },
     //check if a indicator is possible to view in the the given kind of visualization (gebiete/raster)

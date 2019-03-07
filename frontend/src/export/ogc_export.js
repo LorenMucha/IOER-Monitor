@@ -1,4 +1,14 @@
 const ogc_export={
+    getLink:function(service,cap){
+        if(cap){
+            return `http://monitor.ioer.de/cgi-bin/wms?MAP=${indikatorauswahl.getSelectedIndikator().toUpperCase()}_${service}`
+        }
+        else if(service==="wfs" || service==="wcs") {
+            return `https://monitor.ioer.de/monitor_api/user?id=${indikatorauswahl.getSelectedIndikator().toUpperCase()}&service=${service}&key=<Ihr API Key>`;
+        }else{
+            return `http://monitor.ioer.de/cgi-bin/wms?MAP=${indikatorauswahl.getSelectedIndikator().toUpperCase()}_wms`;
+        }
+    },
     wms:{
         endpoint_id:"wms_text",
         text:{
@@ -57,7 +67,7 @@ const ogc_export={
                 const object = ogc_export.wms;
                 let indikator = indikatorauswahl.getSelectedIndikator(),
                     endpoint = $(`#${object.endpoint_id}`),
-                    wms_link = `http://monitor.ioer.de/cgi-bin/wms?MAP=${indikator}_wms`,
+                    wms_link = ogc_export.getLink("wms"),
                     checkbox = endpoint.find("#checkbox_wms"),
                     allow =endpoint.find('#wms_allow');
 
@@ -140,7 +150,7 @@ const ogc_export={
                 const object = ogc_export.wcs;
                 let indikator = indikatorauswahl.getSelectedIndikator(),
                     endpoint = $(`#${object.endpoint_id}`),
-                    wcs_link = `http://monitor.ioer.de/cgi-bin/wcs?MAP=${indikator}_wcs`,
+                    wcs_link = ogc_export.getLink("wcs"),
                     checkbox = endpoint.find("#checkbox_wcs"),
                     allow=endpoint.find('#wcs_allow');
 
@@ -155,7 +165,7 @@ const ogc_export={
                         endpoint
                             .find('.link_container')
                             .find('a')
-                            .attr("href",wcs_link+"&SERVICE=WCS&VERSION=2.0.0&REQUEST=GetCapabilities");
+                            .attr("href",ogc_export.getLink("wcs",true)+"&SERVICE=WCS&VERSION=2.0.0&REQUEST=GetCapabilities");
                     } else {
                         allow.hide();
                     }
@@ -211,7 +221,6 @@ const ogc_export={
                     title:ogc_export.wfs.text[lan].title,
                     modal:false
                 };
-                console.log(instructions);
                 dialog_manager.setInstruction(instructions);
                 dialog_manager.create();
                 this.controller.set();
@@ -224,7 +233,7 @@ const ogc_export={
                 const object = ogc_export.wfs;
                 let indikator = indikatorauswahl.getSelectedIndikator(),
                     endpoint = $(`#${object.endpoint_id}`),
-                    wfs_link = `http://monitor.ioer.de/cgi-bin/wfs?MAP=${indikator}_wfs`,
+                    wfs_link = ogc_export.getLink("wfs"),
                     checkbox = endpoint.find("#checkbox_wfs"),
                     allow=endpoint.find('#wfs_allow');
 
@@ -239,7 +248,7 @@ const ogc_export={
                         endpoint
                             .find('.link_container')
                             .find('a')
-                            .attr("href",wfs_link+"&SERVICE=WFS&VERSION=2.0.0&REQUEST=GetCapabilities");
+                            .attr("href",ogc_export.getLink("wfs",true)+"&SERVICE=WFS&VERSION=2.0.0&REQUEST=GetCapabilities");
                     } else {
                         allow.hide();
                     }

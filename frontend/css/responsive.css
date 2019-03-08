@@ -18,7 +18,7 @@
 }
 
 /*Styles for screen 515px and lower*/
-@media only screen and (max-width : 1024px) {
+@media only screen and (max-width : 1024px) and (max-height: 700px){
     .indikator_header{
         left: 20% !important;
         white-space: normal;
@@ -55,15 +55,15 @@
     .pin{
         display: none;
     }
-    .choice_panel{
-        overflow-x: hidden;
-        overflow-y: auto;
-    }
     #entwicklungsdiagramm_content #diagramm #visualisation{
         height:500px !important;
     }
     .right_content #tabelle_erweitern{
         width:300px !important;
+    }
+    .choice_panel{
+        overflow-x: hidden;
+        overflow-y: auto;
     }
 }
 /* media queries*/

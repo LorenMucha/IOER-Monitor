@@ -116,7 +116,7 @@ class Json
                 $stat_string_ags = '';
                 foreach ($this->ags_array_user as $value) {
                     $ags_set = substr($value, 0, 2);
-                    $stat_string_ags .= '"' . $ags_set . '":{"gen":"' . POSTGRESQL_TASKRESPOSITORY::get_instance()->getAGSName('bld', $ags_set, $this->year) . '","value_ags":"' . number_format(round(MYSQL_TASKREPOSITORY::get_instance()->getIndicatorValueByAGS($this->indicator_id, $value, $this->year), $indicator_rundung), $indicator_rundung, ',', '') . '","ags_grundakt":"' . MYSQL_TASKREPOSITORY::get_instance()->getIndicatorGrundaktualitaet($value, $this->year) . '"},';
+                    $stat_string_ags .= '"' . $ags_set . '":{"gen":"' . POSTGRESQL_TASKRESPOSITORY::get_instance()->getAGSName('bld', $ags_set, $this->year_pg) . '","value_ags":"' . number_format(round(MYSQL_TASKREPOSITORY::get_instance()->getIndicatorValueByAGS($this->indicator_id, $value, $this->year), $indicator_rundung), $indicator_rundung, ',', '') . '","ags_grundakt":"' . MYSQL_TASKREPOSITORY::get_instance()->getIndicatorGrundaktualitaet($value, $this->year) . '"},';
                 }
             }
             trim($JSON = '{ "type": "FeatureCollection", "stat":{' . $stat_string_ags . '"wert_brd":"' . number_format(round(MYSQL_TASKREPOSITORY::get_instance()->getIndicatorValueForBRD($this->indicator_id, $this->year), $indicator_rundung), $indicator_rundung, ',', '') . '","grundakt_brd":"' . MYSQL_TASKREPOSITORY::get_instance()->getIndicatorGrundaktualitaet('99', $this->year) . '"},"features": [ ' . $output . ' ]}');

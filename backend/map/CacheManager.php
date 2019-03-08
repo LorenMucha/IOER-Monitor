@@ -15,9 +15,7 @@ class CacheManager{
     public function check_cached($ags_array,$colors){
         $state = false;
         if(count((array)$colors)==0
-            or !$colors
-            and count($ags_array)==0
-            or !$ags_array) {
+            and count($ags_array)==0) {
             $sql = "SELECT * FROM " . $this->table_name . " where INDIKATOR_ID = '" . $this->indicator_id . "' and TIME = " . $this->year . " and RAUMGLIEDERUNG ='" . $this->spatial_extend . "' and klassifizierung='" . $this->klassifizierung . "' and klassenanzahl=" . $this->klassenanzahl;
             $rs = POSTGRESQL_MANAGER::get_instance()->query($sql);
             if (!empty($rs)) {

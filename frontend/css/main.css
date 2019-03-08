@@ -460,10 +460,8 @@ Vergleichskarte Dialog------------------------------------
 /*
 OGC Dialoge-----------------------------
  */
-.ogc_dialog img{
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+.ogc_dialog{
+    padding: 20px;
 }
 .ogc_dialog h4{
     margin-bottom: 0;

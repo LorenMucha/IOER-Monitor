@@ -155,8 +155,8 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
 
         //build the sql query
         $sql = "SELECT i.INDIKATORWERT AS value, i.ID_INDIKATOR as ind, z.EINHEIT as einheit,i.FEHLERCODE as fc, i.HINWEISCODE as hc, i.AGS as ags, z.RUNDUNG_NACHKOMMASTELLEN as rundung,
-                                IFNULL((SELECT x.INDIKATORWERT FROM m_indikatorwerte_".$year." x WHERE x.ID_INDIKATOR = 'Z00AG' AND x.ags=i.AGS AND x.INDIKATORWERT <=".$year."),0) as grundakt_year,
-                                IFNULL((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS =i.AGS AND y.INDIKATORWERT <= ".$year."),0) as grundakt_month,
+                                IFNULL((SELECT x.INDIKATORWERT FROM m_indikatorwerte_".$year." x WHERE x.ID_INDIKATOR = 'Z00AG' AND x.ags=i.AGS),0) as grundakt_year,
+                                IFNULL((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS =i.AGS),0) as grundakt_month,
                                 z.MITTLERE_AKTUALITAET_IGNORE as grundakt_state,
                                 z.INDIKATOR_NAME_KURZ as name,
                                 IFNULL((SELECT FARBWERT_MAX FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$indikator_id."'),'FFCC99') as color_max,
@@ -166,7 +166,7 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
                                 AND f.STATUS_INDIKATOR_FREIGABE = " . $this->berechtigung . "
                                 And z.ID_INDIKATOR = f.ID_INDIKATOR
                                 And LENGTH(i.AGS) = " .(strlen($ags))
-            .$ags_extend."
+                                .$ags_extend."
                                 and not i.AGS='99'
                                 Group by i.AGS";
 

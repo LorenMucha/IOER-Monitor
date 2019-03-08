@@ -300,9 +300,9 @@ const toolbar = {
                         <div class="dropdown_menu mobile_hidden" id="dropdown_ogc">
                             <div class="export_div"><b>Einbinden in eigenes GIS als</b></div>
                             <hr class="hr"/>
-                            <button id="wms" class="btn .btn-info btn_export raster_export" data-format="WMS" onclick="ogc_export.wms.open()">WMS</button>
-                            <button id="wcs" class="btn .btn-info btn_export raster_export" data-format="WCS" onclick="ogc_export.wcs.open()">WCS</button>
-                            <button id="wfs" class="btn .btn-info btn_export gebiete_export" data-format="WFS" onclick="ogc_export.wfs.open()">WFS</button>
+                            <button id="wms" class="btn .btn-info btn_export raster_export" data-format="WMS" onclick="ogc_export.open('wms')">WMS</button>                            
+                            <button id="wcs" class="btn .btn-info btn_export raster_export" data-format="WCS" onclick="ogc_export.open('wcs')">WCS</button>
+                            <button id="wfs" class="btn .btn-info btn_export gebiete_export" data-format="WFS" onclick="ogc_export.open('wfs')">WFS</button>
                             <div class="export_div" id="export_map_display"><b>Export der Kartendarstellung als</b></div>
                             <hr class="hr"/>
                             <div class="btn-group">

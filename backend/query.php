@@ -189,7 +189,7 @@ try{
     else if($query=="getzusatzlayer"){
         $zusatzlayer = $json_obj['ind']['zusatzlayer'];
         $cache_manager = new CacheManager(substr($zusatzlayer,0,2),2019,$zusatzlayer,"false",0);
-        if (!$cache_manager->check_cached(false,false)) {
+        if (!$cache_manager->check_cached([],[])) {
             $overlay = new Overlay($zusatzlayer);
             $json = json_encode(array_merge($overlay->getJSON(),array("state"=>"generated")));
             $cache_manager->insert($json);

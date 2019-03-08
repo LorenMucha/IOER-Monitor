@@ -43,6 +43,7 @@ const indikator_json = {
 
         $.when(request_manager.getGeoJSON(ind, time, raumgliederung_set, ags_set,klassenanzahl.getSelection(),klassifzierung.getSelectionId()))
             .done(function(arr){
+                console.log(arr);
                 //now we have access to array of data
                 try{
                     object.json_file = JSON.parse(arr);

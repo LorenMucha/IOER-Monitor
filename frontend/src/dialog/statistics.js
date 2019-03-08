@@ -56,7 +56,7 @@ const statistics = {
     },
 
     open: function () {
-        console.log("Starting: Values read")
+
         let lan = language_manager.getLanguage(),
             geoJSON = this.chart.settings.allValuesJSON;
         this.chart.settings.lan=lan;
@@ -84,57 +84,74 @@ const statistics = {
                         <h6 id="currentValue">${chart.settings.indText}: ${chart.settings.currentValue} ${chart.settings.indUnit} </h6>
                     </div>
                     <hr />
-                    <div class="table"> 
-                    <h4>${this.text[lan].info}</h4>
-                    <table id="statistics_table"  style="width:100%">
-                          <tr>
-                            <td>${this.text[lan].areaCount}</td>
-                            <td>${chart.settings.allValuesObjectArray.length}</td>
-                            <td>${chart.settings.areaType}</td>
+                    <div class="table" > 
+                    <h4 style="text-align:center;">${this.text[lan].info}</h4>
+                    <table id="statistics_table" >
+                          <tr class="uneven">
+                            <td class="table_element">${this.text[lan].areaCount}</td>
+                            <td class="table_element">${chart.settings.allValuesObjectArray.length}  ${chart.settings.areaType}</td>
+                           
                             
                           </tr>
-                          <tr>
-                            <td>${this.text[lan].average}</td>
-                            <td>${chart.settings.statistics.average}</td>
-                            <td>${chart.settings.indUnit}</td>
+                          <tr class="even">
+                            <td class="table_element">${this.text[lan].average}</td>
+                            <td class="table_element">${chart.settings.statistics.average}  ${chart.settings.indUnit}</td>
+                    
                             
                           </tr>
-                          <tr>
-                            <td>${this.text[lan].median}</td>
-                            <td>${chart.settings.statistics.median}</td>
-                            <td>${chart.settings.indUnit}</td>
+                          <tr class="uneven">
+                            <td class="table_element">${this.text[lan].median}</td>
+                            <td class="table_element">${chart.settings.statistics.median}  ${chart.settings.indUnit}</td>
+                           
                           </tr>
-                          <tr>
-                            <td>${this.text[lan].stDev}</td>
-                            <td>${chart.settings.statistics.stDeviation}</td>
-                            <td>${chart.settings.indUnit}</td>
+                          <tr class="even">
+                            <td class="table_element">${this.text[lan].stDev}</td>
+                            <td class="table_element">${chart.settings.statistics.stDeviation}  ${chart.settings.indUnit}</td>
+                            
                           </tr>
-                          <tr>
-                            <td>${this.text[lan].max}</td>
-                            <td>${chart.settings.statistics.max}</td>
-                            <td>${chart.settings.indUnit}</td>
-                          </tr>                          <tr>
-                            <td>${this.text[lan].min}</td>
-                            <td>${chart.settings.statistics.min}</td>
-                            <td>${chart.settings.indUnit}</td>
+                          <tr class="uneven">
+                            <td class="table_element">${this.text[lan].max}</td>
+                            <td class="table_element">${chart.settings.statistics.max}  ${chart.settings.indUnit}</td>
+                            
+                          </tr class="even">                          <tr>
+                            <td class="table_element">${this.text[lan].min}</td>
+                            <td class="table_element">${chart.settings.statistics.min}  ${chart.settings.indUnit}</td>
                           </tr>
                           
                     </table>
                     </div>
-                    <div id="chart_ddm_diagramm" class="ui selection multiple dropdown">
-                                <i class="dropdown icon"></i>
-                        <ul class="dropdown-menu">
-                      <li><a href="#1">Item 1</a></li>
-                       <li><a href="#2">Item 2</a></li>
-                      <li><a href="#3">Item 3</a></li>
-                      </ul>
-                  
+                    <div id="chart_select_container" class="ui form" style="margin-left: 60px">
+                        <div class="fields">
+                            <div class="field">
+                                <label>Select chart:</label>
+                                    <div id="chart_ddm_diagramm" class="ui selection dropdown">
+                                        <i class="dropdown icon"></i>    
+                                        <div class="default text">Values</div>                    
+                                        <div class="menu">
+                                            <div class="item" data-value="valueChart">Values</div>
+                                            <div class="item" data-value="densityChart">Probability density</div>
+                                            <div class="item" data-value="distributionChart">Cumulative distribution</div>
+                                        </div>
+                              
+                                    </div>
+                                </div>
+                               <div class="two wide field" id="classCountInput">
+                                   <label>Class count:</label>                                
+                                   <input type="text"  class="form-control" id="classCountInputField" placeholder="25" >
+                               </div>
+                        </div>
+                               <div class="ui warning message field" >
+                                <div class="header">Zu viele Klassen!</div>
+                                <ul class="list">
+                                 <li>Geben Sie nicht mehr als ${chart.data.length/2} Klassen ein.</li>
+                                </ul>
+                               </div>
                     </div>
                     <div id="container_diagramm" class="container_diagramm">
                         <div id="diagramm">
                             <h3 class="Hinweis_diagramm" id="Hinweis_diagramm_empty">${this.text[lan].no_choice}</h3>
                             <h3 class="Hinweis_diagramm" id="diagramm_loading_info">${this.text[lan].load}</h3>
-                            <svg id="visualisation" height="100"></svg>
+                            <svg id="statistics_visualisation" height="100"></svg>
                         </div>
                         <div id="tooltip"></div>
                     </div>
@@ -163,6 +180,7 @@ const statistics = {
             allValuesJSON: "",
             currentValue: "",
             allValuesObjectArray: {},
+            densityClasCount:25,
             areaCount: "",
             areaType: {},
             selectedChart:"valueChart",
@@ -178,29 +196,92 @@ const statistics = {
         init: function () {
 
             // TODO REINIS Set correct Height and Width of the Visualisation!!
-            $("#statistics_content #visualisation").height(532);
-            $("#statistics_content #visualisation").width(1100);
-            let svg = d3.select("#statistics_content #visualisation"),
+            $("#statistics_content #statistics_visualisation").height(532);
+            $("#statistics_content #statistics_visualisation").width(1100);
+            let svg = d3.select("#statistics_content #statistics_visualisation"),
                 margin = {top: 20, right: 60, bottom: 30, left: 60},
                 diagram = $('#statistics_content #diagramm'),
-                chart_auswahl = $('#chart_ddm_diagramm'),
-                chart_width = diagram.width() - margin.left - margin.right,
-                chart_height = $('.ui-dialog').height() * (1.5 / 3) - 100;
-            //set up the dropdown menu
-            chart_auswahl.dropdown({
-                "closeOnClick":true,
-            });
-            chart_auswahl.click(function(){
-                chart_auswahl.dropdown("toggle");
-            });
 
-            this.controller.showVisualisation(statistics.chart.settings.selectedChart, svg, chart_width, chart_height, margin);
+                chart_width = diagram.width() - margin.left - margin.right,
+                chart_height = $('.ui-dialog').height() * (1.5 / 3) - 100,
+                chart= statistics.chart;
+
+            //Set table css styling
+            $("#statistics_table").css({    "margin-left":"auto",
+                "margin-right":"auto"});
+            $(".table_element").css({"border":"1px solid black","padding":"5px"});
+            $(".even").css({"background-color":"white"});
+            $(".uneven").css({"background-color":"gainsboro"});
+
+
+            chart.controller.showVisualisation(chart.settings.selectedChart, svg, chart_width, chart_height, margin);
+            chart.controller.setDropDownMenu(svg, chart_width, chart_height, margin);
+
         },
         controller: {
+            setDropDownMenu:function(svg, chart_width, chart_height, margin){
+                //set up the dropdown menu
+                let chart_auswahl = $('#chart_ddm_diagramm'),
+                    chart=statistics.chart,
+                    classCountInput=$("#classCountInput"),
+                    tooltip= $("#tooltip"),
+                    visualisation=$("#statistics_visualisation");
+
+                chart_auswahl.dropdown({
+                    onChange: function (value, text, $choice) {
+                        if (value === 'valueChart') {
+                            chart.settings.selectedChart='valueChart';
+                            visualisation.empty();
+                            chart.controller.showVisualisation(chart.settings.selectedChart, svg, chart_width, chart_height, margin);
+                            chart_auswahl.dropdown("hide");
+                            classCountInput.hide();
+                            tooltip.hide();
+                        } else if (value === 'densityChart') {
+                            chart.settings.selectedChart='densityChart';
+                            visualisation.empty();
+                            chart_auswahl.dropdown("hide");
+                            classCountInput.show();
+                            tooltip.hide();
+                            chart.controller.showVisualisation(chart.settings.selectedChart, svg, chart_width, chart_height, margin);
+                        } else if (value='distributionChart'){
+                            chart.settings.selectedChart='distributionChart';
+                            visualisation.empty();
+                            chart_auswahl.dropdown("hide");
+                            classCountInput.hide();
+                            tooltip.hide();
+                            chart.controller.showVisualisation(chart.settings.selectedChart, svg, chart_width, chart_height, margin);
+                        }
+                    }
+                });
+                setTimeout(function(){
+                    chart_auswahl.dropdown("hide");
+                },500);
+                // Set the classCount inpt field css.properties
+                // todo ! REINIS Add the Warning, handle event when too many classes chosen. Set default class amount
+                $("#classCountInputField").css({"width":"60px"});
+                classCountInput.hide();
+                classCountInput.on('change', function(e) {
+                    let inputClassCount=$("#classCountInputField").val();
+                    console.log("ClassCount! "+inputClassCount);
+                    console.log("Data length: "+chart.data.length);
+                    if (inputClassCount > chart.data.length/2){
+                        inputClassCount=Math.round(chart.data.length/2);
+                        chart_auswahl.addClass("warning");
+
+                        $("#classCountInputField").val(inputClassCount);
+                        console.log("Too much! "+inputClassCount);
+                        console.log(chart_auswahl.attr("class"));
+                    }
+                    else {chart_auswahl.removeClass("warning")}
+                    chart.settings.densityClasCount=inputClassCount;
+                    visualisation.empty();
+                    chart.controller.showVisualisation(chart.settings.selectedChart, svg, chart_width, chart_height, margin);
+                });
+
+            },
 
             showVisualisation: function (selection, svg, chart_width, chart_height, margin) {
-                console.log("Starting visualisation: Controller start");
-                // TODO REINIS diese Variabeln definitionen sinnvoll???
+
                 let chart = statistics.chart,
                     parameters={data:[],
                         xAxisName:"",
@@ -219,7 +300,6 @@ const statistics = {
 
                 if (selection === "valueChart") {
                     // Bar graph of Values Ascending!!!!!
-                    console.log("Starting visualisation: Selection: 1");
                     let dataSorted = statistics.sortObjectAscending(chart.data, "value", "ags");
                     parameters.data=dataSorted;
                     parameters.xAxisName=chart.settings.areaType;
@@ -232,16 +312,14 @@ const statistics = {
                 }
                 else if(selection=== "densityChart"){
                     // Bar graph of Density function!
-                    console.log("Starting visualisation: Selection: Wahrscheinlichkeitsdichte");
                     //todo REINIS add the ClassCount selector!!
-                    let classCount= 25,
+                    let classCount= chart.settings.densityClasCount,
                         classData =statistics.getDensityFunctionClassValues(chart.data,classCount);
                     parameters.data=classData;
                     parameters.xAxisName=(statistics.text[chart.settings.lan].deviation);
                     parameters.yAxisName=statistics.text[chart.settings.lan].amount;
                     parameters.xValue="averageValue";
                     parameters.yValue="count";
-                    console.log(classData);
                     statistics.drawDensityFunctionChart(parameters);
                 }
 
@@ -262,25 +340,6 @@ const statistics = {
                 else {console.log("No graphical option chosen!")}
 
             }
-            /*
-            //call on select inside the toolbar
-            $(document).on("click", dev_chart.chart_selector, function () {
-                let callback = function () {
-                    if(get_ags()) {
-                        dev_chart.chart.settings.ags = get_ags();
-                        dev_chart.chart.settings.name = get_name();
-                        dev_chart.chart.settings.ind = indikatorauswahl.getSelectedIndikator();
-                        dev_chart.chart.settings.ind_vergleich = false;
-                        dev_chart.open();
-                    }
-                };
-                try {
-                    set_swal(callback);
-                }catch(err){
-                    alert_manager.alertError();
-                }
-            })
-            */
 
         },
 
@@ -410,12 +469,14 @@ const statistics = {
     getDistributionFunctionValues: function (sortedObjectArray) {
         let totalSum = 0,
             sumTillNow = 0,
-            distributionFuncObjectArray = [];
+            distributionFuncObjectArray = [],
+            min=sortedObjectArray[0].value;
+        console.log("min: "+sortedObjectArray[0].value);
         for (let num in sortedObjectArray) {
-            totalSum += sortedObjectArray[num].value;
+            totalSum += sortedObjectArray[num].value-min;
         }
         for (let num in sortedObjectArray) {
-            sumTillNow += sortedObjectArray[num].value;
+            sumTillNow += sortedObjectArray[num].value-min;
             let distrFunc = sumTillNow / totalSum;
             let obj = sortedObjectArray[num];
             obj.distFuncValue = distrFunc;
@@ -437,7 +498,6 @@ const statistics = {
 
     getDensityFunctionClassValues: function(data,classCount) {
         let densityFunctionObjectArray = [];
-        ultimaCounter=0;
         if (classCount > (data.length / 2)){
             classCount=data.length/2
         }
@@ -448,7 +508,6 @@ const statistics = {
             difference = max - min,
             classSize = difference / classCount,
             classLowerLimit = min;
-        console.log("max class deviation value: "+max);
         for (let i = 0; i < classCount; i++) {
             let counter = 0,
                 classElementValues=[],
@@ -457,11 +516,11 @@ const statistics = {
                 if (data[elem].deviation >= classLowerLimit && data[elem].deviation <= classUpperLimit) {
                     counter++;
                     classElementValues.push(data[elem].deviation);
-                    ultimaCounter++;
+
                 }
             }
             let averageClassValue=this.calculateAverage(classElementValues),
-                className=`${this.roundNumber(classLowerLimit)} : ${this.roundNumber(classUpperLimit)}`,
+                className=`${this.roundNumber(classLowerLimit)} bis ${this.roundNumber(classUpperLimit)}`,
                 classObject = {name:className, upperLimit:classUpperLimit, count:counter, averageValue:averageClassValue};
             classLowerLimit=classUpperLimit;
             densityFunctionObjectArray.push(classObject);
@@ -538,7 +597,7 @@ const statistics = {
                 if (d[xValue] === selectedValue) {
                     return "red";
                 }
-                return "blue";
+                return  klassengrenzen.getColor(d[yValue]);
             })
             .attr('stroke', 'white')
             .attr('stroke-width', function (d) {
@@ -574,7 +633,7 @@ const statistics = {
                 {
                     if (d[xValue] === selectedValue) {
                         color = "red";
-                    } else color = "blue"
+                    } else color = klassengrenzen.getColor(d[yValue])
                 }
                 d3.select(this).style("fill", color);
 
@@ -702,7 +761,7 @@ const statistics = {
             .attr('height', function (d) {
                 return Math.abs(yScale(d[yValue]) - yScale(0));
             })
-            .attr("fill", "blue")
+            .attr("fill", function(d){return klassengrenzen.getColor(d[xValue]+mean)})
             .attr('stroke', 'white')
             .attr('stroke-width', function (d) {
                 if (barWidth > 30) {
@@ -712,7 +771,7 @@ const statistics = {
                 } else return 0
             })
             .on("mouseover", function (d) {
-                let html = d.name + "<br/>" +statistics.text[lan].amount+ ": "+ d[yValue] ;
+                let html ="Wertebereich: "+ d.name + "<br/>" +statistics.text[lan].amount+ ": "+ d[yValue] ;
                 let x = xScale(d[xValue]),//(d3.event.pageX - document.getElementById('visualisation').getBoundingClientRect().x) - 100,
                     y = yScale(d[yValue]) - 40//(d3.event.pageY - document.getElementById('visualisation').getBoundingClientRect().y) - 60;
                 //Change Color
@@ -727,7 +786,7 @@ const statistics = {
                 // change tooltip
                 $("#tooltip")
                     .hide();
-                d3.select(this).style("fill", "blue");
+                d3.select(this).style("fill", function(d){return klassengrenzen.getColor(d[xValue]+mean)});
 
 
             });

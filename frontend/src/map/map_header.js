@@ -48,4 +48,10 @@ const map_header ={
             }
         }, 100);
     },
+    moveVertical:function(_position,_range){
+        this.getDOMObject().css(_position,_range);
+    },
+    resetCSS:function(){
+        this.getDOMObject().removeAttr("style");
+    }
 };

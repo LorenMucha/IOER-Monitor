@@ -21,7 +21,6 @@ const request_manager={
                 colors()+
                 '},"format":{"id":"'+raeumliche_visualisierung.getRaeumlicheGliederung()+
                 '"},"query":"getJSON"}');
-        console.log(JSON.stringify(json));
         return this.sendRequestPHP({"file":json,"query":"getGeoJSON","type":"POST","debug":false});
     },
     //check if a indicator is possible to view in the the given kind of visualization (gebiete/raster)
@@ -114,7 +113,6 @@ const request_manager={
                 name:name,
                 message:message
             }};
-        console.error(JSON.stringify(json));
         return this.sendRequestFlask(json)
     },
     sendRequestPHP:function(json){
@@ -123,6 +121,7 @@ const request_manager={
             async: true,
             type: json.type,
             url: manager.url_backend,
+            cache: true,
             data: {
                 values: JSON.stringify(json.file)
             },
@@ -162,13 +161,13 @@ const request_manager={
     },
     onError:function( thrownError,function_name,url){
         if(thrownError !=="abort") {
-            let message= error.getErrorMessage(`${thrownError} in function: ${function_name}`);
+            /*let message= error.getErrorMessage(`${thrownError} in function: ${function_name}`);
             progressbar.remove();
             alert_manager.alertError();
             if(!window.location.href.includes("monitor_test")) {
                 this.sendMailError(message.name, message.message);
             }
-            console.error(url,function_name,url);
+           */
         }
     }
 };

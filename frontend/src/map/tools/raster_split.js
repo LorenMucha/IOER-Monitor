@@ -128,7 +128,7 @@ const raster_split={
                 }
 
                 dialog.controller.set();
-
+                map_header.moveVertical("left","100px");
             },
             controller:{
                 set:function(){
@@ -136,8 +136,6 @@ const raster_split={
                     let button_map = raster_split.getButtonObject(),
                         dropdown_ind =  dialog.getDropdownDOMObject(),
                         close_container = $('.close_vergleich');
-
-                    console.log("set controller");
 
                     dropdown_ind
                         .dropdown({
@@ -383,6 +381,7 @@ const raster_split={
         this.getButtonObject().css("background-color",farbschema.getColorHexMain());
         this.dialog.getButtonDomObject().hide();
         this.dialog.hide();
+        map_header.resetCSS();
     },
     getState:function(){
         return this.getSplitterContainer().length >= 1;

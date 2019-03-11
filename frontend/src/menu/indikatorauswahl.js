@@ -172,7 +172,6 @@ const indikatorauswahl ={
                 if(value.ind === ind) {
                     if(value.avability==false){
                         alert_manager.alertNotAsRaster();
-                        $('.raster_export').hide();
                         return false;
                     }else{
                         if(!ind){
@@ -183,7 +182,6 @@ const indikatorauswahl ={
                         if(draw){
                             menu.setIndicator(ind);
                         }
-                        $('.raster_export').show();
                         return true;
                     }
                 }
@@ -350,6 +348,24 @@ const indikatorauswahl ={
                             });
                     },
                     onChange: function (value, text, $choice) {
+                        //enable or disbale OGC Services 
+                        let state_ogc = indikatorauswahl.getIndikatorInfo(value,"ogc");
+                        var interval = setInterval(function () {
+                            //if all indictaor values are ready
+                            if (state_ogc) {
+                                clearInterval(interval);
+                                if (state_ogc.wfs !=="1"){
+                                    helper.disableElement("#wfs","");
+                                }else{
+                                    helper.enableElement("#wfs","");
+                                }
+                                if (state_ogc.wcs !=="1"){
+                                    helper.disableElement(".raster_export","");
+                                }else{
+                                    helper.enableElement(".raster_export","");
+                                }
+                            }
+                        }, 100);
                         //clean the search field
                         $('#search_input_indikatoren').val('');
                         //save the prev selected indicator as paramter

@@ -416,6 +416,7 @@ const statistics = {
             median: this.roundNumber(medianValue),
             stDeviation: this.roundNumber(stDeviationValue)
         };
+        console.log("hellihallo");
 
     },
 

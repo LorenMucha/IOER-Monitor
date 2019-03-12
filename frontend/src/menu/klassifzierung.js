@@ -34,6 +34,9 @@ const klassifzierung = {
             }
         }
     },
+    getSelectionText:function(){
+      return this.getDOMObject().find(`#${this.getSelectionId()}_label`).find("span").text();
+    },
     init:function() {
         this.constroller.set();
     },

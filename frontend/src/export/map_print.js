@@ -60,13 +60,17 @@ const map_print={
                         cloned_layer = cloneLayer(indikator_raster.raster_layer);
                     }
                     cloned_layer.addTo(map);
+
+                    try{
+                        //fit the map bound by json -> not owrking for rater
+                        map.fitBounds(jsongroup.getBounds());
+                    }catch(err){}
                     map.invalidateSize();
 
                     try {
                         overlay = cloneLayer(layer_control.zusatzlayer.getLayerGroup_set());
                         overlay.addTo(map);
                         overlay.eachLayer(function(layer){
-                            console.log(style[layer.options.name]);
                             layer.setStyle(style[layer.options.name]);
                         });
                     }catch(err){}
@@ -93,10 +97,13 @@ const map_print={
                             Exportieren
                         </button>
                         <div class="print_header">
-                        <div class=float-left">
-                            <h3 id="print_header_title">${$('#header').text()}</h3>
-                            <span id="print_header_spatial_extent">${$('#header_raumgl').text()}</span>
-                        </div>
+                            <div class="float-left w-75">
+                                <h3 id="print_header_title">${$('#header').text()}</h3>
+                                <span id="print_header_spatial_extent">${$('#header_raumgl').text()}</span>
+                            </div>
+                            <div class="float-right w-25">
+                                <div class="logo"></div>
+                            </div>
                     </div>
                     <div class="print_container">
                         <div class="map_print_container">
@@ -107,8 +114,8 @@ const map_print={
                                     <div id="print_legende"></div>
                                 </div>
                                 <div class="map_projection_print_container hover_close" id="print_projection">
-                                    <div class="print_projection"><b>Kartenprojektion</b></div>
-                                    <div class="print_projection">ETRS89 / UTM Zone 32N</div>
+                                        <div><b>Klassifikationsmethode</b></div>
+                                        <div>${klassifzierung.getSelectionText()}</div>
                                 </div>
                                 <div class="histostogramm_print_container hover_close" id="print_histogramm_container">
                                         <div><b>Histogramm</b></div>
@@ -148,22 +155,14 @@ const map_print={
     },
     controller:{
         set:function(){
-            $('.hover_close')
-                .hover(function(){
-                    let id = $(this).attr("id");
-                    helper.disableElement(`#${id}`,"Entfernen Sie das Element durch Klick");
-                })
-                .mouseleave(function(){
-                    let id = $(this).attr("id");
-                    helper.enableElement(`#${id}`,"Entfernen Sie das Element durch Klick");
-                })
-                .click(function() {
-                    $(this).remove();
-                    if($('.hover_close').length==0){
-                        $('.map_print_container').css("width","100%");
-                        map_print.map.invalidateSize();
-                    }
-                });
+            $(".hover_close").click(function(){
+                        $(this).remove();
+                        //resize map if no element is left
+                        if($(".hover_close").length==0){
+                            $('#print_map').css({"width":$('.map_print_container').width()-30});
+                            map_print.map.invalidateSize();
+                        }
+            });
 
             $('#export_btn')
                 .click(function () {
@@ -222,6 +221,7 @@ const map_print={
                 .attr("height",map.height())
                 .attr("width",map.width());
             if (map_print.format === "pdf") {
+                //start thread
                 let worker = html2pdf()
                     .from(element)
                     .set(opt)
@@ -234,6 +234,7 @@ const map_print={
                         }
                     );
             } else {
+                //start thread
                 let worker = html2pdf()
                     .from(element)
                     .set(opt)

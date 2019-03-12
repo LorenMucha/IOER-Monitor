@@ -66,7 +66,7 @@ const script_loader={
         "frontend/src/models/view_state.js",
         "frontend/src/models/base_raumgliederung.js",
         "frontend/src/models/exclude.js",
-        "frontend/src/models/auto_complete.js",
+        "frontend/src/auto_complete.js",
         //menu
         "frontend/src/menu/raeumliche_visualisierung.js",
         "frontend/src/menu/raeumliche_analyseebene.js",

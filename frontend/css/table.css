@@ -61,6 +61,7 @@
     margin-bottom: 10px;
     margin-right: 5px;
     border-collapse: unset;
+    table-layout: fixed;
 }
 .right_content .scrollable-area #table_ags #thead tr th{
     font-size: 12px;

@@ -23,6 +23,19 @@
     margin-left: 0;
     width: 95%;
 }
+#print_container .print_map_content .print_header .w-25{
+    position: absolute;
+    height: 105px;
+    right: 10px;
+    top: 40px;
+}
+#print_container .print_map_content .print_header .logo{
+    background-image: url("../assets/kopf_v2.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 100%;
+    height:100%;
+}
 #print_container .map_print_container{
     margin-top: 2vh;
 }
@@ -54,15 +67,16 @@
     cursor: pointer !important;
 }
 #print_container .hover_close{
-    margin-top: 3vh;
+    margin-top: 35px;
 }
-#print_container .hover_close .disable_print{
+#print_container .hover_close:hover{
     -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
     filter: grayscale(100%);
     opacity: 0.5;
+    cursor: not-allowed;
 }
-#print_container .hover_close .display-none{
-    display: none;
+#print_container #print_histogramm_container{
+    margin-top: 300px;
 }
 #print_container .print_info_content #print_legende{
     width: 100%;

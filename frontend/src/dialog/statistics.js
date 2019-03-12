@@ -5,7 +5,7 @@ const statistics = {
         de: {
             title: "Statistik",
             info: "Statistische Kennzahlen",
-            indicator: "verfügbare Indikatoren",
+            indicator: "Indikator",
             choice: "Bitte wählen.....",
             no_choice: "Kein Indikator gewählt",
             load: "Lädt Diagramm......",
@@ -13,7 +13,7 @@ const statistics = {
             trend: "Prognosewerte",
             unit: "Einheit",
             chart: "Statistik für Gebietseinheit",
-            for: "für",
+            for_lang: "für",
             time: "Zeitpunkt",
             min: "Minimum",
             max: "Maximum",
@@ -25,13 +25,15 @@ const statistics = {
             probability:"Wahrscheinlichkeit",
             amount:"Anzahl",
             area:"Gebiet",
-            areas:"Gebiete"
+            areas:"Gebiete",
+            value:"Wert",
+            values:"Werte"
 
         },
         en: {
             title: "Statistics",
             info: "Statistical indicators",
-            indicator: "available indicators",
+            indicator: "Indicator",
             choice: "Please choose.....",
             no_choice: "No indicator selected",
             load: "Loading diagram ......",
@@ -39,7 +41,7 @@ const statistics = {
             trend: "Forecast values",
             unit: "Unit",
             chart: "Basic statistics for territorial unit",
-            for: "for",
+            for_lang: "for",
             time: "Timestamp",
             min: "Minimum",
             max: "Maximum",
@@ -51,7 +53,11 @@ const statistics = {
             probability: "Probability",
             amount: "Amount",
             area:"Area",
-            areas:"Areas"
+            areas:"Areas",
+            value:"Value",
+            values:"Values"
+
+
         }
     },
 
@@ -77,11 +83,13 @@ const statistics = {
              <div class="jq_dialog" id="${this.endpoint_id}">
                 <div class="container">
                     <div class="header">               
-                        <h4>${this.text[lan].info} ${this.text[lan].for}: ${chart.settings.indText}</h4>
-                        <h4 id="selectedArea">${chart.settings.name}</h4>
+                        <h4>${this.text[lan].info} ${this.text[lan].for_lang}: </h4>
+                        <h2>${chart.settings.indText}</h2>
+                        <h3 id="selectedArea">${chart.settings.name}</h3>
                         <h6 id="selectedAGS">AGS: ${chart.settings.ags}</h6>
                         <h6 id="timeStamp">${this.text[lan].time}: ${timeStamp}</h6>
-                        <h6 id="currentValue">${chart.settings.indText}: ${chart.settings.currentValue} ${chart.settings.indUnit} </h6>
+                        <h6 id="currentValue">${this.text[lan].indicator}: ${chart.settings.indText}  </h6>
+                        <h6 id="currentValue">${this.text[lan].value}: ${chart.settings.currentValue} ${chart.settings.indUnit}</h6>
                     </div>
                     <hr />
                     <div class="table" > 
@@ -286,12 +294,13 @@ const statistics = {
                     parameters={data:[],
                         xAxisName:"",
                         yAxisName:"",
+                        averageName:statistics.text[chart.settings.lan].average,
                         xValue:"",
                         yValue:"",
                         selectedValue:chart.settings.ags,
                         indUnit:chart.settings.indUnit,
                         mean:chart.settings.statistics.average,
-                        median:chart.settings.statistics.median,
+                        stDeviation:chart.settings.statistics.stDeviation,
                         svg:svg,
                         chart_width:chart_width,
                         chart_height:chart_height,
@@ -302,8 +311,8 @@ const statistics = {
                     // Bar graph of Values Ascending!!!!!
                     let dataSorted = statistics.sortObjectAscending(chart.data, "value", "ags");
                     parameters.data=dataSorted;
-                    parameters.xAxisName=chart.settings.areaType;
-                    parameters.yAxisName=chart.settings.indText;
+                    parameters.xAxisName=statistics.text[chart.settings.lan].areas;
+                    parameters.yAxisName=statistics.text[chart.settings.lan].values;
                     parameters.xValue="ags";
                     parameters.yValue="value";
 
@@ -318,7 +327,7 @@ const statistics = {
                     parameters.data=classData;
                     parameters.xAxisName=(statistics.text[chart.settings.lan].deviation);
                     parameters.yAxisName=statistics.text[chart.settings.lan].amount;
-                    parameters.xValue="averageValue";
+                    parameters.xValue="classMiddle";
                     parameters.yValue="count";
                     statistics.drawDensityFunctionChart(parameters);
                 }
@@ -327,7 +336,7 @@ const statistics = {
                     // Line graph, distribution Function !!!!!
                     let dataSorted = statistics.sortObjectAscending(chart.data, "distFuncValue", "ags");
                     parameters.data=dataSorted;
-                    parameters.xAxisName=chart.settings.indText;
+                    parameters.xAxisName=statistics.text[chart.settings.lan].values;
                     parameters.yAxisName=statistics.text[chart.settings.lan].probability;
                     parameters.xValue="value";
                     parameters.yValue="distFuncValue";
@@ -511,7 +520,8 @@ const statistics = {
         for (let i = 0; i < classCount; i++) {
             let counter = 0,
                 classElementValues=[],
-                classUpperLimit = classLowerLimit + classSize;
+                classUpperLimit = classLowerLimit + classSize,
+                classMiddle=classLowerLimit+(classUpperLimit-classLowerLimit)/2;
             for (let elem in data) {
                 if (data[elem].deviation >= classLowerLimit && data[elem].deviation <= classUpperLimit) {
                     counter++;
@@ -521,7 +531,7 @@ const statistics = {
             }
             let averageClassValue=this.calculateAverage(classElementValues),
                 className=`${this.roundNumber(classLowerLimit)} bis ${this.roundNumber(classUpperLimit)}`,
-                classObject = {name:className, upperLimit:classUpperLimit, count:counter, averageValue:averageClassValue};
+                classObject = {name:className, classUpperLimit:classUpperLimit, classLowerLimit:classLowerLimit,classMiddle:classMiddle,  count:counter, classAverageValue:averageClassValue};
             classLowerLimit=classUpperLimit;
             densityFunctionObjectArray.push(classObject);
         }
@@ -535,9 +545,11 @@ const statistics = {
             yValue = parameters.yValue,
             xAxisName = parameters.xAxisName,
             yAxisName = parameters.yAxisName,
+            averageName=parameters.averageName,
             selectedValue = parameters.selectedValue,
             indUnit = parameters.indUnit,
             mean = parameters.mean,
+            stDeviation=parameters.stDeviation,
             svg = parameters.svg,
             chart_width = parameters.chart_width,
             chart_height = parameters.chart_height,
@@ -568,7 +580,7 @@ const statistics = {
 
         let yScale = d3.scaleLinear()
             .range([chart_height, 0])
-            .domain(d3.extent([minValue, maxValue]))
+            .domain(d3.extent([minValue, maxValue+maxValue/10]))
             .nice();
 
         // sets the Start of Chart to the right Position, creates container for chart
@@ -664,7 +676,7 @@ const statistics = {
             .attr("x", margins.left)
             .attr("y", yScale(mean) + margins.top - 40)
             .style("text-anchor", "middle")
-            .text(`${this.text[lan].average} ${decodeURI('%CE%BC')}`);
+            .text(`${averageName} ${decodeURI('%CE%BC')}`);
 
         //Initialise both Axis
         //determine if Axis should have ticks
@@ -711,13 +723,16 @@ const statistics = {
             xAxisName = parameters.xAxisName,
             yAxisName = parameters.yAxisName,
             mean=parameters.mean,
-            median=parameters.median,
+            stDeviation=parameters.stDeviation,
             svg = parameters.svg,
-            chart_width = parameters.chart_width-parameters.margins.left-parameters.margins.right,
+            averageName=parameters.averageName,
+            chart_width = parameters.chart_width,
             chart_height = parameters.chart_height,
             margins = parameters.margins,
             barWidth=chart_width / data.length,
+
             lan = language_manager.getLanguage(),
+
             maxYValue = d3.max(data, function (d) {
                 return d[yValue];
             }),
@@ -730,15 +745,16 @@ const statistics = {
             minXValue=d3.min(data,function(d){
                 return d[xValue]
             });
+        console.log("Bar width:" +barWidth);
 
 
         let xScale = d3.scaleLinear()
             .domain(d3.extent([minXValue, maxXValue]))
-            .range([chart_width / data.length / 2, chart_width - chart_width / data.length / 2]);
+            .range([barWidth/2, chart_width-barWidth/2]);
 
         let yScale = d3.scaleLinear()
             .range([chart_height, 0])
-            .domain(d3.extent([minYValue, maxYValue]))
+            .domain(d3.extent([minYValue, maxYValue+Math.round(maxYValue/10)]))
             .nice();
 
         // sets the Start of Chart to the right Position, creates container for chart
@@ -771,7 +787,7 @@ const statistics = {
                 } else return 0
             })
             .on("mouseover", function (d) {
-                let html ="Wertebereich: "+ d.name + "<br/>" +statistics.text[lan].amount+ ": "+ d[yValue] ;
+                let html ="Wertebereich: "+ d.name + "<br/>" +yAxisName+ ": "+ d[yValue] ;
                 let x = xScale(d[xValue]),//(d3.event.pageX - document.getElementById('visualisation').getBoundingClientRect().x) - 100,
                     y = yScale(d[yValue]) - 40//(d3.event.pageY - document.getElementById('visualisation').getBoundingClientRect().y) - 60;
                 //Change Color
@@ -797,33 +813,41 @@ const statistics = {
             .style("stroke", "black")  // colour the line
             .style("stroke-dasharray", ("3, 3"))
             .attr("x1", xScale(0))     // x position of the first end of the line
-            .attr("y1", yScale(maxYValue))      // y position of the first end of the line
+            .attr("y1", yScale(maxYValue+Math.round(maxYValue/10)))      // y position of the first end of the line
             .attr("x2", xScale(0))     // x position of the second end of the line
             .attr("y2", yScale(minYValue));    // y position of the second end of the line
 
 //Text for AverageLine
         g.append("text")
             .attr("x", xScale(0)+40)
-            .attr("y",  yScale(maxYValue) + margins.top)
+            .attr("y",  yScale(maxYValue+Math.round(maxYValue/10)) + margins.top)
             .style("text-anchor", "middle")
-            .text(`${this.text[lan].average} ${decodeURI('%CE%BC')}`);
+            .text(`${averageName} ${decodeURI('%CE%BC')}`);
 
-        // Draw the median line in Graph
+
+        // Draw standard Deviation lines
+        // upper stDeviation
+        /*
         g.append("line")          // attach a line
-            .attr("class", "medianLine")
+            .attr("class", "stDeviationLine")
             .style("stroke", "black")  // colour the line
-            .style("stroke-dasharray", ("2, 5"))
-            .attr("x1", xScale(median-mean))     // x position of the first end of the line
+            .style("stroke-dasharray", ("3, 3,15,3"))
+            .attr("x1", xScale(0))     // x position of the first end of the line
             .attr("y1", yScale(maxYValue))      // y position of the first end of the line
-            .attr("x2", xScale(median-mean))     // x position of the second end of the line
+            .attr("x2", xScale(0))     // x position of the second end of the line
             .attr("y2", yScale(minYValue));    // y position of the second end of the line
+        // lower stDeviation
+        g.append("line")          // attach a line
+            .attr("class", "stDeviationLine")
+            .style("stroke", "black")  // colour the line
+            .style("stroke-dasharray", ("3, 3,15,3"))
+            .attr("x1", xScale(0))     // x position of the first end of the line
+            .attr("y1", yScale(maxYValue))      // y position of the first end of the line
+            .attr("x2", xScale(0))     // x position of the second end of the line
+            .attr("y2", yScale(minYValue));    // y position of the second end of the line
+*/
 
-//Text for MedianLine
-        g.append("text")
-            .attr("x", xScale(median-mean)-30)
-            .attr("y",  yScale(maxYValue) + margins.top+40)
-            .style("text-anchor", "middle")
-            .text(`Median `);
+
 
         //Initialise both Axis
         //determine if Axis should have ticks
@@ -833,11 +857,13 @@ const statistics = {
 
         let yAxis = d3.axisLeft(yScale);
 
-        g.append('g')
+        let X= g.append('g')
             .call(xAxis)
             .attr('transform', 'translate(0,' + (yScale(0)) + ')');
         g.append('g')
             .call(yAxis);
+//remove the axis line from x Axis
+        X.selectAll("path").attr("display", "none");
 
 // text label for the X axis
         g.append("text")
@@ -866,11 +892,12 @@ const statistics = {
             yAxisName = parameters.yAxisName,
             indUnit = parameters.indUnit,
             mean = parameters.mean,
+            averageName=parameters.averageName,
+            stDeviation=parameters.stDeviation,
             svg = parameters.svg,
             chart_width = parameters.chart_width,
             chart_height = parameters.chart_height,
             margins = parameters.margins,
-            lan = language_manager.getLanguage(),
             maxYValue = d3.max(data, function (d, i) {
                 return d[yValue];
             }),
@@ -926,8 +953,8 @@ const statistics = {
             .attr("x", xScale(mean)+40)
             .attr("y", yScale(maxYValue) + margins.top)
             .style("text-anchor", "middle")
-            .text(`${this.text[lan].average} ${decodeURI('%CE%BC')}`);
-
+            .text(`${averageName} ${decodeURI('%CE%BC')}`);
+        // Draw the main plot
         g.append("path")
             .datum(data)
             .attr("fill", "none")
@@ -936,6 +963,7 @@ const statistics = {
             .attr("stroke-linejoin", "round")
             .attr("stroke-linecap", "round")
             .attr("d", line);
+
         //Initialise both Axis
         let xAxis = d3.axisBottom(xScale)
             .tickFormat(d3.format(".2r"))

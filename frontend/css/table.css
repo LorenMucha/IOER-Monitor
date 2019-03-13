@@ -56,11 +56,10 @@
     box-shadow: none;
     text-align: left;
     color: rgba(0,0,0,.87);
-    border:.1px solid black;
     border-spacing: 0;
     margin-bottom: 10px;
     margin-right: 5px;
-    border-collapse: unset;
+    border-collapse: inherit;
     table-layout: fixed;
 }
 .right_content .scrollable-area #table_ags #thead tr th{

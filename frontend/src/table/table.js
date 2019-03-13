@@ -68,7 +68,7 @@ const table = {
                     html += '<th class="th_head grundakt_head" id="grundakt_head">Mittlere Grund- aktualität</th>';
                 }
 
-                return html+"</tr></thead>";
+                return (html+"</tr></thead>").trim();
             },
             createTableBody=function() {
                 let html = `
@@ -197,7 +197,7 @@ const table = {
                                         ${grundaktualitaet_td()}
                                     </tr>`;
                 });
-                return html+"</tbody>";
+                return (html+"</tbody>").trim();
             },
             createTableFooter=function(){
                 //germany values
@@ -248,13 +248,13 @@ const table = {
                                                              title="Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren" 
                                                              class="indikatoren_gebietsprofil" 
                                                              src="frontend/assets/icon/indikatoren.png"/>
-                                                         <b>${name}</b>
+                                                             <p>${name}</p>
                                                     </th>
                                                     <th class="val-ags" 
                                                         data-name="${value.gen}" 
                                                         data-val="${value_g}" 
                                                         data-ind="${indikatorauswahl.getSelectedIndikator()}">
-                                                        <b>${value_set}</b>
+                                                        ${value_set}
                                                         <img data-name="Bundesrepublik" 
                                                              data-ags="${ags}" 
                                                              data-ind="${indikatorauswahl.getSelectedIndikator()}" 
@@ -271,7 +271,7 @@ const table = {
                                     }
                                 });
                             });
-                            return tfoot_ags;
+                            return tfoot_ags.trim();
                         }else{
                             return ' ';
                         }
@@ -321,13 +321,13 @@ const table = {
                                                  data-ind="${indikatorauswahl.getSelectedIndikator()}" 
                                                  title="Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren" 
                                                  class="indikatoren_gebietsprofil" src="frontend/assets/icon/indikatoren.png"/>
-                                             <b>Bundesrepublik</b>
+                                                 <p>Bundesrepublik</p>
                                         </th>
                                         <th class="val-ags" 
                                             data-name="Bundesrepublik" 
                                             data-val="${value_g}" 
                                             data-ind="${indikatorauswahl.getSelectedIndikator()}">
-                                            <b>${value_g}</b>
+                                            ${value_g}
                                             <img data-name="Bundesrepublik" 
                                                  data-ags="99" 
                                                  data-ind="${indikatorauswahl.getSelectedIndikator()}" 
@@ -343,7 +343,7 @@ const table = {
                         if (indikatorauswahl.getSelectedIndiktorGrundaktState()) {
                             tfoot_brd += `<th class="td_akt indicator_main">${grundakt_val}</th>`;
                         }
-                        return tfoot_brd;
+                        return tfoot_brd.trim();
                     };
                 return `${brd_footer()+ags_footer()}</tr></tfoot>`;
             };

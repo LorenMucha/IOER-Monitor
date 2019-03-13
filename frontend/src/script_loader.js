@@ -138,11 +138,11 @@ const script_loader={
         const loader = this;
         $.getMultiScripts = function(arr) {
             var _arr = $.map(arr, function(scr) {
-                return $.getScript(  scr );
+                return $.getScript(  scr);
             });
 
             _arr.push($.Deferred(function( deferred ){
-                $( deferred.resolve );
+                $( deferred.resolve);
             }));
 
             return $.when.apply($, _arr);

@@ -37,7 +37,7 @@
     height:100%;
 }
 #print_container .map_print_container{
-    margin-top: 2vh;
+    margin-top: 20px;
 }
 #print_container .print_map_content  .map_print_container #print_map{
     float: left;
@@ -47,7 +47,7 @@
     border: .5px solid lightgray;
 }
 #print_container .print_map_content  .map_print_container #print_map svg{
-    margin-top: 2vh;
+    margin-top: 20px;
 }
 #print_container .print_map_content .map_print_container #print_map .leaflet-control-scale-line{
     margin-left: 20px;
@@ -56,10 +56,13 @@
     margin-right: 20px;
 }
 #print_container .print_info_content{
-    float: left;
     display: block;
     width: 140px;
     margin-left: 30px;
+    position: absolute;
+    right: 35px;
+    top: 150px;
+    height:145px;
 }
 #print_container .highlight{
     color: var(--active-color);
@@ -76,7 +79,7 @@
     cursor: not-allowed;
 }
 #print_container #print_histogramm_container{
-    margin-top: 300px;
+    margin-top: 250px;
 }
 #print_container .print_info_content #print_legende{
     width: 100%;

@@ -158,7 +158,7 @@ const map_print={
             $(".hover_close").click(function(){
                         $(this).remove();
                         //resize map if no element is left
-                        if($(".hover_close").length==0){
+                        if($(".hover_close").length===0){
                             $('#print_map').css({"width":$('.map_print_container').width()-30});
                             map_print.map.invalidateSize();
                         }

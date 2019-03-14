@@ -1,5 +1,5 @@
 <?php
-include "../database/MYSQL_TASKREPOSITORY.php";
+include "../database/MysqlTasks.php";
 include "ChartHelper.php";
 
 class Chart{
@@ -14,9 +14,9 @@ class Chart{
         $this->compare=$_compare;
         $this->forecast=$_forecast;
         if($_forecast) {
-            $this->time_array = MYSQL_TASKREPOSITORY::get_instance()->getIndicatorPossibleTimeArray($this->indicator_id, 'gebiete',[2000]);
+            $this->time_array = MysqlTasks::get_instance()->getIndicatorPossibleTimeArray($this->indicator_id, 'gebiete',[2000]);
         }else{
-            $this->time_array = MYSQL_TASKREPOSITORY::get_instance()->getIndicatorPossibleTimeArray($this->indicator_id, 'gebiete',$this->forecast_values);
+            $this->time_array = MysqlTasks::get_instance()->getIndicatorPossibleTimeArray($this->indicator_id, 'gebiete',$this->forecast_values);
         }
         $this->rundung=2;
     }
@@ -36,7 +36,7 @@ class Chart{
         $res= false;
         //create the value array
         foreach($this->time_array as $key=>$t) {
-            $ind_values = MYSQL_TASKREPOSITORY::get_instance()->getIndicatorValuesByAGS($t["time"], $this->indicator_id, $this->ags);
+            $ind_values = MysqlTasks::get_instance()->getIndicatorValuesByAGS($t["time"], $this->indicator_id, $this->ags);
 
             $val = $ind_values[0];
             $this->rundung = $val->rundung;

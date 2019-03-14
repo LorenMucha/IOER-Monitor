@@ -1,9 +1,9 @@
 <?php
 header('Access-Control-Allow-Origin: *');
 header('Content-type: application/json; charset=utf-8');
-include_once "database/MYSQL_TASKREPOSITORY.php";
-include_once "database/POSTGRESQL_MANAGER.php";
-include_once "database/POSTGRESQL_TASKRESPOSITORY.php";
+include_once "database/MysqlTasks.php";
+include_once "database/PostgreManager.php";
+include_once "database/PostgreTasks.php";
 include_once "models/Helper.php";
 include "models/Errors.php";
 include 'models/NOTES.php';
@@ -61,8 +61,8 @@ try{
     }
     //get all possible Extends for a indictaor
     else if($query==="getspatialextend"){
-        $dictionary = MYSQL_TASKREPOSITORY::get_instance()->getSpatialExtendDictionary();
-        $possibilities = MYSQL_TASKREPOSITORY::get_instance()->getSpatialExtend($modus,$year,$indicator);
+        $dictionary = MysqlTasks::get_instance()->getSpatialExtendDictionary();
+        $possibilities = MysqlTasks::get_instance()->getSpatialExtend($modus,$year,$indicator);
         $result = array();
         if($modus==="gebiete"){
             foreach($dictionary as $value){
@@ -83,14 +83,14 @@ try{
         $language = $json_obj['format']['language'];
         $json = '{';
         if($modus=='raster') {
-            $kategories = MYSQL_TASKREPOSITORY::get_instance()->getAllCategoriesRaster();
+            $kategories = MysqlTasks::get_instance()->getAllCategoriesRaster();
         }else{
-            $kategories = MYSQL_TASKREPOSITORY::get_instance()->getAllCategoriesGebiete();
+            $kategories = MysqlTasks::get_instance()->getAllCategoriesGebiete();
         }
 
         foreach($kategories as $row){
 
-            $erg_indikator = MYSQL_TASKREPOSITORY::get_instance()->getAllIndicatorsByCategoryGebiete($row->ID_THEMA_KAT,$modus);
+            $erg_indikator = MysqlTasks::get_instance()->getAllIndicatorsByCategoryGebiete($row->ID_THEMA_KAT,$modus);
 
             //only if indicators are avaliabke
             if (count($erg_indikator) != 0) {
@@ -108,7 +108,7 @@ try{
                     }
                     //get all possible times
                     $time_string = '';
-                    $times = MYSQL_TASKREPOSITORY::get_instance()->getIndicatorPossibleTimeArray($row_ind->ID_INDIKATOR,$modus,false);
+                    $times = MysqlTasks::get_instance()->getIndicatorPossibleTimeArray($row_ind->ID_INDIKATOR,$modus,false);
                     foreach($times as $value){$time_string .= $value["time"].",";};
                     $time_string = substr($time_string,0,-1);
                     //extend the json
@@ -165,7 +165,7 @@ try{
     //get all possible years
     else if($query=='getyears'){
         $jahre = array();
-        $years = MYSQL_TASKREPOSITORY::get_instance()->getIndicatorPossibleTimeArray($indicator,$modus);
+        $years = MysqlTasks::get_instance()->getIndicatorPossibleTimeArray($indicator,$modus);
         foreach ($years as $x){
                 array_push($jahre,intval($x["time"]));
         }
@@ -176,13 +176,13 @@ try{
         $array = array();
             array_push($array, array(
                 "ind" => $indicator,
-                "avability" => MYSQL_TASKREPOSITORY::get_instance()->checkIndicatorAvability($indicator,$modus))
+                "avability" => MysqlTasks::get_instance()->checkIndicatorAvability($indicator,$modus))
             );
         echo json_encode($array);
     }
     //counte the amount of geometries, which will be generated
     else if($query=="countgeometries"){
-        $count = POSTGRESQL_TASKRESPOSITORY::get_instance()->countGeometries($year,$raumgliederung,$ags_array);
+        $count = PostgreTasks::get_instance()->countGeometries($year,$raumgliederung,$ags_array);
         echo json_encode($count);
     }
     //get the map overlay
@@ -225,10 +225,10 @@ try{
     else if($query=="getvaluesags"){
         //takes exactly one ags value
         $ags =$json_obj['ind']['ags'];
-        $values=MYSQL_TASKREPOSITORY::get_instance()->getAllIndicatorValuesInAGS($year,$ags,true,true);
+        $values=MysqlTasks::get_instance()->getAllIndicatorValuesInAGS($year,$ags,true,true);
         $keys = array();
         $result = array();
-        foreach(MYSQL_TASKREPOSITORY::get_instance()->getAllCategoriesGebiete() as $k){array_push($keys,array("cat_id"=>$k->ID_THEMA_KAT,"cat_name"=>$k->THEMA_KAT_NAME,"cat_name_en"=>$k->THEMA_KAT_NAME_EN));}
+        foreach(MysqlTasks::get_instance()->getAllCategoriesGebiete() as $k){array_push($keys,array("cat_id"=>$k->ID_THEMA_KAT,"cat_name"=>$k->THEMA_KAT_NAME,"cat_name_en"=>$k->THEMA_KAT_NAME_EN));}
         //create the cat keys
         foreach($keys as $key=>$val){
             $res = array();

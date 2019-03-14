@@ -1,7 +1,7 @@
 <?php
 require_once ('POSTGRESQL_MANAGER.php');
 
-class POSTGRESQL_TASKRESPOSITORY extends POSTGRESQL_MANAGER
+class PostgreTasks extends PostgreManager
 {
     protected static $instance = NULL;
     private $berechtigung = 3;
@@ -47,7 +47,7 @@ class POSTGRESQL_TASKRESPOSITORY extends POSTGRESQL_MANAGER
         return $this->query($sql . $digit);
     }
     function countGeometries($year,$raumgl,$ags_array){
-        $year_pg = MYSQL_TASKREPOSITORY::get_instance()->getPostGreYear($year);
+        $year_pg = MysqlTasks::get_instance()->getPostGreYear($year);
         $query= "select COUNT(AGS) from vg250_".$raumgl."_".$year_pg."_grob";
         if (count($ags_array) > 0) {
             $sql_pg = "select COUNT(AGS) from  vg250_" . $raumgl . "_" . $year_pg . "_grob where AGS Like'" . $ags_array[0] . "";

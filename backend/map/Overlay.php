@@ -12,7 +12,7 @@ class Overlay{
         $output = '';
         $rowOutput='';
         try {
-            $rs = POSTGRESQL_MANAGER::get_instance()->query($sql);
+            $rs = PostgreManager::get_instance()->query($sql);
             foreach ($rs as $row) {
                 $rowOutput = (strlen($rowOutput) > 0 ? ',' : '').'{"type": "Feature", "geometry": ' . $row->geojson . ', "properties": {';
                 $props = '';

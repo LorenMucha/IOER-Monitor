@@ -1,6 +1,6 @@
 <?php
 
-include "../database/MYSQL_MANAGER.php";
+include "../database/MysqlManager.php";
 
 class UserLink
 {
@@ -21,9 +21,9 @@ class UserLink
         try {
             $data_array=array("array_value"=>$this->setting["val"],"ZEITSTEMPEL"=>$date);
             $filed_array=array("%s","%s");
-            MYSQL_MANAGER::get_instance()->insert($this->table_name,$data_array,$filed_array);
+            MysqlManager::get_instance()->insert($this->table_name,$data_array,$filed_array);
             $sql_get = "select id from ".$this->table_name." where ZEITSTEMPEL = '".$date."' and array_value = '".$this->setting["val"]."'";
-            return array("state"=>"inserted","res"=>MYSQL_MANAGER::get_instance()->query($sql_get));
+            return array("state"=>"inserted","res"=>MysqlManager::get_instance()->query($sql_get));
         }catch (Exception $e){
             return array("state"=>"error");
         }
@@ -31,7 +31,7 @@ class UserLink
     private function getLink(){
         try {
             $sql_get = "SELECT id, array_value FROM " . $this->table_name . " where id='" . $this->setting["val"] . "'";
-            return array("state"=>"get","res"=>MYSQL_MANAGER::get_instance()->query($sql_get));
+            return array("state"=>"get","res"=>MysqlManager::get_instance()->query($sql_get));
         }catch(Exception $e){
             return array("state"=>"error");
         }

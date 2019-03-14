@@ -1,7 +1,7 @@
 <?php
 require_once("MYSQL_MANAGER.php");
 
-class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
+class MysqlTasks extends MysqlManager {
     protected static $instance = NULL;
     //singelton pattern ->Creates exactly one instance of an object.
     public static function get_instance()

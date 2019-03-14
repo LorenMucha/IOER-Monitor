@@ -10,7 +10,7 @@ class Json
 
         $this->indicator_id = $indicator_id;
         $this->year = $year;
-        $this->year_pg =MYSQL_TASKREPOSITORY::get_instance()->getPostGreYear($year);
+        $this->year_pg =MysqlTasks::get_instance()->getPostGreYear($year);
         $this->spatial_extend = $spatial_extend;
         $this->ags_array_user = $ags_array_user;
     }
@@ -19,11 +19,11 @@ class Json
             $output = '';
             $rowOutput = '';
             //get the PostgreObject
-            $geometry_object = POSTGRESQL_TASKRESPOSITORY::get_instance()->getGeometry($this->year_pg, $this->spatial_extend, $this->ags_array_user);
+            $geometry_object = PostgreTasks::get_instance()->getGeometry($this->year_pg, $this->spatial_extend, $this->ags_array_user);
             //get the Indicator Object
-            $indicator_object = MYSQL_TASKREPOSITORY::get_instance()->getIndicatorValuesInSpatialExtend($this->year, $this->indicator_id, $geometry_object[0]->ags,$this->ags_array_user);
+            $indicator_object = MysqlTasks::get_instance()->getIndicatorValuesInSpatialExtend($this->year, $this->indicator_id, $geometry_object[0]->ags,$this->ags_array_user);
             //get the Grundaktualität
-            $indikator_grundaktualitaet = MYSQL_TASKREPOSITORY::get_instance()->getGrundaktState($this->indicator_id);
+            $indikator_grundaktualitaet = MysqlTasks::get_instance()->getGrundaktState($this->indicator_id);
             //get the ags array's to calculate the differences
             $indicator_rundung = '';
             $ags_mysql = array();
@@ -57,7 +57,7 @@ class Json
                             $fc_id = $row_mysql->fc;
                             $note_id = $row_mysql->hc;
                             $ags = $row_postgre->ags;
-                            $des = POSTGRESQL_TASKRESPOSITORY::get_instance()->getDescription($row_postgre->des, $ags, $this->spatial_extend);
+                            $des = PostgreTasks::get_instance()->getDescription($row_postgre->des, $ags, $this->spatial_extend);
 
                             //get the grundakt
                             if ($indikator_grundaktualitaet == 1) {
@@ -116,10 +116,10 @@ class Json
                 $stat_string_ags = '';
                 foreach ($this->ags_array_user as $value) {
                     $ags_set = substr($value, 0, 2);
-                    $stat_string_ags .= '"' . $ags_set . '":{"gen":"' . POSTGRESQL_TASKRESPOSITORY::get_instance()->getAGSName('bld', $ags_set, $this->year) . '","value_ags":"' . number_format(round(MYSQL_TASKREPOSITORY::get_instance()->getIndicatorValueByAGS($this->indicator_id, $value, $this->year), $indicator_rundung), $indicator_rundung, ',', '') . '","ags_grundakt":"' . MYSQL_TASKREPOSITORY::get_instance()->getIndicatorGrundaktualitaet($value, $this->year) . '"},';
+                    $stat_string_ags .= '"' . $ags_set . '":{"gen":"' . PostgreTasks::get_instance()->getAGSName('bld', $ags_set, $this->year) . '","value_ags":"' . number_format(round(MysqlTasks::get_instance()->getIndicatorValueByAGS($this->indicator_id, $value, $this->year), $indicator_rundung), $indicator_rundung, ',', '') . '","ags_grundakt":"' . MysqlTasks::get_instance()->getIndicatorGrundaktualitaet($value, $this->year) . '"},';
                 }
             }
-            trim($JSON = '{ "type": "FeatureCollection", "stat":{' . $stat_string_ags . '"wert_brd":"' . number_format(round(MYSQL_TASKREPOSITORY::get_instance()->getIndicatorValueForBRD($this->indicator_id, $this->year), $indicator_rundung), $indicator_rundung, ',', '') . '","grundakt_brd":"' . MYSQL_TASKREPOSITORY::get_instance()->getIndicatorGrundaktualitaet('99', $this->year) . '"},"features": [ ' . $output . ' ]}');
+            trim($JSON = '{ "type": "FeatureCollection", "stat":{' . $stat_string_ags . '"wert_brd":"' . number_format(round(MysqlTasks::get_instance()->getIndicatorValueForBRD($this->indicator_id, $this->year), $indicator_rundung), $indicator_rundung, ',', '') . '","grundakt_brd":"' . MysqlTasks::get_instance()->getIndicatorGrundaktualitaet('99', $this->year) . '"},"features": [ ' . $output . ' ]}');
             $this->json = json_decode($JSON,true);
             return json_decode($JSON,true);
         }

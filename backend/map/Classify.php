@@ -11,7 +11,7 @@ class Classify
         $this->classes = $classes;
         //if no color is set, get the predefined colors
         if(!(array)$colors or $indicator_id==="Z00AG") {
-            $this->colors = MYSQL_TASKREPOSITORY::get_instance()->getIndicatorColors($indicator_id);
+            $this->colors = MysqlTasks::get_instance()->getIndicatorColors($indicator_id);
         }else{
             //cast because it needs to be an object
             $this->colors=$colors;

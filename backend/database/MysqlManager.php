@@ -1,7 +1,7 @@
 <?php
 require_once('DB_SETTINGS.php');
 //quelle:https://gist.github.com/johnmorris/6001ad2b4ef82d114b77
-class MYSQL_MANAGER extends DB_SETTINGS {
+class MysqlManager extends DB_SETTINGS {
 
     protected static $instance = NULL;
     public $berechtigung = 3;

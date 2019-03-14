@@ -1,7 +1,7 @@
 <?php
 header('Access-Control-Allow-Origin: *');
 header('Content-type: application/json; charset=utf-8');
-include 'database/POSTGRESQL_TASKRESPOSITORY.php';
+include 'database/PostgreTasks.php';
 
 $q =  $_POST["values"];
 $json_obj = json_decode($q, true);
@@ -9,7 +9,7 @@ $query = strtolower($json_obj['query']);
 
 try{
     if($query==='clearcache'){
-       POSTGRESQL_MANAGER::get_instance()->query("TRUNCATE geojson_cache");
+       PostgreManager::get_instance()->query("TRUNCATE geojson_cache");
         echo json_encode("done");
     }
 

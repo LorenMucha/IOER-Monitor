@@ -1,6 +1,6 @@
 <?php
-include_once "../database/MYSQL_TASKREPOSITORY.php";
-include_once "../database/MYSQL_MANAGER.php";
+include_once "../database/MysqlManager.php";
+include_once "../database/MysqlTasks.php";
 
 class TableExpand{
     public function __construct($indicator_id,$time,$raumgliederung) {
@@ -29,7 +29,7 @@ class TableExpand{
             $length_ags = strlen($ags_array[0]);
 
              //get all the bld values in an array
-            $bldArray = POSTGRESQL_MANAGER::get_instance()->query("SELECT gen, ags FROM vg250_bld_2016_grob");
+            $bldArray = PostgreManager::get_instance()->query("SELECT gen, ags FROM vg250_bld_2016_grob");
 
             //set the ABS IND
             if($ind_set==='ABS'){
@@ -62,8 +62,8 @@ class TableExpand{
                                         And LENGTH(i.AGS) = " . $length_ags . "
                                         Group by i.AGS";
 
-            $indicator_array = MYSQL_MANAGER::get_instance()->query($sql);
-            $indikator_grundaktualitaet = MYSQL_TASKREPOSITORY::get_instance()->getGrundaktState($this->id);
+            $indicator_array = MysqlManager::get_instance()->query($sql);
+            $indikator_grundaktualitaet = MysqlTasks::get_instance()->getGrundaktState($this->id);
             $einheit =$indicator_array[0]->einheit;
             if($ind_set==='B00AG'){
                 $einheit= '(*) Werte 2015';

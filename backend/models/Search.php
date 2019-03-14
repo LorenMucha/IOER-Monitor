@@ -1,7 +1,7 @@
 <?php
 include "../models/Helper.php";
-include "../database/MYSQL_MANAGER.php";
-include "../database/POSTGRESQL_MANAGER.php";
+include "../database/MysqlManager.php";
+include "../database/PostgreManager.php";
 
 class Search{
     public function __construct($search_string,$option) {
@@ -28,7 +28,7 @@ class Search{
             AND f.STATUS_INDIKATOR_FREIGABE =3
             AND k.ID_THEMA_KAT = i.ID_THEMA_KAT
             GROUP BY i.ID_INDIKATOR";
-        $indObject = MYSQL_MANAGER::get_instance()->query($sql);
+        $indObject = MysqlManager::get_instance()->query($sql);
         $q = $this->search_string;
         //seach for the suitable results inside the object
         foreach($indObject as $key=>$row){
@@ -62,7 +62,7 @@ class Search{
         $geom = "the_geom ";
 
         $query_bld = "select gid, ags, gen, ST_AsText(ST_centroid(transform(" . pg_escape_string($geom) . ",4326))) AS center from  vg250_bld_" . $year_pg . "_grob where LOWER(gen) LIKE LOWER('%".$searchTerm."%')";
-        $erg_bld = POSTGRESQL_MANAGER::get_instance()->query($query_bld);
+        $erg_bld = PostgreManager::get_instance()->query($query_bld);
         foreach($erg_bld as $row){
             $coordinates = str_replace(array('POINT(',')'),array('',''),$row->center);
             $array = explode(" ",$coordinates);
@@ -70,7 +70,7 @@ class Search{
         }
 
         $query_ror = "select gid, ags, gen, ST_AsText(ST_centroid(transform(" . pg_escape_string($geom) . ",4326))) AS CENTER from  vg250_ror_" . $year_pg . "_grob where LOWER(gen) LIKE LOWER('%".$searchTerm."%')";
-        $erg_ror = POSTGRESQL_MANAGER::get_instance()->query($query_ror);
+        $erg_ror = PostgreManager::get_instance()->query($query_ror);
         if (empty((array)$erg_bld)) {
             foreach($erg_ror as $row){
                 $coordinates = str_replace(array('POINT(',')'),array('',''),$row->center);
@@ -81,7 +81,7 @@ class Search{
 
         /* Kreise disabled for search
          * $query_krs = "select gid, ags, gen,des, ST_AsText(ST_centroid(transform(" . pg_escape_string($geom) . ",4326))) AS CENTER from  vg250_krs_" . $year_pg . "_grob where LOWER(gen) LIKE LOWER('%".$searchTerm."%')";
-        $erg_krs = POSTGRESQL_MANAGER::get_instance()->query($query_krs);
+        $erg_krs = PostgreManager::get_instance()->query($query_krs);
         if (empty((array)$erg_bld)) {
             foreach($erg_krs as $row){
                 $coordinates = str_replace(array('POINT(',')'),array('',''),$row->center);
@@ -90,7 +90,7 @@ class Search{
             }
         }*/
         $query_g50 = "select gid, ags, gen,des, ST_AsText(ST_centroid(transform(" . pg_escape_string($geom) . ",4326))) AS CENTER from  vg250_g50_" . $year_pg . "_grob where LOWER(gen) LIKE LOWER('%".$searchTerm."%')";
-        $erg_g50 = POSTGRESQL_MANAGER::get_instance()->query($query_g50);
+        $erg_g50 = PostgreManager::get_instance()->query($query_g50);
         if (empty((array)$erg_krs)) {
             foreach($erg_g50 as $row){
                 $coordinates = str_replace(array('POINT(',')'),array('',''),$row->center);
@@ -99,7 +99,7 @@ class Search{
             }
         }
         $query_stt = "select gid, ags, gen, ST_AsText(ST_centroid(transform(" . pg_escape_string($geom) . ",4326))) AS CENTER from  vg250_stt_" . $year_pg . "_grob where LOWER(gen) LIKE LOWER('%".$searchTerm."%')";
-        $erg_stt = POSTGRESQL_MANAGER::get_instance()->query($query_stt);
+        $erg_stt = PostgreManager::get_instance()->query($query_stt);
 
         if (empty((array)$erg_bld)) {
             foreach($erg_stt as $row){
@@ -110,7 +110,7 @@ class Search{
         }
 
         $query_gem = "select gid, ags, gen, ST_AsText(ST_centroid(transform(" . pg_escape_string($geom) . ",4326))) AS CENTER from  vg250_gem_" . $year_pg . "_grob where LOWER(gen) LIKE LOWER('%".$searchTerm."%')";
-        $erg_gem = POSTGRESQL_MANAGER::get_instance()->query($query_gem);
+        $erg_gem = PostgreManager::get_instance()->query($query_gem);
         if (empty((array)$erg_krs)) {
             foreach($erg_gem as $row){
                 $coordinates = str_replace(array('POINT(',')'),array('',''),$row->center);

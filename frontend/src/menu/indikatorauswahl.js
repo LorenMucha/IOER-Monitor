@@ -341,11 +341,22 @@ const indikatorauswahl ={
                 .dropdown('refresh')
                 .dropdown({
                     onShow:function(){
-                        $('.link_kat')
-                            .unbind()
-                            .click(function(){
-                                MenuHelper.setUpward($(this).find('.submenu'));
-                            });
+                        let click = 0;
+                        console.log(main_view.getHeight()<= 800);
+                        if(main_view.getHeight()<= 800) {
+                            $('.link_kat')
+                                .unbind()
+                                .click(function () {
+                                    //transform meu on click
+                                    if (click === 0) {
+                                        MenuHelper.setUpward($(this).find('.submenu'));
+                                        click++;
+                                    } else {
+                                        MenuHelper.removeUpward($(this).find('.submenu'));
+                                        click = 0;
+                                    }
+                                });
+                        }
                     },
                     onChange: function (value, text, $choice) {
                         //enable or disbale OGC Services 

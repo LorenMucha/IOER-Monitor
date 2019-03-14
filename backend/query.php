@@ -188,15 +188,8 @@ try{
     //get the map overlay
     else if($query=="getzusatzlayer"){
         $zusatzlayer = $json_obj['ind']['zusatzlayer'];
-        $cache_manager = new CacheManager(substr($zusatzlayer,0,2),2019,$zusatzlayer,"false",0);
-        if (!$cache_manager->check_cached([],[])) {
-            $overlay = new Overlay($zusatzlayer);
-            $json = json_encode(array_merge($overlay->getJSON(),array("state"=>"generated")));
-            $cache_manager->insert($json);
-            echo $json;
-        }else{
-            echo json_encode(array_merge($cache_manager->get_cached(),array("state"=>"cached")));
-        }
+        $overlay = new Overlay($zusatzlayer);
+        echo json_encode($overlay->getJSON());
     }
     //get the values to Expand the Table by the given values
     else if($query=="gettableexpandvalues"){

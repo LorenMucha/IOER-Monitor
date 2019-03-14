@@ -26,6 +26,7 @@
 @import "table.css";
 @import "feeback.css";
 @import "dev_chart.css";
+@import "statistics.css";
 
 body {
     padding: 0;

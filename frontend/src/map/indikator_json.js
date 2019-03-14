@@ -220,7 +220,13 @@ const indikator_json = {
         });
 
         $(document).on('click','#pop_up_diagramm_ags_'+id_popup,function(){
-            openStatistik(ags,gen,value_ags);
+            statistics.chart.settings.ags=ags;
+            statistics.chart.settings.name=gen;
+            statistics.chart.settings.ind=indikatorauswahl.getSelectedIndikator();
+            statistics.chart.settings.allValuesJSON  = indikator_json.getJSONFile();
+            statistics.chart.settings.indText=indikatorauswahl.getSelectedIndikatorText();
+            statistics.chart.settings.indUnit=indikatorauswahl.getIndikatorEinheit();
+            statistics.open();
         });
         $(document).on('click','#pop_up_diagramm_entwicklung_ags_'+id_popup,function(){
             //openEntwicklungsdiagramm(ags,gen,indikatorauswahl.getSelectedIndikator(),true);

@@ -61,21 +61,21 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
         $sql_brd="";
         //create the subquery for brd
         if($diff_brd){
-            $sql_brd="IFNULL((SELECT x.INDIKATORWERT FROM m_indikatorwerte_".$year." x WHERE x.ID_INDIKATOR = 'Z00AG' AND x.ags='99' AND x.INDIKATORWERT <=".$year."),0) as grundakt_year_brd,
-                      IFNULL((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS ='99' AND y.INDIKATORWERT <= ".$year."),0) as grundakt_month_brd,
+            $sql_brd="COALESCE((SELECT x.INDIKATORWERT FROM m_indikatorwerte_".$year." x WHERE x.ID_INDIKATOR = 'Z00AG' AND x.ags='99' AND x.INDIKATORWERT <=".$year."),0) as grundakt_year_brd,
+                      COALESCE((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS ='99' AND y.INDIKATORWERT <= ".$year."),0) as grundakt_month_brd,
                       (select b.INDIKATORWERT from m_indikatorwerte_".$year." b where AGS='99' and b.ID_INDIKATOR=i.ID_INDIKATOR) as value_brd,
                       INDIKATORWERT-(select b.INDIKATORWERT from m_indikatorwerte_".$year." b where AGS='99' and b.ID_INDIKATOR=i.ID_INDIKATOR) as diff_brd,";
         }
         if($diff_krs){
             $ags_krs = substr($ags, 0, 2);
-            $sql_krs = "IFNULL((SELECT x.INDIKATORWERT FROM m_indikatorwerte_".$year." x WHERE x.ID_INDIKATOR = 'Z00AG' AND x.ags='".$ags_krs."' AND x.INDIKATORWERT <=".$year."),0) as grundakt_year_krs,
-                        IFNULL((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS ='".$ags_krs."' AND y.INDIKATORWERT <= ".$year."),0) as grundakt_month_krs,
+            $sql_krs = "COALESCE((SELECT x.INDIKATORWERT FROM m_indikatorwerte_".$year." x WHERE x.ID_INDIKATOR = 'Z00AG' AND x.ags='".$ags_krs."' AND x.INDIKATORWERT <=".$year."),0) as grundakt_year_krs,
+                        COALESCE((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS ='".$ags_krs."' AND y.INDIKATORWERT <= ".$year."),0) as grundakt_month_krs,
                         (select l.INDIKATORWERT from m_indikatorwerte_".$year." l where AGS='".$ags_krs."' and l.ID_INDIKATOR=i.ID_INDIKATOR) as value_krs,
                         INDIKATORWERT-(select k.INDIKATORWERT from m_indikatorwerte_".$year." k where AGS='".$ags_krs."' and k.ID_INDIKATOR=i.ID_INDIKATOR) as diff_krs,";
         }
         $sql = "Select i.ID_INDIKATOR as id, i.INDIKATORWERT AS value,
-                IFNULL((SELECT x.INDIKATORWERT FROM m_indikatorwerte_".$year." x WHERE x.ID_INDIKATOR = 'Z00AG' AND x.ags=i.AGS AND x.INDIKATORWERT <=".$year."),0) as grundakt_year,
-                IFNULL((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS =i.AGS AND y.INDIKATORWERT <= ".$year."),0) as grundakt_month,
+                COALESCE((SELECT x.INDIKATORWERT FROM m_indikatorwerte_".$year." x WHERE x.ID_INDIKATOR = 'Z00AG' AND x.ags=i.AGS AND x.INDIKATORWERT <=".$year."),0) as grundakt_year,
+                COALESCE((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS =i.AGS AND y.INDIKATORWERT <= ".$year."),0) as grundakt_month,
                 z.Einheit as einheit,
                 ".$sql_brd.$sql_krs."
                 (select j.ID_THEMA_KAT from m_thematische_kategorien j where z.ID_THEMA_KAT=j.ID_THEMA_KAT) as category
@@ -90,13 +90,12 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
     }
     /*Get all possible Indicators in a Indicator Category for 'gebiete' or 'raster'-------*/
     public function getAllIndicatorsByCategoryGebiete($kat, $modus){
-        $sql = "SELECT m.*,
-                IFNULL((SELECT FARBWERT_MIN from m_zeichenvorschrift where ID_INDIKATOR = m.ID_INDIKATOR),'FFCC99') as FARBWERT_MIN,
-                IFNULL((SELECT FARBWERT_MAX from m_zeichenvorschrift where ID_INDIKATOR = m.ID_INDIKATOR),'66CC99') as FARBWERT_MAX
-                FROM m_indikatoren m, m_indikator_freigabe f
+        $sql = "SELECT m.*,IFNULL(z.FARBWERT_MIN,'FFCC99') as FARBWERT_MIN,IFNULL(z.FARBWERT_MAX,'66CC99') as FARBWERT_MAX
+                FROM m_indikatoren m, m_indikator_freigabe f, m_zeichenvorschrift z
                 WHERE m.ID_THEMA_KAT =  '" . $kat . "'
                 AND m.ID_INDIKATOR = f.ID_INDIKATOR
                 AND f.STATUS_INDIKATOR_FREIGABE =  '".$this->berechtigung."'
+                AND m.ID_INDIKATOR=z.ID_INDIKATOR
                 GROUP BY m.INDIKATOR_NAME_KURZ
                 ORDER BY  m.MARKIERUNG DESC, m.SORTIERUNG ASC";
 
@@ -116,12 +115,12 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
     // get all the indicator values and specific informations like `Grundaktualität` for a special Indicator selected by year, id and it´s ags
     public function getIndicatorValuesByAGS($year,$indikator_id,$ags){
         $sql = "SELECT i.INDIKATORWERT AS value, i.ID_INDIKATOR as ind, z.EINHEIT as einheit,i.FEHLERCODE as fc, i.HINWEISCODE as hc, i.AGS as ags, z.RUNDUNG_NACHKOMMASTELLEN as rundung,
-                                IFNULL((SELECT x.INDIKATORWERT FROM m_indikatorwerte_".$year." x WHERE x.ID_INDIKATOR = 'Z00AG' AND x.ags=i.AGS AND x.INDIKATORWERT <=".$year."),0) as grundakt_year,
-                                IFNULL((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS =i.AGS AND y.INDIKATORWERT <= ".$year."),0) as grundakt_month,
+                                COALESCE((SELECT x.INDIKATORWERT FROM m_indikatorwerte_".$year." x WHERE x.ID_INDIKATOR = 'Z00AG' AND x.ags=i.AGS AND x.INDIKATORWERT <=".$year."),0) as grundakt_year,
+                                COALESCE((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS =i.AGS AND y.INDIKATORWERT <= ".$year."),0) as grundakt_month,
                                 z.MITTLERE_AKTUALITAET_IGNORE as grundakt_state,
                                 z.INDIKATOR_NAME as name,
-                                IFNULL((SELECT FARBWERT_MAX FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$indikator_id."'),'FFCC99') as color_max,
-                                IFNULL((SELECT FARBWERT_MIN FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$indikator_id."'),'66CC99') as color_min
+                                COALESCE((SELECT FARBWERT_MAX FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$indikator_id."'),'FFCC99') as color_max,
+                                COALESCE((SELECT FARBWERT_MIN FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$indikator_id."'),'66CC99') as color_min
                                 FROM m_indikatorwerte_" . $year . " i, m_indikator_freigabe f, m_indikatoren z
                                 Where f.ID_INDIKATOR = i.ID_INDIKATOR AND f.ID_INDIKATOR =  '" . $indikator_id . "'
                                 AND f.STATUS_INDIKATOR_FREIGABE = " . $this->berechtigung . "
@@ -155,12 +154,12 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
 
         //build the sql query
         $sql = "SELECT i.INDIKATORWERT AS value, i.ID_INDIKATOR as ind, z.EINHEIT as einheit,i.FEHLERCODE as fc, i.HINWEISCODE as hc, i.AGS as ags, z.RUNDUNG_NACHKOMMASTELLEN as rundung,
-                                IFNULL((SELECT x.INDIKATORWERT FROM m_indikatorwerte_".$year." x WHERE x.ID_INDIKATOR = 'Z00AG' AND x.ags=i.AGS),0) as grundakt_year,
-                                IFNULL((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS =i.AGS),0) as grundakt_month,
+                                COALESCE((SELECT x.INDIKATORWERT FROM m_indikatorwerte_".$year." x WHERE x.ID_INDIKATOR = 'Z00AG' AND x.ags=i.AGS AND x.INDIKATORWERT <=".$year."),0) as grundakt_year,
+                                COALESCE((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS =i.AGS AND y.INDIKATORWERT <= ".$year."),0) as grundakt_month,
                                 z.MITTLERE_AKTUALITAET_IGNORE as grundakt_state,
                                 z.INDIKATOR_NAME_KURZ as name,
-                                IFNULL((SELECT FARBWERT_MAX FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$indikator_id."'),'FFCC99') as color_max,
-                                IFNULL((SELECT FARBWERT_MIN FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$indikator_id."'),'66CC99') as color_min
+                                (SELECT FARBWERT_MAX FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$indikator_id."') as color_max,
+                                (SELECT FARBWERT_MIN FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$indikator_id."') as color_min
                                 FROM m_indikatorwerte_" . $year . " i, m_indikator_freigabe f, m_indikatoren z
                                 Where f.ID_INDIKATOR = i.ID_INDIKATOR AND f.ID_INDIKATOR =  '" . $indikator_id . "'
                                 AND f.STATUS_INDIKATOR_FREIGABE = " . $this->berechtigung . "
@@ -174,7 +173,7 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
             $sql = "SELECT i.INDIKATORWERT AS value, i.ID_INDIKATOR as ind, i.ID_INDIKATORWERT as einheit,i.FEHLERCODE as fc, i.HINWEISCODE as hc, i.AGS as ags FROM m_indikatorwerte_".$year." i 
             Where i.ID_INDIKATOR = 'Z00AG' And LENGTH(i.AGS) = " .(strlen($ags)).$ags_extend;
         }
-        return $this->query($sql);
+       return $this->query($sql);
     }
     // get all the possible time shifts for a given indicator, it is also possible to exclude specific years
     public function getIndicatorPossibleTimeArray($ind, $modus, $exclude_year)
@@ -207,7 +206,7 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
         }
         $ergObject = $this->query($query);
 
-        foreach($ergObject as $row){
+       foreach($ergObject as $row){
             array_push($times, array("time" => $row->JAHR));
         }
         //needs to be sorted to make sure every column takes the correct place
@@ -224,12 +223,12 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
             $query = "SELECT Indikator,Jahr FROM d_raster WHERE INDIKATOR = '" . $indikator . "' AND FREIGABE_AUSSEN ='".$this->berechtigung."' Group by JAHR";
         }
         $rs = $this->query($query);
-        if (count($rs)>0) {
-            return true;
-        }
-        else {
-            return false;
-        }
+            if (count($rs)>0) {
+                return true;
+            }
+            else {
+                return false;
+            }
     }
     public function getIndicatorGrundaktualitaet($ags, $year){
         $sql_year = "SELECT INDIKATORWERT as value FROM m_indikatorwerte_" . $year . " WHERE ID_INDIKATOR = 'Z00AG' and AGS ='" . $ags . "' AND INDIKATORWERT <= " . $year . " ";
@@ -252,7 +251,7 @@ class MYSQL_TASKREPOSITORY extends MYSQL_MANAGER {
         return $rs[0]->value;
     }
     public function getIndicatorColors($ind){
-        $sql = "SELECT IFNULL(FARBWERT_MAX,'FFCC99') as max,IFNULL(FARBWERT_MIN,'66CC99') as min FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$ind."'";
+        $sql = "SELECT FARBWERT_MAX as max,FARBWERT_MIN as min FROM m_zeichenvorschrift WHERE ID_INDIKATOR='".$ind."'";
         $rs = $this->query($sql);
         return $rs[0];
     }

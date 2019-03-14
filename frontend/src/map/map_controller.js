@@ -4,19 +4,6 @@ var map= L.map('map',{
 });
 
 const map_controller={
-    //scripts to activate all the scripts
-    tools:['lupe.init()',
-        'measurement.init()',
-        'file_loader.init()',
-        'center_map.init()',
-        'zoom_out.init()',
-        'zoom_in.init()',
-        'raster_split.init()',
-        'glaetten.init()',
-        'dev_chart.init()',
-        'map_link.init()',
-        'geolocate.init()'
-    ],
   set:function(){
       map.on('moveend',         function () {
 
@@ -50,14 +37,6 @@ const map_controller={
 
         //style
         $('.leaflet-control-scale-line').css({"border-bottom-color":"black","border-right-color": "black","border-left-color":"black"});
-
-        $.each(this.tools,function(key,value){
-            try {
-                var tmpFunc = new Function(value);
-                tmpFunc();
-            }catch(err){
-                console.error(err);
-            }
-        });
+        //activate all the tools
     }
 };

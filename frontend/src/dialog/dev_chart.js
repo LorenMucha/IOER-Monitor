@@ -1,6 +1,6 @@
 const dev_chart={
-    chart_compare_selector:"#dev_chart_compare",
-    chart_selector:"#dev_chart",
+    chart_compare_selector_toolbar:"#dev_chart_compare",
+    chart_selector_toolbar:"#dev_chart",
     endpoint_id:"entwicklungsdiagramm_content",
     text:{
         de:{
@@ -45,11 +45,11 @@ const dev_chart={
     },
     init:function(){
         if(raeumliche_visualisierung.getRaeumlicheGliederung()==="raster"){
-            helper.disableElement(this.chart_selector,"vergleichen Sie 2 Indikatoren oder Zeitschnitte miteinander");
-            helper.disableElement(this.chart_compare_selector,"vergleichen Sie 2 Indikatoren oder Zeitschnitte miteinander");
+            helper.disableElement(this.chart_selector_toolbar,"vergleichen Sie 2 Indikatoren oder Zeitschnitte miteinander");
+            helper.disableElement(this.chart_compare_selector_toolbar,"vergleichen Sie 2 Indikatoren oder Zeitschnitte miteinander");
         }else{
-            helper.enableElement(this.chart_selector,$(this.chart_selector).data("title"));
-            helper.enableElement(this.chart_compare_selector,$(this.chart_compare_selector).data("title"));
+            helper.enableElement(this.chart_selector_toolbar,$(this.chart_selector_toolbar).data("title"));
+            helper.enableElement(this.chart_compare_selector_toolbar,$(this.chart_compare_selector_toolbar).data("title"));
         }
         this.controller.set();
     },
@@ -170,6 +170,14 @@ const dev_chart={
             let g = svg.append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+            let line = d3.line()
+                .x(function (d) {
+                    return x(d.date);
+                })
+                .y(function (d) {
+                    return y(d.value);
+                });
+
             let legend = svg.append("g")
                 .attr("class", "legend");
 
@@ -206,7 +214,7 @@ const dev_chart={
 
                 $('#diagramm_loading_info').hide();
                 scaleChart();
-                scalePathData();
+                createPath();
             });
 
             function scaleChart() {
@@ -228,15 +236,13 @@ const dev_chart={
                 if (!chart.settings.state_prognose) {
                     max_date = new Date(current_year + 2, 0, 1);
                 }
-                if (minYear===maxYear) {
+                if (minYear== maxYear) {
                     x.domain(d3.extent([new Date(maxYear - 5, 0, 1), max_date]));
                 } else {
                     x.domain(d3.extent([min_date, max_date]));
                 }
 
-                console.log(minValue,maxValue);
-
-                y.domain(d3.extent([parseInt(minValue)-1, parseInt(maxValue)+1]));
+                y.domain(d3.extent([minValue, maxValue]));
 
                 g.append("g")
                     .attr("class", "axis axis--x")
@@ -255,14 +261,14 @@ const dev_chart={
                     .attr("class", "axis axis--y")
                     .call(d3.axisLeft(y).ticks(8).tickFormat(function (d) {
                         if (chart.settings.ind_vergleich) {
-                            if (d === 0) {
-                                if (array.length=== 1) {
+                            if (d == 0) {
+                                if (array.length== 1) {
                                     return data[0].real_value;
                                 } else {
                                     return 'x';
                                 }
                             }
-                            else if (d !== minValue || d !== maxValue) {
+                            else if (d != minValue || d != maxValue) {
                                 return d;
                             }
                         } else {
@@ -272,27 +278,20 @@ const dev_chart={
             }
 
             //fill the path values
-            function scalePathData() {
+            function createPath() {
                 $.each(chart.merge_data, function (key, value) {
                     let data = value.values;
                     parseTime(data);
-                    createPath(data, data[0].color.toString());
+                    appendData(data, data[0].color.toString());
                     createCircle(data, data[0].color.toString());
                     setLegende(data, data[0].color.toString());
                 });
             }
 
             //add the data
-            function createPath(data, color) {
+            function appendData(data, color) {
                 let values_line = [],
                     values_future=[],
-                    lineCatmull=d3.line().curve(d3.curveLinear)
-                        .x(function (d) {
-                            return x(d.date);
-                        })
-                        .y(function (d) {
-                            return y(d.value);
-                        }),
                     set=function(array,_dash_array){
                         g.append("path")
                             .data(array)
@@ -300,7 +299,7 @@ const dev_chart={
                             .attr('stroke', color)
                             .attr("stroke-dasharray",_dash_array)
                             .attr("fill", "none")
-                            .attr("d",lineCatmull(array));
+                            .attr("d", line(array));
                 };
                 $.each(data,function(key,value){
                     if(value.year <(new Date).getFullYear()){
@@ -577,75 +576,36 @@ const dev_chart={
     },
     controller:{
         set:function(){
-                let chart_array = [],
-                    id_input="search_ags",
-                    set_autocomplete = function () {
-                        chart_array = indikator_json_group.getAGSArray();
-                        auto_complete.autocomplete(document.getElementById(id_input), chart_array);
-                    },
-                    get_ags=function(){
-                        return $(`#${id_input}`).data("id");
-                    },
-                    get_name=function(){
-                        return $(`#${id_input}`).val();
-                    },
-                    lan = language_manager.getLanguage(),
-                    set_swal=function(callback){
-                        swal({
-                            title: `${dev_chart.text[lan].set_choice()}`,
-                            text: `<div class="form-group" style="display: unset !important;">
-                                <input type="text" id="${id_input}" class="form-control" tabindex="3" placeholder="Gebiet...">
-                           </div>`,
-                            showCancelButton: true,
-                            cancelButtonText: `${dev_chart.text[lan].cancel}`,
-                            html: true
-                        }, function (isConfirm) {
-                            if (isConfirm) {
-                                callback();
-                            }
-
-                        });
-                        //on enter also open the chart
-                        $(`#${id_input}`)
-                            .unbind()
-                            .keypress(function(e){
-                                var keycode = (e.keyCode ? e.keyCode : e.which);
-                                if (keycode == '13') {
-                                    callback();
-                                }
-                            });
-                        set_autocomplete()
-                    };
                 //call on select inside the toolbar
-                $(document).on("click", dev_chart.chart_selector, function () {
+                $(document).on("click", dev_chart.chart_selector_toolbar, function () {
                     let callback = function () {
-                        if(get_ags()) {
-                            dev_chart.chart.settings.ags = get_ags();
-                            dev_chart.chart.settings.name = get_name();
+                        if(Dialoghelper.getAGS_Input()) {
+                            dev_chart.chart.settings.ags = Dialoghelper.getAGS_Input();
+                            dev_chart.chart.settings.name =Dialoghelper.getAGS_InputName();
                             dev_chart.chart.settings.ind = indikatorauswahl.getSelectedIndikator();
                             dev_chart.chart.settings.ind_vergleich = false;
                             dev_chart.open();
                         }
                     };
                     try {
-                        set_swal(callback);
+                        Dialoghelper.setSwal(callback);
                     }catch(err){
                        alert_manager.alertError();
                     }
                 });
 
-            $(document).on("click", dev_chart.chart_compare_selector, function () {
+            $(document).on("click", dev_chart.chart_compare_selector_toolbar, function () {
                 let callback = function () {
-                    if(get_ags()) {
-                        dev_chart.chart.settings.ags = get_ags();
-                        dev_chart.chart.settings.name = get_name();
+                    if(Dialoghelper.getAGS_Input()) {
+                        dev_chart.chart.settings.ags = Dialoghelper.getAGS_Input();
+                        dev_chart.chart.settings.name = Dialoghelper.getAGS_InputName()
                         dev_chart.chart.settings.ind = indikatorauswahl.getSelectedIndikator();
                         dev_chart.chart.settings.ind_vergleich = true;
                         dev_chart.open();
                     }
                 };
                 try {
-                    set_swal(callback);
+                    Dialoghelper.setSwal(callback);
                 }catch(err){
                     alert_manager.alertError();
                 }

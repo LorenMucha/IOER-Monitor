@@ -823,10 +823,13 @@ const table = {
             $('.indikatoren_diagramm_ags')
                 .unbind()
                 .click(function() {
-                    let ags = $(this).data('ags'),
-                        name = $(this).data('name'),
-                        wert = $(this).data('wert');
-                    openStatistik(ags,name,wert);
+                    statistics.chart.settings.ags=$(this).data('ags');
+                    statistics.chart.settings.name=name;
+                    statistics.chart.settings.ind=indikatorauswahl.getSelectedIndikator();
+                    statistics.chart.settings.allValuesJSON  = indikator_json.getJSONFile();
+                    statistics.chart.settings.indText=indikatorauswahl.getSelectedIndikatorText();
+                    statistics.chart.settings.indUnit=indikatorauswahl.getIndikatorEinheit();
+                    statistics.open();
                 });
             //development chart single ind
             if(exclude.checkPerformanceAreas()) {

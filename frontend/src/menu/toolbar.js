@@ -269,20 +269,28 @@ const toolbar = {
                             <ul class="tools w-100">
                                 <li class="w-30">
                                     <div class="btn_container">
-                                        <div id="dev_chart" class="image ind_chart ${exclude.class_performance} ${exclude.class_gebiete} cursor oneTime" data-title="Analysieren Sie die zeitliche Entwicklung eines Indikatorwertes" title="Analysieren Sie die zeitliche Entwicklung eines Indikatorwertes"></div>
+                                        <div id="${dev_chart.chart_selector_toolbar.replace("#","")}" class="image ind_chart ${exclude.class_performance} ${exclude.class_gebiete} cursor oneTime" data-title="Analysieren Sie die zeitliche Entwicklung eines Indikatorwertes" title="Analysieren Sie die zeitliche Entwicklung eines Indikatorwertes"></div>
                                         <div class="btn_txt wordbreak ${exclude.class_performance}">Werte- entwicklung</div>
                                     </div>
                                 </li>
                                  <li class="w-35">
                                     <div class="btn_container">
-                                        <div id="dev_chart_compare" class="image ind_chart ${exclude.class_performance} ${exclude.class_gebiete} cursor oneTime" data-title="Analysieren Sie die zeitliche Entwicklung mehrerer Indikatorwerte" title="Analysieren Sie die zeitliche Entwicklung mehrerer Indikatorwerte"></div>
-                                        <div class="btn_txt wordbreak ${exclude.class_performance}" data-title="">Entwicklungs- vergleich</div>
+                                        <div id="${dev_chart.chart_compare_selector_toolbar.replace("#","")}" class="image ind_chart ${exclude.class_performance} ${exclude.class_gebiete} cursor oneTime" data-title="Analysieren Sie die zeitliche Entwicklung mehrerer Indikatorwerte" title="Analysieren Sie die zeitliche Entwicklung mehrerer Indikatorwerte"></div>
+                                        <div class="btn_txt wordbreak ${exclude.class_performance.replace("#","")}" data-title="">Entwicklungs- vergleich</div>
                                     </div>
                                 </li>
                                 <li class="w-30">
                                     <div class="btn_container">
-                                        <div id="ind_compare" class="image cursor ${exclude.class_raster}" data-title="vergleichen Sie 2 Indikatoren oder Zeitschnitte miteinander" title="vergleichen Sie 2 Indikatoren oder Zeitschnitte miteinander"></div>
+                                        <div id="${raster_split.selector_toolbar.replace("#","")}" class="image cursor ${exclude.class_raster}" data-title="vergleichen Sie 2 Indikatoren oder Zeitschnitte miteinander" title="vergleichen Sie 2 Indikatoren oder Zeitschnitte miteinander"></div>
                                         <div class="btn_txt wordbreak" data-title="">Karten- vergleich</div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul class="tools w-100">
+                                <li class="w-30">
+                                    <div class="btn_container">
+                                        <div id="${statistics.selector_toolbar.replace("#","")}" class="image cursor ${exclude.class_gebiete}" data-title="Statistik des Indikators" title="Statistik des Indikators"></div>
+                                        <div class="btn_txt wordbreak ${exclude.class_gebiete}">Statistik</div>
                                     </div>
                                 </li>
                             </ul>

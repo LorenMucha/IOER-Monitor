@@ -1,7 +1,7 @@
 const raster_split={
     control:'',
     button:'',
-    selector:"#ind_compare",
+    selector_toolbar:"#ind_compare",
     dialog:
         {
             jahre:'',
@@ -395,7 +395,7 @@ const raster_split={
             object.button = new L.control({position:'topright'});
             //extend map with the function
             $(document)
-                .on("click",raster_split.selector,function(){
+                .on("click",raster_split.selector_toolbar,function(){
                     if(click==0) {
                         object.dialog.info_leave = 1;
                         if(object.dialog.info_leave==0){

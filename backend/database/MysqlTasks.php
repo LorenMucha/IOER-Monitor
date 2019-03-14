@@ -1,5 +1,5 @@
 <?php
-require_once("MYSQL_MANAGER.php");
+require_once("MysqlManager.php");
 
 class MysqlTasks extends MysqlManager {
     protected static $instance = NULL;

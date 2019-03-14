@@ -1,5 +1,5 @@
 <?php
-require_once('DB_SETTINGS.php');
+require_once('DbSettings.php');
 //quelle:https://gist.github.com/johnmorris/6001ad2b4ef82d114b77
 class MysqlManager extends DB_SETTINGS {
 

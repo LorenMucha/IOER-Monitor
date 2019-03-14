@@ -1,5 +1,5 @@
 <?php
-require_once ('POSTGRESQL_MANAGER.php');
+require_once ('PostgreManager.php');
 
 class PostgreTasks extends PostgreManager
 {

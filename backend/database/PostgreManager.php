@@ -1,5 +1,5 @@
 <?php
-require_once('DB_SETTINGS.php');
+require_once('DbSettings.php');
 
 class PostgreManager extends DB_SETTINGS {
 

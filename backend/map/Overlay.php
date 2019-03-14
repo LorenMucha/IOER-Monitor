@@ -1,6 +1,6 @@
 <?php
 
-include_once "../database/POSTGRESQL_MANAGER.php";
+include_once "../database/PostgreManager.php";
 include_once "../models/Helper.php";
 
 class Overlay{

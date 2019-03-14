@@ -1,6 +1,6 @@
 <?php
-include_once '../database/POSTGRESQL_TASKRESPOSITORY.php';
-include_once '../database/MYSQL_TASKREPOSITORY.php';
+include_once '../database/PostgreTasks.php';
+include_once '../database/MysqlTasks.php';
 
 class Json
 {

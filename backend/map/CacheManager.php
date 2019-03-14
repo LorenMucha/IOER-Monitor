@@ -1,5 +1,5 @@
 <?php
-include_once '../database/POSTGRESQL_MANAGER.php';
+include_once '../database/PostgreManager.php';
 
 class CacheManager{
     

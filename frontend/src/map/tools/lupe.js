@@ -8,7 +8,7 @@ const lupe={
     set:false,
     magnifyingGlass: L.magnifyingGlass({
         layers: [
-            layer = layer_control.baselayer.getBaseLayers_rgb()["TopPlus-Web-Open"]
+            layer = additiveLayer.baselayer.getBaseLayers_rgb()["TopPlus-Web-Open"]
         ]
     }),
     init:function(){

@@ -57,7 +57,7 @@ const search={
                             });
                             return response;
                         },
-                        url: request_manager.url_backend,
+                        url: url_backend,
                         method: 'POST',
                         data:{
                             values:function(){

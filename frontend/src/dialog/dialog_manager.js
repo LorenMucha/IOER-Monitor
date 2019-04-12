@@ -13,7 +13,7 @@ const dialog_manager={
     },
     calculateWidth:function(){
         let width = main_view.getWidth();
-        if($('.right_content').is(':visible') || width >=1280 && width<2000){
+        if(width >=1280 && width<2000){
             return (width*0.5);
         }
         else if(width>2000){
@@ -24,7 +24,6 @@ const dialog_manager={
         }
     },
     calculateHeight:function(){
-        const manager = this;
         let height = main_view.getHeight();
         if($('.right_content').is(':visible') || height >= 800){
             return (height-210);

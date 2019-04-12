@@ -29,7 +29,7 @@ const grundakt_layer = {
                 raumgliederung_set = settings.raumgl;
             }
 
-            $.when(request_manager.getGeoJSON('Z00AG', zeit_slider.getTimeSet(), raumgliederung_set, gebietsauswahl.getSelection(),5,"gleich")).done(function(arr){
+            $.when(RequestManager.getGeoJSON('Z00AG', zeit_slider.getTimeSet(), raumgliederung_set, gebietsauswahl.getSelection(),5,"gleich")).done(function(arr){
                 //now we have access to array of data
 
                 try{

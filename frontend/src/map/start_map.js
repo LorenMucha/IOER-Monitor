@@ -12,7 +12,7 @@ const start_map= {
     },
     set:function(){
         this.state=true;
-        layer_control.remove();
+        additiveLayer.remove();
 
         this.layer = start_map.getLeafletJSON();
         this.layer.addTo(map);
@@ -21,6 +21,7 @@ const start_map= {
         map_header.hide();
 
         $('.kennblatt').hide();
+        $('#slider_zeit_container').hide();
         legende.close();
         $('#drop_kat').slideDown();
         //if menu is ready show it
@@ -36,7 +37,8 @@ const start_map= {
             this.layer.removeFrom(map);
         }catch(err){}
         this.state=false;
-        layer_control.init();
+        additiveLayer.init();
         map_header.show();
+        $('#slider_zeit_container').show();
     }
 };

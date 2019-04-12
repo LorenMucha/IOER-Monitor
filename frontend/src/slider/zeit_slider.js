@@ -60,22 +60,29 @@ const zeit_slider={
                     if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'gebiete') {
                         var time = object.getTimeSet(),
                             //disable SST and g50
-                            stt = $('#Raumgliederung option[value="stt"]'),
-                            g50 = $('#Raumgliederung option[value="g50"]');
+                            stt_id = "stt_raumgl",
+                            g50_id = "g50_raumgl",
+                            stt_state = document.getElementById("stt_raumgl").dataset.state,
+                            g50_state = document.getElementById("g50_raumgl").dataset.state,
+                            raumgl_test = parseInt(gebietsauswahl.countTags());
 
-                        if (time < 2014) {
-                            stt.prop('disabled', true);
-                            g50.prop('disabled', true);
-                        } else {
-                            stt.prop('disabled', false);
-                            g50.prop('disabled', false);
+                        console.log(stt_state);
+                        if(stt_state!=="disabled") {
+                            if (time < 2014) {
+                                helper.disableElement("#" + stt_id, exclude.disable_text);
+                                helper.disableElement("#" + g50_id, exclude.disable_text);
+                            } else {
+                                helper.enableElement("#" + stt_id, "");
+                                helper.enableElement("#" + g50_id, "");
+                            }
                         }
-                        //get the json and table
-                        if (gebietsauswahl.countTags()==0) {
-                            indikator_json.init();
-                        }
-                        else {
-                            indikator_json.init(raumgliederung.getSelectionId());
+                        switch(raumgl_test){
+                            case raumgl_test===0:
+                                indikator_json.init();
+                                break;
+                            default:
+                                indikator_json.init(raumgliederung.getSelectionId());
+                                break;
                         }
                     }else{
                         indikator_raster.init();

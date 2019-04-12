@@ -1,6 +1,4 @@
 <?php
-include_once "../database/MysqlManager.php";
-include_once "../database/MysqlTasks.php";
 
 class TableExpand{
     public function __construct($indicator_id,$time,$raumgliederung) {
@@ -65,9 +63,6 @@ class TableExpand{
             $indicator_array = MysqlManager::get_instance()->query($sql);
             $indikator_grundaktualitaet = MysqlTasks::get_instance()->getGrundaktState($this->id);
             $einheit =$indicator_array[0]->einheit;
-            if($ind_set==='B00AG'){
-                $einheit= '(*) Werte 2015';
-            }
 
             # get the FC Codes
             $fc_array = Errors::get_instance()->getCodes();
@@ -79,7 +74,6 @@ class TableExpand{
                         $valueInd = $row_mysql->value;
                         $rundung = $row_mysql->rundung;
                         $value_comma = number_format(round($valueInd, $rundung), $rundung, ',', '');
-                        $valueID = $row_mysql->ind;
                         $fc_id = $row_mysql->fc;
                         $note_id  = $row_mysql->hc;
                         $ags = $row_mysql->ags;

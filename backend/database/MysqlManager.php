@@ -1,13 +1,13 @@
 <?php
 require_once('DbSettings.php');
 //quelle:https://gist.github.com/johnmorris/6001ad2b4ef82d114b77
-class MysqlManager extends DB_SETTINGS {
+class MysqlManager extends DbSettings {
 
     protected static $instance = NULL;
     public $berechtigung = 3;
     public function __construct() {
 
-        $settings = DB_SETTINGS::getSettings_mysql();
+        $settings = DbSettings::getSettings_mysql();
 
         $this->user = $settings['dbusername'];
         $this->password = $settings['dbpassword'];

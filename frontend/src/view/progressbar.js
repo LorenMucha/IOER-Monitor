@@ -18,7 +18,7 @@ const progressbar ={
         }
         $(document).on("click","#abort_btn",function(){
             console.log("click");
-            request_manager.cancel();
+            RequestManager.cancel();
             window.stop();
             object.remove();
         });

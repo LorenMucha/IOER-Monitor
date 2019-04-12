@@ -30,8 +30,8 @@ const table = {
                     <span title="Tabelle schließen" class="glyphicon glyphicon-remove checker" id="close_checker"></span>
                 </div>
                 <div id="interact_div">
-                    <button type="button" class="btn btn-primary mobile_hidden ${exclude.class_performance}" id="btn_table">
-                        <i class="glyphicon glyphicon-chevron-right" title="Tabelle mit Indikatorwerten oder Zeitschnitten erweitern"></i><span>erweitern</span></button>
+                    <button type="button" class="btn btn-primary mobile_hidden" id="btn_table">
+                        <i class="glyphicon glyphicon-chevron-right mobile_hidden" title="Tabelle mit Indikatorwerten oder Zeitschnitten erweitern"></i><span>erweitern</span></button>
                     <div title="Tabelle filtern" id="filter_table" class="filter"></div>
                     <div title="Tabelle als CSV exportieren" id="csv_export" data-id="csv_export" data-title="Tabelle als CSV exportieren"></div>
                      <input id="search_input_table" placeholder="Suche nach Orten.." type="text" class="form-control search_input prompt" />
@@ -40,11 +40,9 @@ const table = {
       `);
     },
     fill:function(){
-        const tableObject = this.getContainer();
-
         //array sorted by name
         let layer_array = _.sortBy(indikator_json_group.getLayerArray(),"gen"),
-            html_table = '<table id="table_ags" class="'+this.table_classes+'">',
+            html_table = `<table id="table_ags" class="${this.table_classes}">`,
             //create the main Table header --private functions
             createTableHeader=function(){
                 let value_text = `Wert (${indikatorauswahl.getIndikatorEinheit()})`,
@@ -58,8 +56,8 @@ const table = {
                     <th colspan="${colspan}" data-sorter="false" class="sorter-false" id="header_ind_set">${indikatorauswahl.getSelectedIndikatorText_Lang()} (${zeit_slider.getTimeSet()})</th>
                     </tr>
                     <tr class="header" id="second_row_head">
-                        <th class="th_head" data-export="false"></th>
-                        <th class="th_head" id="tr_rang" data-export="false">lfd. Nr.</th>
+                        <th class="th_head ${csv_export.ignoreClass}" data-export="false"></th>
+                        <th class="th_head ${csv_export.ignoreClass}" id="tr_rang" data-export="false">lfd. Nr.</th>
                         <th class="th_head ags sort-arrow" data-export="true">AGS</th>
                         <th class="th_head gebietsname sort-arrow" data-export="true">Gebietsname</th>
                         <th id="tabel_header_raumgl" class="th_head sort-arrow" data-export="true">${value_text}</th>`;
@@ -190,7 +188,7 @@ const table = {
                                         </td>
                                         <td class="val-ags" 
                                             data-name="${value.gen}" 
-                                            data-sort-value="${value_int}" 
+                                            data-text="${value_int}" 
                                             data-val="${value_int}">
                                             ${value_td()}
                                         </td>
@@ -239,31 +237,21 @@ const table = {
 
                                     tfoot_ags += `<tfoot class="tfoot full-width">
                                                 <tr id="tfoot_${ags}">
-                                                    <th></th>
-                                                    <th colspan="2"></th>
-                                                    <th class="td_name">
-                                                        <img data-name="${value.gen}" 
+                                                    <th colspan="4" class="td_name">
+                                                        <img style="margin-left: 10px; margin-right: 10px;"
+                                                             data-name="${value.gen}" 
                                                              data-ags="${ags}" 
                                                              data-ind="${indikatorauswahl.getSelectedIndikator()}" 
                                                              title="Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren" 
                                                              class="indikatoren_gebietsprofil" 
                                                              src="frontend/assets/icon/indikatoren.png"/>
-                                                             <p>${name}</p>
+                                                             ${name}
                                                     </th>
                                                     <th class="val-ags" 
                                                         data-name="${value.gen}" 
                                                         data-val="${value_g}" 
                                                         data-ind="${indikatorauswahl.getSelectedIndikator()}">
                                                         ${value_set}
-                                                        <img data-name="Bundesrepublik" 
-                                                             data-ags="${ags}" 
-                                                             data-ind="${indikatorauswahl.getSelectedIndikator()}" 
-                                                             data-wert="${value_set}" 
-                                                             data-einheit="${indikatorauswahl.getIndikatorEinheit()}" 
-                                                             title="Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators" 
-                                                             class="indikatoren_diagramm_ags histogramm_ags" 
-                                                             id="diagramm_ags_${ags}" 
-                                                             src="frontend/assets/icon/histogramm.png"/>
                                                         ${img_trend_ind+img_trend}
                                                      </th>`;
                                     if (indikatorauswahl.getSelectedIndiktorGrundaktState()) {
@@ -313,30 +301,20 @@ const table = {
                                           src="${dev_chart.icon.single.path}"/>`,
                             tfoot_brd = `<tfoot class="tfoot full-width">
                                     <tr id="tfoot_99">
-                                        <th></th>
-                                        <th colspan="2"></th>
-                                        <th class="td_name">
-                                            <img data-name="Bundesrepublik" 
+                                        <th colspan="4" class="td_name">
+                                            <img style="margin-left: 10px; margin-right: 10px;"
+                                                 data-name="Bundesrepublik" 
                                                  data-ags="99" 
                                                  data-ind="${indikatorauswahl.getSelectedIndikator()}" 
                                                  title="Gebietesprofil: Charakteristik dieser Raumeinheit mit Werteübersicht aller Indikatoren" 
                                                  class="indikatoren_gebietsprofil" src="frontend/assets/icon/indikatoren.png"/>
-                                                 <p>Bundesrepublik</p>
+                                                 Bundesrepublik
                                         </th>
                                         <th class="val-ags" 
                                             data-name="Bundesrepublik" 
                                             data-val="${value_g}" 
                                             data-ind="${indikatorauswahl.getSelectedIndikator()}">
                                             ${value_g}
-                                            <img data-name="Bundesrepublik" 
-                                                 data-ags="99" 
-                                                 data-ind="${indikatorauswahl.getSelectedIndikator()}" 
-                                                 data-wert="${value_g}" 
-                                                 data-einheit="${indikatorauswahl.getIndikatorEinheit()}" 
-                                                 title="Indikatorwert der Gebietseinheit in Bezug auf statistische Kenngrößen der räumlichen Auswahl und des gewählten Indikators" 
-                                                 class="indikatoren_diagramm_ags histogramm_ags" 
-                                                 id="diagramm_ags_99" 
-                                                 src="frontend/assets/icon/histogramm.png"/>
                                             ${img_trend_ind+img_trend}
                                         </th>`;
 
@@ -395,44 +373,46 @@ const table = {
         let grey_border = 'grey_border',
             class_expand = expand_panel.class_expand,
             expand_array = expand_panel.getExpandArray(),
-            colspan_th = $('#header_ind_set'),
             first_header_row = $('#first_row_head'),
             second_header_row = $('#second_row_head'),
             table_body = this.getTableBodyObject(),
             footer_brd = $('#tfoot_99'),
             def = $.Deferred();
 
+        TableHelper.resetColspan();
+
         //function
         let getDifferenceValue=function(value_ind,value_ags){
                 return (value_ags-value_ind).toFixed(2);
             },
             getDifferenceDiv=function(value_ind,value_ags){
-            //create the difference view
-            let dif_val = (value_ags-value_ind).toFixed(2),
-                class_glyphicon = 'negativ';
-            if (value_ind<value_ags){
-                class_glyphicon='positiv';
-            }else if(value_ags==value_ind){
-                class_glyphicon='';
-            }
-            return `<div class="dif_val_div">
-                        <b>${dif_val.replace('.',',')}</b>
-                        <span class="glyphicon glyphicon-circle-arrow-right ${class_glyphicon}"></span>
-                    </div>`;
+                //create the difference view
+                let dif_val = (value_ags-value_ind).toFixed(2),
+                    class_glyphicon = 'negativ';
+                if (value_ind<value_ags){
+                    class_glyphicon='positiv';
+                }else if(value_ags==value_ind){
+                    class_glyphicon='';
+                }
+                return `<div class="dif_val_div">
+                            <b>${dif_val.replace('.',',')}</b>
+                            <span class="glyphicon glyphicon-circle-arrow-right ${class_glyphicon}"></span>
+                        </div>`;
             },
             //function to get the order state inside the table, based on the given number
             getExpandValue=function(id,key_set){
-                let return_val;
+                console.log("call expand value",id,key_set);
+                let result = "";
                 $.each(expand_array,function(key,value){
                     if(value.id===id){
-                        if(key_set) {
-                            return_val = value[key_set];
+                        if(key_set && typeof key_set !=="undefined") {
+                            result =  value[key_set];
                         }else{
-                            return_val=value;
+                            result = value;
                         }
                     }
                 });
-                return return_val;
+                return result;
             },
             //function to create the difference div, value ind = expand value
             //get the dufference between the year's
@@ -454,7 +434,7 @@ const table = {
         function defCalls(){
             let requests = [];
             $.each(expand_array,function(key,value){
-                requests.push(request_manager.getTableExpandValues(value));
+                requests.push(RequestManager.getTableExpandValues(value));
             });
             $.when.apply($,requests).done(function(){
                 def.resolve(arguments);
@@ -475,19 +455,25 @@ const table = {
 
             //expand the table---------------------------------------------------------------
             $.each(results,function(key,values_expand){
+                console.log("results",results);
                 let id = values_expand.id,
-                    count =values_expand.count,
+                    count =parseInt(values_expand.count),
                     name = getExpandValue(id,'text'),
                     einheit = values_expand.einheit,
                     time_set = getExpandValue(id,'time'),
                     //the html elements
-                    rowspan_head = parseFloat(colspan_th.attr("colspan"));
+                    obj_brd = getExpandValue(id),
+                    obj_ags = [{ags:"99"}];
+
+                console.log(id,count,name,einheit,time_set);
 
                 //expand elements inside the map indicator table (S00AG, B00AG, ABS)
                 if(count===10){
+                    let colspan_th = $('#header_ind_set'),
+                        rowspan_head = parseFloat(colspan_th.attr("colspan")),
+                        einheit_txt = '('+einheit+')';
                     //expand the header of the table
                     colspan_th.attr("colspan",(rowspan_head+1));
-                    let einheit_txt = '('+einheit+')';
                     if(id==="B00AG"){
                         einheit_txt = einheit;
                     }
@@ -502,11 +488,9 @@ const table = {
                         })
                     });
                     //expand the footer
-                    let obj_brd = getExpandValue(id);
-                    let obj_ags = [{ags:"99"}];
-                    footer_brd.append(`<td id="99_expand_${id}" class="val-ags ${class_expand}"></td>`);
+                    footer_brd.append(`<th id="99_expand_${id}" class="val-ags ${class_expand}"></th>`);
                     //grab the data for brd and bld
-                    $.when(request_manager.getTableExpandValues(obj_brd,obj_ags)).done(function(data){
+                    $.when(RequestManager.getTableExpandValues(obj_brd,obj_ags)).done(function(data){
                         let value_brd = data['values']['99']['value_round'];
                         $('#99_expand_'+id).text(value_brd);
                     });
@@ -517,8 +501,8 @@ const table = {
                         //append the footer
                         $.each(selection,function(key,value){
                             let obj_ags_bld = [{ags:value}];
-                            $('#tfoot_'+value).append(`<td id="${value}_expand_${id}" class="val-ags ${class_expand}"></td>`);
-                            $.when(request_manager.getTableExpandValues(obj_brd,obj_ags_bld)).done(function(data){
+                            $('#tfoot_'+value).append(`<th id="${value}_expand_${id}" class="val-ags ${class_expand}"></th>`);
+                            $.when(RequestManager.getTableExpandValues(obj_brd,obj_ags_bld)).done(function(data){
                                 let value_bld = data['values'][value]['value_round'];
                                 $(`#${value}_expand_${id}`).text(value_bld);
                             });
@@ -526,7 +510,7 @@ const table = {
                     }
                 }
                 //expand with BRD ord BLD as new columns outside the table
-                else if(count==15){
+                else if(count===15){
                     //epand the header
                     let header_text_first_row = "Differenz",
                         header_text_second_row = "Bld-Wert ("+indikatorauswahl.getIndikatorEinheit()+")",
@@ -562,7 +546,7 @@ const table = {
                     $('#table_ags').find('.tfoot').find('tr').each(function(){$(this).append(`<th class="${grey_border} ${class_expand}" colspan="2"></th>`)})
                 }
                 //time shift expand
-                else if(count==20){
+                else if(count===20){
                     let colspan = 1,
                         //calculate the cospan
                         td_grund = '',
@@ -571,7 +555,7 @@ const table = {
 
                     if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
                         x = x+2;
-                        td_grund = '<th class="'+class_expand+' header">'+$('#grundakt_head').text()+'</th><th class="'+class_expand+' header">Aktualitäts- Differenz (Jahre,dezimal)</th>';
+                        td_grund = '<th class="'+class_expand+' header">'+$('#grundakt_head').text()+'</th><th class="'+class_expand+' header">Aktualitäts- Differenz</th>';
                     }
                     if(expand_panel.getDifferenceState()){
                         x=x+1;
@@ -605,9 +589,7 @@ const table = {
                         });
                     });
                     //expand the footer
-                    let obj_brd = getExpandValue(id),
-                        obj_ags = [{ags:"99"}],
-                        key_time_shift = id.replace("|","_");
+                    let key_time_shift = id.replace("|","_");
                     footer_brd.append('<th id="99_expand_'+key_time_shift+'" class="val-ags '+grey_border+' '+class_expand+'"></th>');
                     if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
                         footer_brd.append('<th id="expand_grundakt_footer_99'+key_time_shift+'" class="val-grundakt '+class_expand+'"></th><th id="expand_grundakt_footer_diff_99'+key_time_shift+'" class="val-grundakt '+class_expand+'"></th>');
@@ -615,7 +597,7 @@ const table = {
                     if(expand_panel.getDifferenceState()){
                         footer_brd.append('<th id="expand_diff_footer_99'+key_time_shift+'" class="'+class_expand+'"></th>');
                     }
-                    $.when(request_manager.getTableExpandValues(obj_brd,obj_ags)).done(function(data){
+                    $.when(RequestManager.getTableExpandValues(obj_brd,obj_ags)).done(function(data){
                         let data_array = data;
                         let value_brd = data_array['values']['99']['value_round'];
                         $('#99_expand_'+key_time_shift).text(value_brd);
@@ -629,7 +611,8 @@ const table = {
                         if(expand_panel.getDifferenceState()){
                             //create the difference view
                             let value_ind = parseFloat((value_brd).replace(',', '.'));
-                            let value_ags = parseFloat(footer_brd.find('.val-ags').find('b').text().replace(',', '.'));
+                            let value_ags = parseFloat(footer_brd.find('.val-ags').text().replace(',', '.'));
+                            console.warn(value_ind,value_ags);
                             $('#expand_diff_footer_99'+key_time_shift).html(getDifferenceDiv(value_ind,value_ags));
                         }
                     });
@@ -649,7 +632,7 @@ const table = {
                             if(expand_panel.getDifferenceState()){
                                 tFoot_append_bld.append('<th id="expand_diff_footer_'+value+'" class="'+class_expand+'"></th>');
                             }
-                            $.when(request_manager.getTableExpandValues(obj_brd,obj_ags_bld)).done(function(data){
+                            $.when(RequestManager.getTableExpandValues(obj_brd,obj_ags_bld)).done(function(data){
                                 let data_array_bld = data;
                                 let value_bld = data_array_bld['values'][value]['value_round'];
                                 $('#'+value+'_expand_'+key_time_shift).text(value_bld);
@@ -664,7 +647,7 @@ const table = {
                                 if(expand_panel.getDifferenceState()){
                                     //create the difference view
                                     let value_ind = parseFloat((value_bld).replace(',', '.'));
-                                    let value_ags = parseFloat($('#tfoot_'+value).find('.val-ags').find('b').text().replace(',', '.'));
+                                    let value_ags = parseFloat($('#tfoot_'+value).find('.val-ags').text().replace(',', '.'));
                                     //$('#tfoot_'+value).append('<td class="'+class_expand+'">'+getDifferenceDiv(value_ind,value_ags)+'</td>');
                                     $('#expand_diff_footer_'+value).html(getDifferenceDiv(value_ind,value_ags));
                                 }
@@ -673,7 +656,7 @@ const table = {
                     }
                 }
                 //trend values
-                else if(count==30){
+                else if(count===30){
                     //the head
                     first_header_row.append('<th class="'+grey_border+' '+class_expand+' sorter-false expand">'+name+'</th>');
                     second_header_row.append('<th class="'+grey_border+' '+class_expand+' header">'+$('#tabel_header_raumgl').text()+'</th>');
@@ -686,12 +669,9 @@ const table = {
                         });
                     });
                     //expand the footer
-                    let obj_brd = getExpandValue(id);
-                    let obj_ags = [{ags:"99"}];
                     footer_brd.append('<th id="99_expand_'+time_set+'" class="val-ags '+grey_border+' '+class_expand+'"></th>');
-                    $.when(request_manager.getTableExpandValues(obj_brd,obj_ags)).done(function(data){
-                        let data_array = data;
-                        let value_brd = data_array['values']['99']['value_round'];
+                    $.when(RequestManager.getTableExpandValues(obj_brd,obj_ags)).done(function(data){
+                        let value_brd = data['values']['99']['value_round'];
                         $('#99_expand_'+time_set).text(value_brd);
                     });
                     //if finer spatial choice -> expand the table footer above the brd part
@@ -702,18 +682,17 @@ const table = {
                         $.each(selection,function(key,value){
                             let obj_ags_bld = [{ags:value}];
                             $('#tfoot_'+value).append('<th id="'+value+'_expand_'+time_set+'" class="val-ags '+grey_border+' '+class_expand+'"></th>');
-                            $.when(request_manager.getTableExpandValues(obj_brd,obj_ags_bld)).done(function(data){
-                                let data_array_bld = data;
-                                let value_bld = data_array_bld['values'][value]['value_round'];
+                            $.when(RequestManager.getTableExpandValues(obj_brd,obj_ags_bld)).done(function(data){
+                                let value_bld = data['values'][value]['value_round'];
                                 $('#'+value+'_expand_'+time_set).text(value_bld);
                             });
                         });
                     }
                 }
                 //indicator expand
-                else if(count==50){
+                else if(count===50){
                     //epand the table header
-                    first_header_row.append('<th rowspan="2" class="'+grey_border+' '+class_expand+' header">'+name+' ('+einheit+')</th>');
+                    first_header_row.append(`<th rowspan="2" class="${grey_border+" "+class_expand+" header"}">${name+" ("+einheit+")"}</th>`);
 
                     //expand the table body
                     $.each(values_expand.values,function(key,value_json) {
@@ -724,12 +703,10 @@ const table = {
                         });
                     });
                     //expand the footer
-                    let obj_brd = getExpandValue(id);
-                    let obj_ags = [{ags:"99"}];
                     footer_brd.append('<th id="99_expand_ind" class="val-ags '+grey_border+' '+class_expand+'"></th>');
-                    $.when(request_manager.getTableExpandValues(obj_brd,obj_ags)).done(function(data){
-                        let data_array =data;
-                        let value_brd = data_array['values']['99']['value_round'];
+                    $.when(RequestManager.getTableExpandValues(obj_brd,obj_ags)).done(function(data){
+                        console.log(data);
+                        let value_brd = data['values']['99']['value_round'];
                         $('#99_expand_ind').text(value_brd);
                     });
                     //if finer spatial choice -> expand the table footer above the brd part
@@ -740,9 +717,9 @@ const table = {
                         $.each(selection,function(key,value){
                             let obj_ags_bld = [{ags:value}];
                             $('#tfoot_'+value).append('<th id="'+value+'_expand_ind" class="val-ags '+grey_border+' '+class_expand+'"></th>');
-                            $.when(request_manager.getTableExpandValues(obj_brd,obj_ags_bld)).done(function(data){
-                                let data_array_bld = data;
-                                let value_bld = data_array_bld['values'][value]['value_round'];
+                            $.when(RequestManager.getTableExpandValues(obj_brd,obj_ags_bld)).done(function(data){
+                                console.log(data);
+                                let value_bld = data['values'][value]['value_round'];
                                 $('#'+value+'_expand_ind').text(value_bld);
                             });
                         });
@@ -817,18 +794,20 @@ const table = {
                 .click(function(){
                     let ags = $(this).data('ags'),
                         name = $(this).data('name');
-                    openGebietsprofil(ags,name);
+                    gebietsprofil.open(ags,name);
                 });
             //development chart button
             $('.indikatoren_diagramm_ags')
                 .unbind()
                 .click(function() {
-                    statistics.chart.settings.ags=$(this).data('ags');
-                    statistics.chart.settings.name=name;
-                    statistics.chart.settings.ind=indikatorauswahl.getSelectedIndikator();
-                    statistics.chart.settings.allValuesJSON  = indikator_json.getJSONFile();
-                    statistics.chart.settings.indText=indikatorauswahl.getSelectedIndikatorText();
-                    statistics.chart.settings.indUnit=indikatorauswahl.getIndikatorEinheit();
+                    statistics.chart.settings = {
+                        ags: $(this).data('ags').toString(),
+                        name: $(this).data('name'),
+                        ind: indikatorauswahl.getSelectedIndikator(),
+                        allValuesJSON: indikator_json.getJSONFile(),
+                        indText: indikatorauswahl.getSelectedIndikatorText(),
+                        indUnit: indikatorauswahl.getIndikatorEinheit()
+                    };
                     statistics.open();
                 });
             //development chart single ind
@@ -842,7 +821,7 @@ const table = {
                         dev_chart.chart.settings.ags = ags;
                         dev_chart.chart.settings.name = name;
                         dev_chart.chart.settings.ind = indikatorauswahl.getSelectedIndikator();
-                        dev_chart.chart.settings.ind_vergleich = false;
+                        dev_chart.chart.settings.ind_vergleich = true;
                         dev_chart.open();
                     });
 
@@ -856,7 +835,7 @@ const table = {
                         dev_chart.chart.settings.ags = ags;
                         dev_chart.chart.settings.name = name;
                         dev_chart.chart.settings.ind = indikatorauswahl.getSelectedIndikator();
-                        dev_chart.chart.settings.ind_vergleich = true;
+                        dev_chart.chart.settings.ind_vergleich = false;
                         dev_chart.open();
                     });
             }

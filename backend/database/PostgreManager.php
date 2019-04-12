@@ -1,13 +1,13 @@
 <?php
 require_once('DbSettings.php');
 
-class PostgreManager extends DB_SETTINGS {
+class PostgreManager extends DbSettings {
 
     protected static $instance = NULL;
 
     public function __construct() {
 
-        $settings = DB_SETTINGS::getSettings_postgre();
+        $settings = DbSettings::getSettings_postgre();
 
         $this->user = $settings['dbusername'];
         $this->password = $settings['dbpassword'];

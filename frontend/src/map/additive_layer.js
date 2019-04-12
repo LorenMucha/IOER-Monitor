@@ -1,33 +1,7 @@
-const layer_control={
+const additiveLayer={
     control:'',
     state:'sw',
-    endpoint_id:"layer_control",
-    text:{
-      de:{
-          title:"Karten",
-          grund:"Grundkarten",
-          extra:"Zusatzkarten",
-          empty:"kein Hintergrund",
-          laendergrenzen:"Ländergrenzen",
-          kreisgrenzen:"Kreisgrenzen",
-          gemeindegrenzen:"Gemeindegrenzen",
-          autobahn:"Autobahnnetz (Stand 2015)",
-          fernbahnnetz:"Fernbahnnetz (Stand 2016)",
-          gewaesser:"Gewässer"
-      },
-      en:{
-          title:"Maps",
-          grund:"Base Maps",
-          extra:"Extra Maps",
-          empty:"no Background",
-          laendergrenzen:"National borders",
-          kreisgrenzen:"District boundaries",
-          gemeindegrenzen:"Municipal boundaries",
-          autobahn:"Autobahn network (as of 2015)",
-          fernbahnnetz:"Long-distance railway network (as of 2016)",
-          gewaesser:"Waters"
-      }
-    },
+    toolbar_button:'#map_button',
     baselayer:{
         paramter:'baselayer',
         layer_set: "topplus",
@@ -96,7 +70,7 @@ const layer_control={
         getParameter:function(){
             if(!urlparamter.getUrlParameter(this.paramter)){
                 //if not set replace it with the standard base layer
-                this.setParamter(layer_control.baselayer.layer_set);
+                this.setParamter(additiveLayer.baselayer.layer_set);
             }
             return urlparamter.getUrlParameter(this.paramter);
         },
@@ -135,10 +109,10 @@ const layer_control={
         },
         getBaseLayerGroup_set:function(){
             if(opacity_slider.getOpacity()==0){
-                layer_control.state='rgb';
+                additiveLayer.state='rgb';
                 return this.getBaseLayers_rgb();
             }else{
-                layer_control.state='sw';
+                additiveLayer.state='sw';
                 return this.getBaseLayers_sw();
             }
         },
@@ -181,11 +155,7 @@ const layer_control={
             name: 'gewaesser'
         }),
         getState:function(){
-            if(this.getLayerGroup_set().length==0){
-                return false
-            }else{
-                return true;
-            }
+            return this.getLayerGroup_set().length !== 0;
         },
         getParameter:function(){
             return urlparamter.getUrlParameter(this.parameter);
@@ -197,7 +167,7 @@ const layer_control={
                 array.push(layer.options.name);
             });
 
-            if(array.length==0){
+            if(array.length===0){
                 object.removeParamter();
             }
             else if (!this.getParameter()) {
@@ -232,90 +202,7 @@ const layer_control={
         return this.state;
     },
     open:function(){
-        const control = this;
-        let lan = language_manager.getLanguage(),
-            html=`
-             <div class="jq_dialog" id="${this.endpoint_id}">
-                <div class="container">
-                    <h3 class="well">${this.text[lan].grund}</h3>
-                    <div class="maps">
-                        <div class="float-left">
-                            <div id="topplus" class="image-content cursor base_layers" data-id="topplus">
-                                <div class="pic image"></div>
-                                <div class="name">Topplus</div>
-                            </div>
-                            <div id="satellite" class="image-content cursor base_layers" data-id="satellite">
-                                <div class="pic image"></div>
-                                <div class="name">Satellite</div>
-                            </div>
-                            <div id="osm" class="image-content cursor base_layers" data-id="osm">
-                                <div class="pic image"></div>
-                                <div class="name">OSM</div>
-                            </div>
-                        </div>
-                        <div class="float-right">
-                            <div id="webatlas" class="image-content cursor base_layers" data-id="webatlas">
-                                <div class="pic image"></div>
-                                <div class="name">WebatlasDE</div>
-                            </div>
-                             <div id="leer" class="image-content cursor base_layers" data-id="noBackground">
-                                <div class="pic image"></div>
-                                <div class="name">${this.text[lan].empty}</div>
-                            </div>
-                        </div>
-                    </div>
-                    </div>
-                    <div class="container">
-                    <h3 class="well">${this.text[lan].extra}</h3>
-                    <div class="maps extra-maps">
-                        <div class="float-left">
-                            <div id="laendergrenzen" class="image-content cursor overlay" data-id="laendergrenzen">
-                                <div class="pic extra-image"></div>
-                                <div class="name">${this.text[lan].laendergrenzen}</div>
-                            </div>
-                            <div id="kreisgrenzen" class="image-content cursor overlay" data-id="kreisgrenzen">
-                                <div class="pic extra-image"></div>
-                                <div class="name">${this.text[lan].kreisgrenzen}</div>
-                            </div>
-                            <div id="gemeindegrenzen" class="image-content cursor overlay" data-id="gemeindegrenzen">
-                                <div class="pic extra-image"></div>
-                                <div class="name">${this.text[lan].gemeindegrenzen}</div>
-                            </div>
-                        </div>
-                        <div class="float-right">
-                            <div id="autobahn" class="image-content overlay cursor" data-id="autobahn">
-                                <div class="pic extra-image"></div>
-                                <div class="name">${this.text[lan].autobahn}</div>
-                            </div>
-                             <div id="fernbahnnetz" class="image-content overlay cursor" data-id="fernbahnnetz">
-                                <div class="pic extra-image"></div>
-                                <div class="name">${this.text[lan].fernbahnnetz}</div>
-                            </div>
-                            <div id="gewaesser" class="image-content overlay cursor" data-id="gewaesser">
-                                <div class="pic extra-image"></div>
-                                <div class="name">${this.text[lan].gewaesser}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-             </div>
-        `;
-        //settings for the manager
-        dialog_manager.instructions.endpoint = `${this.endpoint_id}`;
-        dialog_manager.instructions.html= html;
-        dialog_manager.instructions.title=this.text[lan].title;
-        dialog_manager.instructions.modal=false;
-        dialog_manager.create();
-        try {
-            $('.base_layers').each(function(){
-                if($(this).data("id")===control.baselayer.getParameter()){
-                    $(this).addClass("active");
-                }
-            });
-            $.each(this.zusatzlayer.overlays_set.eachLayer(function (layer) {
-                $(`#${layer.options.name}`).addClass('active');
-            }));
-        }catch(err){}
+
     },
     init:function(){
         const controller = this;
@@ -343,11 +230,12 @@ const layer_control={
     },
     controller:{
         set:function(){
-            const control = layer_control;
-            $('#map_button')
+            const control = additiveLayer;
+            $(control.toolbar_button)
                 .unbind()
                 .click(function(){
-                layer_control.open();
+                    const addControl = new AdditiveLayerControl();
+                    addControl.open();
             });
             //on click baselayer
             $(document).on("click",".base_layers",function () {
@@ -357,7 +245,6 @@ const layer_control={
             //on click overlay
             $(document).on("click",".overlay",function(){
                     let id = $(this).data("id");
-                    console.log(id);
                     if($(this).hasClass('active')){
                         control.controller.removeOverlay(id);
                     }else{
@@ -374,50 +261,54 @@ const layer_control={
                     }
                 }catch(err){}
             });
-            $.each(layer_control.baselayer.getBaseLayerGroup_set(), function (key, value) {
+            $.each(additiveLayer.baselayer.getBaseLayerGroup_set(), function (key, value) {
                 if (_id.indexOf(value.options.name) >= 0) {
-                    layer_control.baselayer.layer_set = value;
+                    additiveLayer.baselayer.layer_set = value;
                     value.addTo(map);
                     value.bringToBack();
-                    layer_control.baselayer.updateParamter(_id);
+                    additiveLayer.baselayer.updateParamter(_id);
                     dialog_manager.close();
                 }
             });
         },
         setOverlay:function(_id){
-            const control = layer_control;
-            let time = zeit_slider.getTimeSet();
-            if(time >= 2016){
-                time = 2015;
-            }
+            const control = additiveLayer;
+            let layer = control.zusatzlayer[_id],
+                name = $(`#zusatz_${_id}`).data("name");
+
             dialog_manager.close();
+
+            if(_id==="mdmap"){
+                OsmBuildings.addEngine();
+                return false;
+            }
             progressbar.init();
             progressbar.setHeaderText("Lade Layer");
 
-            $.when(request_manager.getZusatzlayer(_id)).done(function(json){
-                console.log(json);
-                let layer = control.zusatzlayer[_id],
-                    lan= language_manager.getLanguage(),
-                    name = control.text[lan][_id];
+            $.when(RequestManager.getZusatzlayer(_id)).done(function(json){
                 layer.addData(json);
                 layer.setStyle(style[_id]);
                 //add a legend entry
-                legende.getLegendeColorsObject().append(`<div class="zusatzlayer" id="zusatz_${_id}"><div style="border-bottom: 3px solid ${style[_id].color};"></div>${name}</div>`);
                 control.zusatzlayer.getLayerGroup_set().addLayer(layer);
                 control.zusatzlayer.setParameter();
                 layer.addTo(map);
                 control.zusatzlayer.setForward();
                 progressbar.remove();
+                legende.getLegendeColorsObject().append(`<div class="zusatzlayer" id="zusatz_${_id}"><div style="border-bottom: 3px solid ${style[_id].color};"></div>${name}</div>`);
             });
         },
         removeOverlay:function(_id){
-            layer_control.zusatzlayer.overlays_set.eachLayer(function(layer){
+            dialog_manager.close();
+            if(_id==="mdmap"){
+                OsmBuildings.removeEngine();
+                return false;
+            }
+            additiveLayer.zusatzlayer.overlays_set.eachLayer(function(layer){
                let name = layer.options.name;
                if(name === _id){
                    map.removeLayer(layer);
-                   layer_control.zusatzlayer.overlays_set.removeLayer(layer);
-                   dialog_manager.close();
-                   layer_control.zusatzlayer.updateParamter();
+                   additiveLayer.zusatzlayer.overlays_set.removeLayer(layer);
+                   additiveLayer.zusatzlayer.updateParamter();
                    //remove from elend
                    $(`#zusatz_${_id}`).remove();
                }

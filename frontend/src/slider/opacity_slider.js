@@ -42,12 +42,12 @@ const opacity_slider = {
                     object.setOpacity(slider_value);
                     //set the baselayer to rgb
                     if(slider_value===0) {
-                        layer_control.init();
+                        additiveLayer.init();
                     }
                     //reset the baselayer
-                    else if(layer_control.getState()==='rgb'){
-                        layer_control.remove();
-                        layer_control.init();
+                    else if(additiveLayer.getState()==='rgb'){
+                        additiveLayer.remove();
+                        additiveLayer.init();
                     }
                 }
             });

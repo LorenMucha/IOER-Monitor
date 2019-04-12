@@ -15,6 +15,7 @@
 @import url("../lib/d3/animate.min.css");
 @import url("../lib/sweetalert/sweetalert.css");
 @import url("../lib/spectrum/spectrum.css");
+@import url("../lib/qunit/qunit-2.6.2.css");
 /*modules*/
 @import "styles.css";
 @import "responsive.css";
@@ -27,6 +28,9 @@
 @import "feeback.css";
 @import "dev_chart.css";
 @import "statistics.css";
+@import "loading.css";
+@import "Gebietsprofil.css";
+
 
 body {
     padding: 0;
@@ -52,45 +56,6 @@ The Tour
 .search .input #search_input_field::placeholder{
     font-weight: bold;
     color:black !important;
-}
-/*progress Bar*/
-#progress_div{
-    display: none;
-    position: absolute;
-    left: 40%;
-    bottom: 50%;
-    top: 50%;
-    z-index: 200000;
-    right:40%;
-    width: 300px;
-    height: 300px;
-    background: white;
-    border: 2px solid var(--main-color);
-    padding: 10px;
-    border-radius: 15px;
-}
-#progress_div #abort_btn {
-    width: 50%;
-    margin-left: 20%;
-    background-color: #8CB91B;
-    color:white;
-}
-.progress{
-    border: 16px solid #f3f3f3;
-    border-radius: 50%;
-    border-top: 16px solid var(--main-color);
-    width: 150px;
-    height: 150px;
-    -webkit-animation: spin 2s linear infinite; /* Safari */
-    animation: spin 2s linear infinite;
-    margin: auto;
-}
-#progressbar_div{
-    width: 90%;
-}
-.progress-bar{
-    line-height: 50px;
-    font-size: 25px;
 }
 /*
 Layer Control
@@ -172,6 +137,9 @@ Layer Control
 }
 #layer_control .extra-maps #gewaesser .pic{
     background-image: url("../assets/icon/water.png");
+}
+#layer_control .extra-maps #mdmap .pic{
+    background-image: url("../assets/icon/3d-house.png");
 }
 #layer_control .active{
     border: 3px solid green;
@@ -340,8 +308,7 @@ Legende
 }
 /*Text class styling*/
 .text {
-    fill: white;
-    font-family: sans-serif
+    font-weight: normal;
 }
 
 .backButton{

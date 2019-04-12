@@ -5,8 +5,9 @@ class TableHelper{
     }
     //check if table is visible
     static isTableOpen(){
-        let state = true;
-        if ($('.right_content').is(':hidden')) {
+        let state = true,
+            elem = document.getElementById('right_content');
+        if (window.getComputedStyle(elem).display==="none" || window.getComputedStyle(elem).visibility==="hidden") {
             state = false;
         }
         return state;
@@ -69,6 +70,9 @@ class TableHelper{
     static updateTableSorter(){
         table.getDOMObject().trigger("update");
     }
+    static destroyTableSorter(){
+        table.getDOMObject().trigger("destroy");
+    }
     //create the fixed table header on scroll
     static setStickTableHeader(){
         table.getDOMObject().stickyTableHeaders({
@@ -84,5 +88,13 @@ class TableHelper{
         if(table.getWidth()<right_view.getWidth()){
             this.setStickTableHeader();
         }
+    }
+    static resetColspan(){
+        let header = document.getElementById("header_ind_set");
+        let colspan = 5;
+        if(indikatorauswahl.getSelectedIndiktorGrundaktState()){
+            colspan=6;
+        }
+        header.colSpan=colspan;
     }
 }

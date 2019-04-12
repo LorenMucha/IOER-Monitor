@@ -48,7 +48,7 @@ const urlparamter={
 
         for (let i = 0; i < sURLVariables.length; i++) {
             let sParameterName = sURLVariables[i].split('=');
-            if (sParameterName[0]== key) {
+            if (sParameterName[0]=== key) {
                 return sParameterName[1];
             }
         }

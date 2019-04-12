@@ -1,4 +1,3 @@
-//Räumliche Analyseebene
 //Multi Choice Gebietsauswahl
 var changed = false;
 const gebietsauswahl = {

@@ -124,7 +124,6 @@ const dev_chart={
         dialog_manager.setInstruction(instructions);
         dialog_manager.create();
         this.chart.create();
-
     },
     chart:{
         settings:{
@@ -138,14 +137,17 @@ const dev_chart={
         ind_array_chart:[],
         merge_data:[],
         init:function(){
-            const chart = this;
+            const chart = this,
+                migrationValues = MigrationValue.getValues(),
+                ags = this.settings.ags;
             let svg = d3.select("#visualisation"),
                 array = chart.ind_array_chart,
                 diagram = $('#diagramm'),
                 margin = {top: 20, right: 60, bottom: 30, left: 60},
                 chart_width = diagram.width() - margin.left - margin.right,
                 chart_height = 400 - (array.length * 30),
-                margin_top = 0;
+                margin_top = 0,
+                migration_set = false;
 
             //let chart_height = $('.ui-dialog').height()*(1.5/3);
             let x = d3.scaleTime().range([0, chart_width]),
@@ -154,7 +156,7 @@ const dev_chart={
             //show loading info
             $('#diagramm_loading_info').show();
 
-            if (array.length == 0) {
+            if (array.length=== 0) {
                 $('#visualisation').hide();
                 $('#Hinweis_diagramm_empty').show();
             } else {
@@ -192,20 +194,19 @@ const dev_chart={
                         "compare":chart.settings.ind_vergleich.toString()
                     };
                 $.each(array, function (key, value) {
-                    requests.push(request_manager.getTrendValues(value.id,chart.settings.ags.toString(),settings));
+                    requests.push(RequestManager.getTrendValues(value.id,chart.settings.ags.toString(),settings));
                 });
                 $.when.apply($, requests).done(function () {
                     def.resolve(arguments);
                 });
                 return def.promise();
             }
-
             defCalls().done(function (arr) {
                 chart.merge_data = [];
                 let i = 0;
                 $.each(array, function (key, val) {
                     let obj = {id: val.id, values: arr[i][0]};
-                    if (array.length == 1) {
+                    if (array.length === 1) {
                         obj = {id: val.id, values: arr[0]};
                     }
                     chart.merge_data.push(obj);
@@ -216,7 +217,6 @@ const dev_chart={
                 scaleChart();
                 createPath();
             });
-
             function scaleChart() {
                 let data = [];
                 $.each(chart.merge_data, function (key, value) {
@@ -226,8 +226,8 @@ const dev_chart={
                 });
                 let minYear = helper.getMinArray(data, "year"),
                     maxYear = helper.getMaxArray(data, "year"),
-                    maxValue = (helper.getMaxArray(data, "value")+.5).toFixed(1),
-                    minValue = (helper.getMinArray(data, "value")-.5).toFixed(1),
+                    maxValue = parseInt(helper.getMaxArray(data, "value")+1),
+                    minValue = parseInt(helper.getMinArray(data, "value")-1),
                     min_date = new Date(minYear - 1, 0, 1),
                     max_date = new Date(maxYear + 1, 0, 1),
                     current_year = helper.getCurrentYear();
@@ -236,14 +236,13 @@ const dev_chart={
                 if (!chart.settings.state_prognose) {
                     max_date = new Date(current_year + 2, 0, 1);
                 }
-                if (minYear== maxYear) {
+                if (minYear===maxYear) {
                     x.domain(d3.extent([new Date(maxYear - 5, 0, 1), max_date]));
                 } else {
                     x.domain(d3.extent([min_date, max_date]));
                 }
-
                 y.domain(d3.extent([minValue, maxValue]));
-
+                //set x axis
                 g.append("g")
                     .attr("class", "axis axis--x")
                     .attr("transform", "translate(0," + chart_height + ")")
@@ -256,19 +255,19 @@ const dev_chart={
                             return d.getFullYear();
                         }
                     }));
-
+                //set y axis
                 g.append("g")
                     .attr("class", "axis axis--y")
                     .call(d3.axisLeft(y).ticks(8).tickFormat(function (d) {
                         if (chart.settings.ind_vergleich) {
-                            if (d == 0) {
-                                if (array.length== 1) {
+                            if (d=== 0) {
+                                if (array.length===1) {
                                     return data[0].real_value;
                                 } else {
                                     return 'x';
                                 }
                             }
-                            else if (d != minValue || d != maxValue) {
+                            else if (d !== minValue || d !== maxValue) {
                                 return d;
                             }
                         } else {
@@ -282,15 +281,20 @@ const dev_chart={
                 $.each(chart.merge_data, function (key, value) {
                     let data = value.values;
                     parseTime(data);
-                    appendData(data, data[0].color.toString());
-                    createCircle(data, data[0].color.toString());
-                    setLegende(data, data[0].color.toString());
+                    try {
+                        setMigrationValue(data);
+                    }catch(error){console.info("no migration values")}
+                    setTimeout(function(){
+                        appendData(data, data[0].color.toString());
+                        createCircle(data, data[0].color.toString());
+                        setLegende(data, data[0].color.toString());
+                    },100);
                 });
             }
 
             //add the data
             function appendData(data, color) {
-                let values_line = [],
+                 let values_line = [],
                     values_future=[],
                     set=function(array,_dash_array){
                         g.append("path")
@@ -317,27 +321,81 @@ const dev_chart={
                     set(values_future,("1,3"));
                 }
             }
+            //create the migration value
+            function setMigrationValue(data){
+                //console.log(data,migrationValues);
+                let values =new Map();
+                for(let x=0; x<=data.length-1; x++) {
+                    let id = data[x].id,
+                        year = parseInt(data[x].year),
+                        ags_s = ags.toString().substr(0,2);
+                    try{
+                        let min = parseInt(migrationValues[id][ags_s]["min"]),
+                            max = parseInt(migrationValues[id][ags_s]["max"]);
+                        if(year<=max && year>=min){
+                            values.set(year,data[x])
+                        }
+                    }catch(err){}
+                }
+                let last_elem = Array.from(values.values()).pop().date,
+                    first_elem =values.values().next().value.date,
+                    id="migration_effekt",
+                    width=function(){
+                        let sum = x(last_elem)-x(first_elem);
+                        if(sum===0) {
+                            return 10;
+                        }else{
+                            return sum;
+                            }
+                        };
+                g.append('rect')
+                    .attr("x",x(first_elem)-5.5)
+                    .attr("y",0)
+                    .attr("width",width())
+                    .attr("height",chart_height)
+                    .attr("id",id)
+                    .attr("fill","#d3d3d3");
 
-            function setLegende(data, color) {
+                if(!migration_set) {
+                    setLegende({name: "Migrationseffekte"}, "#d3d3d3");
+                    migration_set=true;
+                }
+            }
+            //function to set the legende, margin is a object like margin.left = 50x
+            function setLegende(data, color,_margin) {
+                var title = function(){
+                    if(data.length >0){
+                            return data[0].name+" in "+data[0].einheit;
+                        }else {
+                            return data.name;
+                        }
+                    },
+                    margin_set = function(){
+                        if(_margin){
+                            return _margin.left;
+                        }else{
+                            return margin.left;
+                        }
+                    };
                 legend.append('g')
                     .append("rect")
-                    .attr("x", margin.left)
+                    .attr("x", margin_set())
                     .attr("y", chart_height + 50 + margin_top)
                     .attr("width", 10)
                     .attr("height", 10)
                     .style("fill", color);
 
                 legend.append("text")
-                    .attr("x", margin.left + 30)
+                    .attr("class","chart_legend")
+                    .attr("x", margin_set() + 30)
                     .attr("y", chart_height + 60 + margin_top)
                     .attr("height", 30)
-                    .attr("width", chart_width)
+                    .attr("width", (chart_width*0.7))
                     .style("fill", color)
-                    .text(data[0].name + ' in ' + data[0].einheit);
+                    .text(title());
 
                 margin_top += 20;
             }
-
             function createCircle(data, color) {
                 let color_set = color,
                     format_month = d3.timeFormat("%m"),
@@ -436,7 +494,6 @@ const dev_chart={
                     });
                 }
             }
-
             function parseTime(data) {
                 let parseTime = d3.timeParse("%m/%Y");
                 // format the data

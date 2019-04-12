@@ -23,7 +23,7 @@ const indikator_raster = {
             _klassenanzahl = _settings[0].klassenanzahl;
         }
 
-        $.when(getRasterMap(_time, _ind, _raumgliederung_set, _klassifizierung, _klassenanzahl, _darstellung_map, _seite))
+        $.when(RequestManager.getRasterMap(_time, _ind, _raumgliederung_set, _klassifizierung, _klassenanzahl, _darstellung_map, _seite))
             .done(function (data) {
                 let txt = data,
                     x = txt.split('##'),

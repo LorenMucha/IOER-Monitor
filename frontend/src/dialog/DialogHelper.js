@@ -5,13 +5,14 @@ class Dialoghelper{
         return $(`#${id_input_ags}`).data("id");
     }
     static getAGS_InputName(){
-        console.log($(`#${id_input_ags}`));
         return $(`#${id_input_ags}`).val();
     };
     static setSwal(callback){
         let chart_array = [],
             set_autocomplete = function () {
+            let germany = {"id":"99","name":"Deutschland"};
                 chart_array = indikator_json_group.getAGSArray();
+                chart_array.push(germany);
                 auto_complete.autocomplete(document.getElementById(id_input_ags), chart_array);
             },
             lan = language_manager.getLanguage();
@@ -28,7 +29,6 @@ class Dialoghelper{
                 if (isConfirm) {
                     callback();
                 }
-
             });
             //on enter also open the chart
             $(`#${id_input_ags}`)

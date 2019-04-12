@@ -199,8 +199,8 @@ const raster_split={
 
                     function defCalls() {
                         let requests = [
-                            request_manager.getJahre(indikator_id),
-                            request_manager.getRaumgliederung(indikator_id)
+                            RequestManager.getJahre(indikator_id),
+                            RequestManager.getRaumgliederung(indikator_id)
                         ];
                         $.when.apply($, requests).done(function () {
                             def.resolve(arguments);
@@ -265,7 +265,7 @@ const raster_split={
                     klassenanzahl = settings[0].klassenanzahl,
                     indicator_id = indikatorauswahl.getSelectedIndikator();
 
-                $.when(getRasterMap(time, ind, raumgl_set, klassifizierung, klassenanzahl, farbliche_darstellungsart.getSelectionId()))
+                $.when(RequestManager.getRasterMap(time, ind, raumgl_set, klassifizierung, klassenanzahl, farbliche_darstellungsart.getSelectionId()))
                     .done(function (data) {
                         //TODO umschreiben auf den neuen Mapserver
                         let txt = data,
@@ -421,7 +421,7 @@ const raster_split={
                                     if (!window.location.href.includes("monitor_test")) {
                                         let message = error.getErrorMessage(`function:raster_split\n Error: ${err}`);
                                         alert_manager.alertError();
-                                        request_manager.sendMailError(message.name, message.message);
+                                        RequestManager.sendMailError(message.name, message.message);
                                     }
                                 }
                             }

@@ -93,6 +93,9 @@
     .mobile_hidden{
         display: none !important;
     }
+    .right_content{
+        overflow: auto;
+    }
 
 }
 @media only screen and (max-width : 500px) {
@@ -107,7 +110,8 @@
         display: none !important;
     }
     #scrollable-area{
-        width: 100% !important;
+        width: 90% !important;
+        height: 100% !important;
     }
     #scrollable-area #table_ags{
         margin-right: 60px !important;

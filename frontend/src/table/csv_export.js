@@ -38,7 +38,6 @@ const csv_export = {
                             .then(csv_export.state = true)
                         //push all table header in array
                         // Quelle:https://tableexport.v5.travismclarke.com
-                            .then(TableHelper.destroyStickyTableHeader())
                             .then(function(){let exportTable = table.getDOMObject()
                                                         .tableExport({
                                                             formats: ['csv'],
@@ -46,7 +45,8 @@ const csv_export = {
                                                             footers: false,
                                                             filename: indikatorauswahl.getSelectedIndikator() + "_" + gebietsauswahl.getSelectionAsString() + "_" + zeit_slider.getTimeSet(),
                                                             trimWhitespace: true,
-                                                            ignoreCols: [0, 1],
+                                                            bootstrap: false,
+                                                            //ignoreCols: [0, 1],
                                                             exportButtons: false,
                                                             ignoreCSS: "." + csv_export.ignoreClass
                                                         });

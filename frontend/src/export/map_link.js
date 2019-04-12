@@ -8,7 +8,7 @@ const map_link={
 
                 let setting={"id":"set","val":urlparamter.getAllUrlParameter()};
 
-                $.when(request_manager.handleLink(setting)).done(function (data) {
+                $.when(RequestManager.handleLink(setting)).done(function (data) {
                     if(data.state==="inserted") {
                         let rid=data.res[0]["id"],
                             link_a = urlparamter.getURLMonitor() + "?rid=" + rid,
@@ -48,10 +48,10 @@ const map_link={
         },
         loadRID(_rid){
             let setting = {"id":"get","val":_rid};
-            $.when(request_manager.handleLink(setting)).done(function (data) {
+            $.when(RequestManager.handleLink(setting)).done(function (data) {
                 console.log(data);
                 if(data.state==="get") {
-                    window.location.href = `${urlparamter.getURLMonitor()}?${data.res[0]["array_value"]}`;
+                    window.location.href = `${window.location.href.split('?')[0]}?${data.res[0]["array_value"]}`;
                 }else{
                     alert_manager.alertError();
                 }

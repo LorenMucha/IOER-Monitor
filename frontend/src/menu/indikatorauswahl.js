@@ -72,7 +72,7 @@ const indikatorauswahl ={
     fill:function(){
         const menu = this;
         //get all possebilities via ajax
-        $.when(request_manager.getAllAvaliableIndicators()).done(function(data){
+        $.when(RequestManager.getAllAvaliableIndicators()).done(function(data){
             menu.possebilities = data;
             let container = $('#kat_auswahl');
             let html = "";
@@ -167,7 +167,7 @@ const indikatorauswahl ={
         let ind = this.getSelectedIndikator();
         const menu = this;
         if(_ind){ind = _ind;}
-        $.when(request_manager.getAvabilityIndicator(ind)).done(function(data){
+        $.when(RequestManager.getAvabilityIndicator(ind)).done(function(data){
             $.each(data,function(key,value) {
                 if(value.ind === ind) {
                     if(value.avability==false){
@@ -207,7 +207,7 @@ const indikatorauswahl ={
         //reset error code
         error.setErrorCode(false);
         legende.init(true);
-        $.when(request_manager.getJahre(indicator_id)).done(function(data_time){
+        $.when(RequestManager.getJahre(indicator_id)).done(function(data_time){
             menu.all_possible_years = data_time;
             let years_selected = [];
             $.each(data_time,function(key,value){
@@ -217,7 +217,7 @@ const indikatorauswahl ={
             });
             menu.filtered_years = years_selected;
             zeit_slider.init(years_selected);
-            $.when(request_manager.getRaumgliederung(indicator_id)).done(function(data_raum){
+            $.when(RequestManager.getRaumgliederung(indicator_id)).done(function(data_raum){
                 raeumliche_analyseebene.init(data_raum);
             });
         });
@@ -230,10 +230,14 @@ const indikatorauswahl ={
         $('#'+indicator_id+"_item").css({"color": farbschema.getColorHexMain(), "font-weight": "bold"});
     },
     getIndikatorInfo:function(indicator_id,key_name){
-        let val_found = null;
+        let val_found = null,
+            id = indicator_id;
+        if(typeof id==="undefined" || !id){
+            id = this.getSelectedIndikator();
+        }
         $.each(this.getPossebilities(),function(cat_key,cat_value){
             $.each(cat_value.indicators, function (key, value) {
-                if(key===indicator_id){
+                if(key===id){
                     val_found = value[key_name];
                 }
             });
@@ -342,7 +346,6 @@ const indikatorauswahl ={
                 .dropdown({
                     onShow:function(){
                         let click = 0;
-                        console.log(main_view.getHeight()<= 800);
                         if(main_view.getHeight()<= 800) {
                             $('.link_kat')
                                 .unbind()

@@ -68,7 +68,7 @@ const map_print={
                     map.invalidateSize();
 
                     try {
-                        overlay = cloneLayer(layer_control.zusatzlayer.getLayerGroup_set());
+                        overlay = cloneLayer(additiveLayer.zusatzlayer.getLayerGroup_set());
                         overlay.addTo(map);
                         overlay.eachLayer(function(layer){
                             layer.setStyle(style[layer.options.name]);
@@ -150,16 +150,17 @@ const map_print={
         dialog_manager.create();
         this.controller.set();
     },
-    init:function(){
-
-    },
     controller:{
         set:function(){
+            //remove map elements on click
             $(".hover_close").click(function(){
                         $(this).remove();
                         //resize map if no element is left
                         if($(".hover_close").length===0){
-                            $('#print_map').css({"width":$('.map_print_container').width()-30});
+                            let width_map = $('#print_map_content').width();
+                            //css needs to be forced on this width, otherwise the print will be confused
+                            $('.map_print_container').css({"width":width_map-30});
+                            $('#print_map').css({"width":width_map-30});
                             map_print.map.invalidateSize();
                         }
             });
@@ -180,6 +181,7 @@ const map_print={
                         })
                         .then(progressbar.init())
                         .then(progressbar.setHeaderText("erstelle " + map_print.format.toUpperCase()))
+                        //needed to set a4
                         .then(dialog_manager.changeHeight( 1100))
                         .then(function () {
                             if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'raster') {

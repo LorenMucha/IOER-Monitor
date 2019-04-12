@@ -4,6 +4,9 @@ const helper={
             .toString()
             .replace(/\./g, ',');
     },
+    parseFloatCommaToPoint: function (string) {
+        return parseFloat(string.replace(',', '.'));
+    },
     removefromarray:function(array,value_remove){
         var array_cleaned = [];
         $.each(array,function(key,value){

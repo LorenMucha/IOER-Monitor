@@ -10,7 +10,7 @@ class ScriptLoader{
             "frontend/lib/jquery/plugin/he.js",
             //spectrum
             "frontend/lib/spectrum/spectrum.js",
-            //Bootsrap
+            //Bootstrap
             "frontend/lib/bootstrap/bootstrap.min.js",
             "frontend/lib/bootstrap-tour/bootstrap-tour-standalone.js",
             "frontend/lib/bootstrap/bootstrapvalidator.min.js",
@@ -30,6 +30,7 @@ class ScriptLoader{
             "frontend/lib/leaflet/plugin/togeojson.js",
             "frontend/lib/leaflet/plugin/leaflet.filelayer.js",
             "frontend/lib/leaflet/plugin/leaflet-image.js",
+            //"frontend/lib/leaflet/plugin/OSMBuildings-Leaflet.js",
             //Semantic UI
             "frontend/lib/semanticUi/semantic.min.js",
             "frontend/lib/semanticUi/components/transition.js",
@@ -68,6 +69,7 @@ class ScriptLoader{
             "frontend/src/models/base_raumgliederung.js",
             "frontend/src/models/exclude.js",
             "frontend/src/auto_complete.js",
+            "frontend/src/models/MigrationValue.js",
             //menu
             "frontend/src/menu/raeumliche_visualisierung.js",
             "frontend/src/menu/raeumliche_analyseebene.js",
@@ -82,7 +84,8 @@ class ScriptLoader{
             "frontend/src/menu/farbschema.js",
             "frontend/src/menu/MenuHelper.js",
             //map
-            "frontend/src/map/layer_control.js",
+            "frontend/src/map/OsmBuildings.js",
+            "frontend/src/map/additive_layer.js",
             "frontend/src/map/map_controller.js",
             "frontend/src/map/indikator_json.js",
             "frontend/src/map/indikator_raster.js",
@@ -121,20 +124,21 @@ class ScriptLoader{
             "frontend/src/dialog/kennblatt.js",
             "frontend/src/dialog/DialogHelper.js",
             "frontend/src/dialog/statistics.js",
-            "frontend/src/dialog/dialog.js",
+            "frontend/src/dialog/gebietsprofil.js",
+            "frontend/src/dialog/AdditiveLayerControl.js",
             //export
             "frontend/src/export/ogc_export.js",
             "frontend/src/export/map_link.js",
             "frontend/src/export/map_print.js",
             "frontend/src/export/Export_Helper.js",
             //other elements
-            "frontend/src/request_manager.js",
+            "frontend/src/RequestManager.js",
             "frontend/src/alert_manager.js",
             "frontend/src/config.js",
             "frontend/src/search.js",
             "frontend/src/webtour.js",
             "frontend/src/track.js",
-            "frontend/src/main.js",
+            "frontend/app.js",
             "frontend/src/ToolLoader.js"
         ];
     }
@@ -142,7 +146,20 @@ class ScriptLoader{
         const loader = this;
         $.getMultiScripts = function(arr) {
             var _arr = $.map(arr, function(scr) {
-                return $.getScript(  scr);
+                return $.getScript(  scr,function(){
+                    //script loaded
+                }).fail(function(){
+                    $('#loading_circle').remove();
+                    setTimeout(function(){
+                        swal({
+                            title:"Es ist ein Problem aufgetreten",
+                            text:`Bitte laden Sie die Anwendung über <b class="cursor" style="color:blue;" id="force_reload" onclick="location.reload(true)">STRG-F5</b> oder kontaktieren Sie uns über das Feedback Formular.`,
+                            type:"error",
+                            html:true
+                    });
+                        progressbar.remove();
+                    },500);
+                });
             });
 
             _arr.push($.Deferred(function( deferred ){
@@ -155,7 +172,7 @@ class ScriptLoader{
         $.getMultiScripts(loader.scripts).done(function() {
             try {
                 //init the map with all there Functions
-                main.call(this);
+                App.main.call(this);
                 ToolLoader.initTools();
             }catch(err){
                 //IE is not supportet, otherwise there is an real error
@@ -166,7 +183,7 @@ class ScriptLoader{
                     if(!window.location.href.includes("monitor_test")) {
                         let message = error.getErrorMessage(err);
                         alert_manager.alertError();
-                        request_manager.sendMailError(message.name, message.message);
+                        RequestManager.sendMailError(message.name, message.message);
                     }
                 }
             }

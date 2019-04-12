@@ -143,7 +143,7 @@ const toolbar = {
                         </div>
                         <div class="dropdown_menu" id="dropdown_layer">
                         <div class="w-100" id="map-selection">
-                                <button type="button" class="btn btn_dropdown w-100" id="map_button">Grundkarten</button>
+                                <button type="button" class="btn btn_dropdown w-100" id="${additiveLayer.toolbar_button.replace("#","")}">Grundkarten</button>
                             </div>
                             <div id="layer_conainer">
                                 <span><b>Sichtbarkeit Indikator</b></span>
@@ -286,14 +286,14 @@ const toolbar = {
                                     </div>
                                 </li>
                             </ul>
-                            <ul class="tools w-100">
+                            <!--<ul class="tools w-100">
                                 <li class="w-30">
                                     <div class="btn_container">
                                         <div id="${statistics.selector_toolbar.replace("#","")}" class="image cursor ${exclude.class_gebiete}" data-title="Statistik des Indikators" title="Statistik des Indikators"></div>
                                         <div class="btn_txt wordbreak ${exclude.class_gebiete}">Statistik</div>
                                     </div>
                                 </li>
-                            </ul>
+                            </ul>-->
                         </div>
                         <!--Export-->
                         <div class="dropdown_choice mobile_hidden" id="export_map">

@@ -38,9 +38,13 @@
 }
 #print_container .map_print_container{
     margin-top: 20px;
+    float: left;
+    height: 634.89px;
+    width: 526.05px;
+    position: absolute;
+    top:150px;
 }
 #print_container .print_map_content  .map_print_container #print_map{
-    float: left;
     height: 634.89px;
     width: 526.05px;
     background-color: white;
@@ -63,6 +67,7 @@
     right: 35px;
     top: 150px;
     height:145px;
+
 }
 #print_container .highlight{
     color: var(--active-color);
@@ -91,7 +96,10 @@
 #print_container .print_bottom{
     width: 700px;
     display: inline-block;
-    margin: 20px;
+    position: absolute;
+    top: 830px;
+    left: 10px;
+    padding: 2vh;
 }
 #print_container .print_bottom .datengrundlage_print_container{
     margin-top: 10px;

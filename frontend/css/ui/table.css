@@ -1,0 +1,286 @@
+:root{
+    --table-padding:.5vh;
+}
+.right_content .table_page{
+    width:100%;
+    height:100%;
+}
+.right_content .table_page_header .close_table{
+    width: 100%;
+    display: inline-block;
+}
+.right_content .table_page_header .close_table .glyphicon-remove{
+    float: right;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+.right_content .table_page_header #interact_div {
+    width: 100%;
+    padding:10px;
+    display: inline-block;
+}
+.right_content .table_page_header #interact_div #print_table{
+    width: 30px;
+    height: 30px;
+    background: white url(../../assets/icon/print_dark.png) no-repeat center center;
+    float: right;
+    margin-right: 10px;
+    cursor: pointer;
+}
+.right_content  .table_page_header #interact_div #csv_export{
+    width: 30px;
+    height: 30px;
+    background: white url(../../assets/icon/csv-down.png) no-repeat center center;
+    float: right;
+    margin-right: 10px;
+    cursor: pointer;
+}
+.right_content .table_page_header #interact_div #btn_table{
+    float: right;
+    margin-right: 10px;
+    pointer-events: auto;
+}
+.right_content .table_page_header #interact_div #btn_table i{
+    margin-right: 5px;
+}
+.right_content .table_page_header #search_input_table{
+    width:40%;
+}
+.right_content .table_page .scrollable-area {
+    overflow: auto;
+    height:90%;
+    margin: 10px;
+}
+.right_content .scrollable-area #table_ags{
+    background: #FFF;
+    box-shadow: none;
+    text-align: left;
+    color: rgba(0,0,0,.87);
+    border-spacing: 0;
+    margin-bottom: 10px;
+    margin-right: 5px;
+    border-collapse: inherit;
+    table-layout: fixed;
+}
+.right_content .scrollable-area #table_ags #thead tr th{
+    font-size: 12px;
+    text-align: center;
+    overflow:hidden;
+    background-color: lightgray;
+    border:.5px solid black;
+    padding: var(--table-padding);
+}
+.right_content .scrollable-area #table_ags #thead .sort-arrow
+{
+    background: lightgray url(../../assets/icon/bg.gif) no-repeat center right;
+    padding-right: 20px;
+    cursor: pointer;
+}
+.right_content .scrollable-area #table_ags #thead .tablesorter-headerAsc
+{
+    background: lightgray url(../../assets/icon/asc.gif) no-repeat center right;
+}
+.right_content .scrollable-area #table_ags #thead .tablesorter-headerDesc
+{
+    background: lightgray url(../../assets/icon/desc.gif) no-repeat center right;
+}
+.right_content .scrollable-area #table_ags #thead .tablesorter-headerDesc, .tablesorter-headerAsc
+{
+    color: #000;
+}
+.right_content .scrollable-area #table_ags .tBody_value_table tr:hover{
+    background-color: rgba(78,96,170,.5)
+}
+.right_content .scrollable-area #table_ags tr td{
+    display: table-cell;
+    font-size: 12px;
+    border:.1px solid black;
+    padding: var(--table-padding);
+}
+.right_content .scrollable-area #table_ags tr .td_name{
+    text-align:left;
+}
+.right_content .scrollable-area #table_ags tr .td_ags{
+    text-align:center;
+}
+.right_content .scrollable-area #table_ags tr .td_akt{
+    text-align:right;
+}
+.right_content .scrollable-area #table_ags tr .val-ags{
+    text-align: right;
+    width:140px;
+}
+.right_content .scrollable-area #table_ags tr .expand_brd_bld{
+    width:80px;
+    text-align: right;
+}
+.right_content .scrollable-area #table_ags tr .val-grundakt{
+    text-align: right;
+}
+.right_content .scrollable-area #table_ags img{
+    cursor: pointer;
+}
+.right_content .scrollable-area #table_ags tr .count_ags_table{
+    text-align: right;
+}
+.right_content .scrollable-area #table_ags .tfoot tr{
+    background-color: lightgray !important;
+}
+.right_content .scrollable-area #table_ags .tfoot tr td{
+    border: 1px solid black;
+}
+.right_content .scrollable-area #table_ags #tfoot_brd{
+    border-top: 2px solid black;
+}
+.right_content .scrollable-area #table_ags tr .dif_val_div{
+    margin-left: 1vh;
+}
+.right_content .scrollable-area #table_ags tr .dif_val_div .glyphicon{
+    color: var(--main-color);
+    font-size: 2em;
+}
+.right_content .scrollable-area #table_ags tr .dif_val_div b{
+    margin-left: 1vh;
+}
+.right_content .scrollable-area #table_ags .grey_border{
+    border-left: 6px solid grey !important;
+}
+/*
+tabelle filtern
+ */
+.right_content .filter{
+    width: 35px;
+    height: 35px;
+    background: white url(../../assets/icon/filter.png) no-repeat center center;
+    float: right;
+    margin-right: 10px;
+    cursor: pointer;
+}
+.right_content #filter_div{
+    display: none;
+    position: absolute;
+    height: 100%;
+    width: 250px;
+    background: white;
+    border: 1px solid var(--main-color);
+    bottom: 0;
+    top: 0;
+    right: 0;
+    z-index: 20000;
+    padding: 20px;
+    opacity: 1;
+}
+.right_content #filter_div .title_filter_table{
+    font-weight: bold;
+    font-size: 1.4rem;
+    padding-bottom: 2px;
+}
+/*
+    Tabelle erweitern panel
+*/
+.right_content #tabelle_erweitern{
+    display: none;
+    position: absolute;
+    height: 100%;
+    width: 250px;
+    background: white;
+    border: 1px solid var(--main-color);
+    bottom: 0;
+    top: 0;
+    right: 0;
+    z-index: 20000;
+    padding: 20px;
+    opacity: 1;
+}
+.right_content #tabelle_erweitern .panel_choice_container{
+    margin-bottom: 10px;
+}
+.right_content #tabelle_erweitern #btn_table_indikator_add{
+    width: 100%;
+}
+.right_content #tabelle_erweitern .table_add{
+    width: 100%;
+    margin-top: 10px;
+}
+.right_content #tabelle_erweitern #indikator_choice_container_table {
+    position: relative;
+    width: 100%;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+.right_content #tabelle_erweitern .ddm_table{
+    width: 100%;
+}
+.right_content #tabelle_erweitern .ddm_table .menu{
+    height: auto;
+    z-index: 20000 !important;
+}
+.right_content #tabelle_erweitern .ddm_table .menu i{
+    margin-right: 30px;
+}
+.right_content #tabelle_erweitern .ddm_table .menu .item{
+    background-color: white;
+}
+.right_content #tabelle_erweitern .ddm_table .menu .item:hover{
+    font-weight: bold;
+}
+.right_content #tabelle_erweitern .ddm_table .menu .submenu{
+    z-index: 20000 !important;
+    overflow-x: hidden;
+}
+.right_content #tabelle_erweitern #kenngroessen_ddm_table #ue_raum_sum_content .ue_sum_content_table_erweitern{
+    margin-left: 60px;
+}
+.right_content #tabelle_erweitern #kenngroessen_ddm_table #ue_raum_sum_content .ue_sum_content_table_erweitern:first-child{
+    margin-top: 10px;
+}
+.right_content #tabelle_erweitern #zeitschnitt_choice_container_table .hinweis{
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+.right_content #tabelle_erweitern #hinweis_time_expand_linear{
+    display: none;
+    margin-bottom: 10px;
+}
+.right_content #tabelle_erweitern #hinweis_ind_expand{
+    display: none;
+}
+.right_content #tabelle_erweitern #hinweis_time_expand{
+    display: none;
+}
+.right_content #tabelle_erweitern #trend_hinweis_expand{
+    display: none;
+}
+.right_content #tabelle_erweitern #hinweis_time_expand_null{
+    display: none;
+}
+.right_content #tabelle_erweitern #trend_hinweis_expand b{
+    color: red;
+}
+.right_content #tabelle_erweitern #hinweis_time_expand_null b{
+    color: red;
+}
+.right_content #tabelle_erweitern #btn_table{
+    pointer-events: auto;
+}
+.right_content #tabelle_erweitern .ui.toggle.checkbox{
+    padding-left: 0 !important;
+}
+.right_content #tabelle_erweitern #btn_table_remove_expand{
+    background-color: grey !important;
+    width: 100%;
+    margin-top: 10px;
+}
+.right_content #tabelle_erweitern #btn_table_load_expand{
+    width: 100%;
+    background-color: var(--main-color) !important;
+    margin-top: 10px;
+}
+.right_content #tabelle_erweitern #btn_table_clear_expand{
+    width: 100%;
+    background-color: grey !important;
+    margin-top: 10px;
+}
+.right_content #tabelle_erweitern #btn_table_clear_expand i {
+    float: left;
+}

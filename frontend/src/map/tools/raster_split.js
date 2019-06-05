@@ -182,10 +182,14 @@ const raster_split={
                         const settings = dialog.getSettings();
                         indikator_raster.init(null,null,"rechts",settings);
                         dialog.hide();
-                        $('#indikator_header_rechts')
-                            .show();
-                        $('#header_rechts').text(settings[0].ind_text+" ("+settings[0].time+")");
-                        $('#header_raumgl_rechts').text(settings[0].raumgl);
+                        if(main_view.getWidth()>=950) {
+                            $('#indikator_header_rechts')
+                                .show();
+                            $('#header_rechts').text(settings[0].ind_text + " (" + settings[0].time + ")");
+                            $('#header_raumgl_rechts').text(settings[0].raumgl);
+                        }else{
+                            $('#indikator_header_rechts').hide();
+                        }
                     });
 
                     $("#kennblatt_vergleich").click(function(){

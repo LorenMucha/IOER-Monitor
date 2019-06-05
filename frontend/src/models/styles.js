@@ -57,16 +57,7 @@ const style = {
         return {
             weight: 5,
             color: farbschema.getColorHexMain(),
-            dashArray: '',
-            fillOpacity: opacity_slider.getOpacity()
-        }
-    },
-    getActive:function(){
-        return {
-            weight: 5,
-            color: farbschema.getColorHexActive(),
-            dashArray: '',
-            fillOpacity: opacity_slider.getOpacity()
+            dashArray: ''
         }
     },
     getLayerStyle:function(layer_value){

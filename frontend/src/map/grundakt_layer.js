@@ -13,6 +13,14 @@ const grundakt_layer = {
     getJSONFile:function(){
         return this.json_file;
     },
+    remove:function(){
+      try{
+         map.removeLayer(this.json_layer);
+      }catch(err){throw err}
+      try{
+          map.removeLayer(this.raster_layer);
+      }catch(err){throw err}
+    },
     addToLegende:function(settings) {
         //-----------------------------------------------------------
         const object = this;
@@ -265,18 +273,3 @@ const grundakt_layer = {
     }
     }
 };
-/*$('.grundaktmap_click').click(function () {
-    if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'gebiete') {
-        let last_clicked_layer = indikator_json.getJSONLayer();
-        if (click_grundakt_map== 0) {
-            jsongroup.setStyle(style.disable);
-            jsongroup_grund.addTo(map);
-            jsongroup_grund.setStyle({fillOpacity: opacity_slider.getOpacity()});
-            click_grundakt_map++;
-        } else {
-            jsongroup_grund.removeFrom(map);
-            jsongroup.setStyle(last_clicked_layer);
-            click_grundakt_map = 0;
-        }
-    }
-});*/

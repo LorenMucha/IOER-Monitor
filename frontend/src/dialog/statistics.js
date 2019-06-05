@@ -82,22 +82,6 @@ const statistics = {
         }
         this.controller.set();
     },
-    controller:{
-        set:function(){// set the behavior on Statistics-Icon click- open the Statistics Dialog
-            $(document).on("click", statistics.selector_toolbar, function () {
-                let callback = function () {
-                    if (Dialoghelper.getAGS_Input()) {
-                        statistics.open();
-                    }
-                };
-                try {
-                    Dialoghelper.setSwal(callback);
-                } catch (err) {
-                    alert_manager.alertError();
-                }
-            });
-        }
-    },
     open: function () {
 
         this.populateChartSettingsWithValues(); // Gets all the necessary values for chart.settings
@@ -226,6 +210,203 @@ const statistics = {
         chart.settings.densityIntervalCount=Math.round(chart.settings.data.length/4); // sets the default Interval Count for the probability density Chart
         chart.settings.lan=language_manager.getLanguage();
     },
+    getAllValues: function (geoJSON) {
+        // extracts the indicator Values from GeoJSON
+        let valueArray = [];
+        for (let elem in geoJSON.features) {
+            let object = geoJSON["features"][elem]["properties"];
+            // checks if Object has "value_comma" property and it is not empty, then fetches the value
+            if (object.hasOwnProperty("value_comma") && object.value_comma !== "") {
+                //create object:
+                let obj = {name: object.gen, value: helper.parseFloatCommaToPoint(object.value_comma), ags: object.ags};
+                if (typeof obj.value == "number") {
+                    valueArray.push(obj);
+                }
+                else {
+                    console.log("The JSON Object either has no value_comma property!!")
+                }
+            }
+        }
+        return valueArray;
+
+    },
+    getCurrentValue: function (geoJSON, ags) {
+        let currentValue = null;
+        // check if geoJSON has value "ags", and finds the corresponding value
+        for (let elem in this.chart.settings.allValuesJSON["features"]) {
+            let object = geoJSON["features"][elem]["properties"];
+            if (object.hasOwnProperty("ags")) {
+                if (object["ags"] === ags) {
+                    currentValue = helper.parseFloatCommaToPoint(object["value_comma"]);
+                }
+            }
+        }
+        return currentValue;
+    },
+    getAreaCount: function (geoJSON) {
+        return Object.keys(geoJSON["features"]).length
+    },
+    parseStringPointToComma:function(input){
+        return input.toString().replace('.',',')
+    },
+    calculateStatistics: function (values, decimal) {
+        let maxValue = Math.max(...values);
+
+        let minValue = Math.min(...values);
+
+        let averageValue = this.calculateAverage(values);
+
+        let medianValue = this.calculateMedian(values);
+
+        let stDeviationValue = this.calculateStDeviation(values, averageValue);
+
+        return {
+            max: this.roundNumber(maxValue,decimal),
+            min: this.roundNumber(minValue, decimal),
+            average: this.roundNumber(averageValue, decimal),
+            median: this.roundNumber(medianValue, decimal),
+            stDeviation: this.roundNumber(stDeviationValue, decimal)
+        };
+    },
+    calculateAverage: function (values) {
+        let total = 0;
+
+        for (let num in values) {
+
+            total += parseFloat(values[num]);
+        }
+        return total / values.length;
+    },
+    calculateMedian(values) {
+
+        let median = 0,
+            numsLen = values.length;
+        values.sort(function(a, b){return a - b});
+        if (numsLen % 2 === 0) { // is even
+            // average of two middle numbers
+            median = (values[numsLen / 2 - 1] + values[numsLen / 2]) / 2;
+        } else { // is odd
+            // middle number only
+            median = values[(numsLen - 1) / 2];
+        }
+        return median;
+    },
+    calculateStDeviation: function (values, average) {
+
+        let squareDiffSum = null;
+        let count = values.length;
+        for (let num in values) {
+            let diff = parseFloat(values[num]) - average;
+            let sqr = diff * diff;
+            squareDiffSum = squareDiffSum + sqr;
+        }
+
+        return Math.sqrt(squareDiffSum / (count - 1));
+
+    },
+    getDecimalSpaces:function(){
+        return parseInt(indikatorauswahl.getIndikatorInfo(false,"rundung"));
+    },
+    roundNumber: function (number, decimalSpaces) {
+        return Math.round(parseFloat(number) * Math.pow(10, decimalSpaces)) / Math.pow(10, decimalSpaces)
+    },
+    sortObjectAscending: function (objectArray, key1, key2) {
+        return objectArray.sort((function (a, b) {
+            return a[key1] - b[key1] || a[key2] - b[key2];
+        }));
+    },
+    getOnlyValues: function (objectArray) {
+        let valueArray = [];
+        for (let num in objectArray) {
+            valueArray.push(parseFloat(objectArray[num].value))
+        }
+        return valueArray
+    },
+    getDistributionFunctionValues: function (sortedObjectArray) {
+        let totalSum = 0,
+            sumTillNow = 0,
+            distributionFuncObjectArray = [],
+            min=sortedObjectArray[0].value;
+        for (let num in sortedObjectArray) {
+            totalSum += sortedObjectArray[num].value-min;
+        }
+        for (let num in sortedObjectArray) {
+            sumTillNow += sortedObjectArray[num].value-min;
+            let distrFunc = sumTillNow / totalSum;
+            let obj = sortedObjectArray[num];
+            obj.distFuncValue = distrFunc;
+            distributionFuncObjectArray.push(obj);
+        }
+        return distributionFuncObjectArray;
+    },
+    getDeviationValues: function (objectArray, mean) {
+        let deviationArray = [];
+        for (let num in objectArray) {
+            let obj = objectArray[num],
+                distribution = objectArray[num].value - mean;
+            obj.deviation = distribution;
+            deviationArray.push(obj);
+        }
+        return deviationArray
+    },
+    getDensityFunctionIntervalValues: function(data,intervalCount,decimal) {
+        let densityFunctionObjectArray = [];
+
+        data = this.sortObjectAscending(data, "deviation", "ags");
+        let min = data[0].deviation,
+            max = data[data.length-1].deviation,
+            difference = max - min,
+            classSize = difference / intervalCount,
+            intervalLowerLimit = min;
+        for (let i = 0; i < intervalCount; i++) {
+            let counter = 0,
+                intervalElementValues=[],
+                intervalElements=[],
+                intervalUpperLimit = intervalLowerLimit + classSize,
+                intervalMiddle=intervalLowerLimit+(intervalUpperLimit-intervalLowerLimit)/2;
+            for (let elem in data) {
+                if (data[elem].deviation >= intervalLowerLimit && data[elem].deviation <= intervalUpperLimit) {
+                    counter++;
+                    let element={name:data[elem].name, ags:data[elem].ags, value:data[elem].value, deviation:data[elem].deviation};
+                    intervalElementValues.push(data[elem].deviation);
+                    intervalElements.push(element);
+                }
+            }
+            let averageClassValue=Math.round(this.calculateAverage(intervalElementValues) * 1000) / 1000,
+                probability=counter/data.length*100,  // Probability in PERCENT!
+
+                classObject = {intervalUpperLimit:statistics.roundNumber(intervalUpperLimit,decimal), intervalLowerLimit: statistics.roundNumber(intervalLowerLimit, decimal),intervalMiddle:statistics.roundNumber(intervalMiddle,decimal),  count:counter, probability: statistics.roundNumber(probability,decimal+1), intervalAverageValue: statistics.roundNumber(averageClassValue, decimal), elements:intervalElements};
+            intervalLowerLimit=intervalUpperLimit;
+            densityFunctionObjectArray.push(classObject);
+        }
+        return densityFunctionObjectArray;
+    },
+    findSelectedAreaInInterval:function(intervalArray, selectedAgs){ // Finds the selected Area in one of the Intervals
+
+        let x = 0,
+            y = 0,
+            name="",
+            deviation=0,
+            found=false;
+        for (let interval in intervalArray) {
+            for (let elem in intervalArray[interval].elements)
+                if (intervalArray[interval].elements[elem].ags === selectedAgs) {
+                    x = intervalArray[interval].elements[elem].deviation;
+                    y= intervalArray[interval].probability;
+                    name= intervalArray[interval].elements[elem].name;
+                    deviation= intervalArray[interval].elements[elem].deviation;
+                    found=true;
+                }
+            if (found){
+                break;
+            }
+        }
+
+        return {x:x,y:y, name:name, deviation:deviation};
+
+    },
+
+
     chart: { // Holds all the variables
         settings: {
             lan:"",
@@ -286,8 +467,7 @@ const statistics = {
                     tooltip= $("#tooltip"),
                     visualisation=$("#statistics_visualisation");
 
-                //set up the Visualisation dropdown menu
-                chart_auswahl.dropdown({
+                chart_auswahl.dropdown({  //set up the Visualisation dropdown menu
                     onChange: function (value) {
                         switch (value) {
                             case "valueChart":
@@ -335,7 +515,7 @@ const statistics = {
                     visualisation.empty();
                     chart.controller.showVisualisation(chart.settings.selectedChart, svg, chart_width, chart_height, margin);
                 });
-                $("body").mouseup(function(e)
+                $("body").mouseup(function(e)   // todo Reinis: Possibly transfer to the draw Function if Density Graph?
                 { // sets the IntervalInfo Tooltip behaviour
                     let intervalInfo = $("#intervalInfo");
                     // if the target of the click isn't the container nor a descendant of the container
@@ -394,7 +574,7 @@ const statistics = {
                     parameters.xValue="value";
                     parameters.yValue="distFuncValue";
 
-                    this.drawCumulativeDistributionGraph(parameters)
+                    this.drawCumulativeDistributionChart(parameters)
                 }
 
                 else {console.log("No graphical option chosen!")}
@@ -726,7 +906,7 @@ const statistics = {
                     });
 
                 //Draw the selected area line in Graph
-                // Find the selected region, x,y Values
+                // Find the selected district, x,y Values
                 let selectedArea=statistics.findSelectedAreaInInterval(data, selectedAreaAGS);
                 g.append("line")          // attach a line
                     .attr("class", "selectedAreaLine")
@@ -838,7 +1018,7 @@ const statistics = {
 
 
             },
-            drawCumulativeDistributionGraph: function (parameters) {
+            drawCumulativeDistributionChart: function (parameters) {
                 let data = parameters.data,
                     xValue = parameters.xValue,
                     yValue = parameters.yValue,
@@ -980,7 +1160,7 @@ const statistics = {
 
 
                 //Draw the selected area line in Graph
-                // Find the selected region, x,y Values
+                // Find the selected district, x,y Values
                 g.append("line")          // attach a line
                     .attr("class", "selectedAreaLine")
                     .style("stroke", "red")  // colour the line
@@ -1032,205 +1212,22 @@ const statistics = {
         },
 
     },
-    getAllValues: function (geoJSON) {
-        // extracts the indicator Values from GeoJSON
-        let valueArray = [];
-        for (let elem in geoJSON.features) {
-            let object = geoJSON["features"][elem]["properties"];
-            // checks if Object has "value_comma" property and it is not empty, then fetches the value
-            if (object.hasOwnProperty("value_comma") && object.value_comma !== "") {
-                //create object:
-                let obj = {name: object.gen, value: helper.parseFloatCommaToPoint(object.value_comma), ags: object.ags};
-                if (typeof obj.value == "number") {
-                    valueArray.push(obj);
+    controller:{
+        set:function(){// set the behavior on Statistics-Icon click- open the Statistics Dialog
+            $(document).on("click", statistics.selector_toolbar, function () {
+                let callback = function () {
+                    if (Dialoghelper.getAGS_Input()) {
+                        statistics.open();
+                    }
+                };
+                try {
+                    Dialoghelper.setSwal(callback);
+                } catch (err) {
+                    alert_manager.alertError();
                 }
-                else {
-                    console.log("The JSON Object either has no value_comma property!!")
-                }
-            }
+            });
         }
-        return valueArray;
-
     },
-    getCurrentValue: function (geoJSON, ags) {
-        let currentValue = null;
-        // check if geoJSON has value "ags", and finds the corresponding value
-        for (let elem in this.chart.settings.allValuesJSON["features"]) {
-            let object = geoJSON["features"][elem]["properties"];
-            if (object.hasOwnProperty("ags")) {
-                if (object["ags"] === ags) {
-                    currentValue = helper.parseFloatCommaToPoint(object["value_comma"]);
-                }
-            }
-        }
-        return currentValue;
-    },
-    getAreaCount: function (geoJSON) {
-        return Object.keys(geoJSON["features"]).length
-    },
-
-    parseStringPointToComma:function(input){
-        return input.toString().replace('.',',')
-    },
-    calculateStatistics: function (values, decimal) {
-        let maxValue = Math.max(...values);
-
-        let minValue = Math.min(...values);
-
-        let averageValue = this.calculateAverage(values);
-
-        let medianValue = this.calculateMedian(values);
-
-        let stDeviationValue = this.calculateStDeviation(values, averageValue);
-
-        return {
-            max: this.roundNumber(maxValue,decimal),
-            min: this.roundNumber(minValue, decimal),
-            average: this.roundNumber(averageValue, decimal),
-            median: this.roundNumber(medianValue, decimal),
-            stDeviation: this.roundNumber(stDeviationValue, decimal)
-        };
-    },
-    calculateAverage: function (values) {
-        let total = 0;
-
-        for (let num in values) {
-
-            total += parseFloat(values[num]);
-        }
-        return total / values.length;
-    },
-    calculateMedian(values) {
-
-        let median = 0,
-            numsLen = values.length;
-        values.sort(function(a, b){return a - b});
-        if (numsLen % 2 === 0) { // is even
-            // average of two middle numbers
-            median = (values[numsLen / 2 - 1] + values[numsLen / 2]) / 2;
-        } else { // is odd
-            // middle number only
-            median = values[(numsLen - 1) / 2];
-        }
-        return median;
-    },
-    calculateStDeviation: function (values, average) {
-
-        let squareDiffSum = null;
-        let count = values.length;
-        for (let num in values) {
-            let diff = parseFloat(values[num]) - average;
-            let sqr = diff * diff;
-            squareDiffSum = squareDiffSum + sqr;
-        }
-
-        return Math.sqrt(squareDiffSum / (count - 1));
-
-    },
-    getDecimalSpaces:function(geoJSON){
-        return parseInt(indikatorauswahl.getIndikatorInfo(false,"rundung"));
-    },
-    roundNumber: function (number, decimalSpaces) {
-        return Math.round(parseFloat(number) * Math.pow(10, decimalSpaces)) / Math.pow(10, decimalSpaces)
-    },
-    sortObjectAscending: function (objectArray, key1, key2) {
-        return objectArray.sort((function (a, b) {
-            return a[key1] - b[key1] || a[key2] - b[key2];
-        }));
-    },
-    getOnlyValues: function (objectArray) {
-        let valueArray = [];
-        for (let num in objectArray) {
-            valueArray.push(parseFloat(objectArray[num].value))
-        }
-        return valueArray
-    },
-    getDistributionFunctionValues: function (sortedObjectArray) {
-        let totalSum = 0,
-            sumTillNow = 0,
-            distributionFuncObjectArray = [],
-            min=sortedObjectArray[0].value;
-        for (let num in sortedObjectArray) {
-            totalSum += sortedObjectArray[num].value-min;
-        }
-        for (let num in sortedObjectArray) {
-            sumTillNow += sortedObjectArray[num].value-min;
-            let distrFunc = sumTillNow / totalSum;
-            let obj = sortedObjectArray[num];
-            obj.distFuncValue = distrFunc;
-            distributionFuncObjectArray.push(obj);
-        }
-        return distributionFuncObjectArray;
-    },
-
-    getDeviationValues: function (objectArray, mean) {
-        let deviationArray = [];
-        for (let num in objectArray) {
-            let obj = objectArray[num],
-                distribution = objectArray[num].value - mean;
-            obj.deviation = distribution;
-            deviationArray.push(obj);
-        }
-        return deviationArray
-    },
-
-    getDensityFunctionIntervalValues: function(data,intervalCount,decimal) {
-        let densityFunctionObjectArray = [];
-
-        data = this.sortObjectAscending(data, "deviation", "ags");
-        let min = data[0].deviation,
-            max = data[data.length-1].deviation,
-            difference = max - min,
-            classSize = difference / intervalCount,
-            intervalLowerLimit = min;
-        for (let i = 0; i < intervalCount; i++) {
-            let counter = 0,
-                intervalElementValues=[],
-                intervalElements=[],
-                intervalUpperLimit = intervalLowerLimit + classSize,
-                intervalMiddle=intervalLowerLimit+(intervalUpperLimit-intervalLowerLimit)/2;
-            for (let elem in data) {
-                if (data[elem].deviation >= intervalLowerLimit && data[elem].deviation <= intervalUpperLimit) {
-                    counter++;
-                    let element={name:data[elem].name, ags:data[elem].ags, value:data[elem].value, deviation:data[elem].deviation};
-                    intervalElementValues.push(data[elem].deviation);
-                    intervalElements.push(element);
-                }
-            }
-            let averageClassValue=Math.round(this.calculateAverage(intervalElementValues) * 1000) / 1000,
-                probability=counter/data.length*100,  // Probability in PERCENT!
-
-                classObject = {intervalUpperLimit:statistics.roundNumber(intervalUpperLimit,decimal), intervalLowerLimit: statistics.roundNumber(intervalLowerLimit, decimal),intervalMiddle:statistics.roundNumber(intervalMiddle,decimal),  count:counter, probability: statistics.roundNumber(probability,decimal+1), intervalAverageValue: statistics.roundNumber(averageClassValue, decimal), elements:intervalElements};
-            intervalLowerLimit=intervalUpperLimit;
-            densityFunctionObjectArray.push(classObject);
-        }
-        return densityFunctionObjectArray;
-    },
-
-    findSelectedAreaInInterval:function(intervalArray, selectedAgs){ // Finds the selected Area in one of the Intervals
-
-        let x = 0,
-            y = 0,
-            name="",
-            deviation=0,
-            found=false;
-        for (let interval in intervalArray) {
-            for (let elem in intervalArray[interval].elements)
-                if (intervalArray[interval].elements[elem].ags === selectedAgs) {
-                    x = intervalArray[interval].elements[elem].deviation;
-                    y= intervalArray[interval].probability;
-                    name= intervalArray[interval].elements[elem].name;
-                    deviation= intervalArray[interval].elements[elem].deviation;
-                    found=true;
-                }
-            if (found){
-                break;
-            }
-        }
-
-        return {x:x,y:y, name:name, deviation:deviation};
-
-    }
 
 };
 

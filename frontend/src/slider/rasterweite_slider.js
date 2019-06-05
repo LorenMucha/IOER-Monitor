@@ -18,34 +18,44 @@ const rasterweite_slider={
         return this.steps[this.getParameter()];
     },
     init:function(steps){
-        const object = this;
-        let raumgl_param = object.getParameter(),
+        const obj = this;
+        let raumgl_param = obj.getParameter(),
             value_set = raumgl_param,
-            labels = [];
+            labels = [],
+            slider=obj.getDOMObject();
 
-        object.steps = steps;
+        obj.steps = steps;
 
         if(!raumgl_param){
             value_set = 0;
-            object.setParameter(value_set);
+            obj.setParameter(value_set);
         }
 
-        object.getDOMObject().slider({
+        slider.slider({
             orientation: "horizontal",
             min: 0,
             max: steps.length-1,
             value: value_set,
             step: 1,
             stop: function (event, ui) {
-                object.updateParameter(ui.value);
+                obj.updateParameter(ui.value);
                 indikator_raster.init();
             }
         });
+        //disable slider for one possibility
+        if(steps.length>1){
+            helper.enableElement("#"+obj.getDOMObject().attr("id"),"");
+            slider.slider('enable');
+        }else{
+            helper.disableElement("#"+obj.getDOMObject().attr("id"),`Der Indikator steht nur für die Rasterweite ${rasterweite_slider.getSelectText()} zur Verfügung.`);
+            slider.slider('disable');
+        }
+
         try{
             $.each(steps,function(key,value){labels.push(value.replace('Raster','').replace('m',''));});
+            pips.set(obj.getDOMObject(),labels);
         }catch(err){
             console.log(err);
         }
-        pips.set(object.getDOMObject(),labels);
     }
 };

@@ -24,23 +24,20 @@ const zeit_slider={
 
         //show the time container
         object.jahre= jahre;
-
         if(!time_param){
             object.setParameter(jahre[value_set]);
         }
         //time param is set
         else{
-            if(jahre.length == 1){
+            if(jahre.length=== 1){
                 object.updateParam(jahre[value_set]);
-                helper.disableElement("#"+object.getContainerDOMObject().attr("id"),`Der Indikator steht nur für den Zeitschnitt ${zeit_slider.getTimeSet()} zur Verfügung.`);
             }
-            else if($.inArray(parseInt(time_param),jahre)!= -1){
+            else if($.inArray(parseInt(time_param),jahre)!== -1){
                 object.updateParam(jahre[$.inArray(parseInt(time_param),jahre)]);
                 value_set = $.inArray(parseInt(time_param),jahre);
-                helper.enableElement("#"+object.getContainerDOMObject().attr("id"),``);
             }
             else{
-                if($.inArray(parseInt(time_param),jahre) == -1){
+                if($.inArray(parseInt(time_param),jahre) === -1){
                     object.updateParam(jahre[value_set]);
                     alert_manager.alertNotInTimeShift();
                 }
@@ -63,10 +60,8 @@ const zeit_slider={
                             stt_id = "stt_raumgl",
                             g50_id = "g50_raumgl",
                             stt_state = document.getElementById("stt_raumgl").dataset.state,
-                            g50_state = document.getElementById("g50_raumgl").dataset.state,
                             raumgl_test = parseInt(gebietsauswahl.countTags());
 
-                        console.log(stt_state);
                         if(stt_state!=="disabled") {
                             if (time < 2014) {
                                 helper.disableElement("#" + stt_id, exclude.disable_text);
@@ -97,6 +92,15 @@ const zeit_slider={
                 map.dragging.enable();
             });
         pips.set(slider,jahre);
+
+        //disable chart for single time shift
+        if(zeit_slider.getTimes().length===1){
+            helper.disableElement("#"+object.getContainerDOMObject().attr("id"),`Der Indikator steht nur für den Zeitschnitt ${zeit_slider.getTimeSet()} zur Verfügung.`);
+            slider.slider('disable');
+        }else{
+            helper.enableElement("#"+object.getContainerDOMObject().attr("id"),"");
+            slider.slider('enable');
+        }
     },
     show:function(){
         this.getContainerDOMObject().show();
@@ -106,5 +110,8 @@ const zeit_slider={
     },
     getTimeSet:function(){
         return parseInt(urlparamter.getUrlParameter(this.parameter));
+    },
+    getTimes:function(){
+      return this.jahre;
     }
 };

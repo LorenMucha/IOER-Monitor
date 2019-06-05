@@ -74,20 +74,14 @@ const kennblatt={
                     $.each(ogc, function (key, value) {
                         let state = function () {
                                 let state = 'checked="checked"';
-                                if (parseInt(value) != 1) {
+                                if (parseInt(value) !== 1) {
                                     state = "";
                                 }
                                 return state;
                             },
                             link = function () {
                                 let ind_id = indikatorauswahl.getSelectedIndikator();
-                                if (key === "wms") {
-                                    return "http://maps.ioer.de/cgi-bin/wms?map=" + ind_id + "_100&";
-                                } else if (key === "wcs") {
-                                    return "http://maps.ioer.de/cgi-bin/wcs?map=" + ind_id + "_wcs";
-                                } else {
-                                    return "http://maps.ioer.de/cgi-bin/wfs?map=" + ind_id;
-                                }
+                                return  `https://monitor.ioer.de/cgi-bin/${key}?MAP=${ind_id}_${key}`;
                             },
                             checkbox = `<div class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" ${state()} disabled>

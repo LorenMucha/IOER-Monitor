@@ -145,7 +145,6 @@ const gebietsauswahl = {
                 .unbind()
                 .dropdown({
                     onAdd: function (addedValue, addedText, $addedChoice) {
-                        console.log("add",addedValue);
                         //close after each choice
                         menu.dropdown('hide');
                         indikator_json_group.clean();

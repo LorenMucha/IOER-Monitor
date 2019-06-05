@@ -40,14 +40,19 @@ const alert_manager= {
             )
         },500);
     },
-    alertError:function(){
+    alertError:function(error){
+        let error_span = `<b style="color: red">Fehler: ${error}</b>`;
         $('#loading_circle').remove();
         setTimeout(function(){
-            swal(
-                "Es ist ein Problem aufgetreten",
-                "Bitte versuchen Sie es später nochmal oder kontaktieren Sie uns über das Feedback Formular.",
-                "error"
-            );
+            swal({
+                title:"Es ist ein Problem aufgetreten",
+                text:`<span>Bitte versuchen Sie es später nochmal oder kontaktieren Sie uns über das Feedback Formular.</span>
+                      <br/>
+                      <hr/>
+                      ${error ? error_span: ""}`,
+                html:true,
+                type:"error"
+            });
             progressbar.remove();
         },500);
     },

@@ -95,4 +95,26 @@ class Export_Helper{
             a.remove();
         },500);
     }
+    static exportTable(_tableId){
+        let exportTable = $(`#${_tableId}`)
+            .tableExport({
+                formats: ['csv'],
+                headers: true,
+                footers: false,
+                filename: indikatorauswahl.getSelectedIndikator() + "_" + gebietsauswahl.getSelectionAsString() + "_" + zeit_slider.getTimeSet(),
+                trimWhitespace: true,
+                bootstrap: false,
+                //ignoreCols: [0, 1],
+                exportButtons: false,
+                ignoreCSS: "." + csv_export.ignoreClass
+            });
+        let exportData = exportTable.getExportData()[_tableId]['csv'];
+        var interval = setInterval(function () {
+            //if table date csv is created
+            if (exportData.data) {
+                clearInterval(interval);
+                Export_Helper.downloadFile(exportData.data, exportData.filename, exportData.fileExtension);
+            }
+        }, 500);
+    }
 }

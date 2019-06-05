@@ -1,7 +1,6 @@
 const indikator_json = {
-    json_layer : '',
-    json_file:'',
-    hover:true,
+    json_layer : false,
+    json_file:false,
     ags_count:false,
     getJSONLayer:function(){
         return this.json_layer;
@@ -19,6 +18,7 @@ const indikator_json = {
         progressbar.init();
         indikator_raster_group.clean();
         indikator_json_group.clean();
+        grundakt_layer.remove();
 
         if (raumgl) {
             raumgliederung_set = raumgl;
@@ -163,7 +163,7 @@ const indikator_json = {
                               <img title="${text[lan].stat_title}" 
                                 src="frontend/assets/icon/histogramm.png"/>
                          </div>`,
-            indikatorwertentwicklung = `<div class="mobile_hidden dev_chart_trend oneTime ${exclude.class_performance} cursor w-100" 
+            indikatorwertentwicklung = `<div class="dev_popup mobile_hidden dev_chart_trend oneTime ${exclude.class_performance} cursor w-100" 
                                              id="pop_up_diagramm_ind_ags_${id_popup}">
                                             <b class="float-right w-75">${text[lan].trend}</b>
                                             <img data-title="${text[lan].trend_title}" 
@@ -171,7 +171,7 @@ const indikator_json = {
                                                 style="margin-right: 1.3vh;" 
                                                 src="${dev_chart.icon.single.path}"/>
                                         </div>`,
-            entwicklungsdiagramm = `<div class="mobile_hidden dev_chart_compare ${exclude.class_performance} oneTime cursor w-100" 
+            entwicklungsdiagramm = `<div class="dev_popup mobile_hidden dev_chart_compare ${exclude.class_performance} oneTime cursor w-100" 
                                             id="pop_up_diagramm_entwicklung_ags_${id_popup}" >
                                             <b class="wordbreak float-right w-75">${text[lan].compare}</b>
                                             <img data-title="${text[lan].compare}" 
@@ -212,9 +212,7 @@ const indikator_json = {
             .openOn(map);
 
         $(document).on('click','#pop_up_gebietsprofil_'+id_popup,function(){
-            gebietsprofil.parameters.ags=ags;
-            gebietsprofil.parameters.name=gen;
-            gebietsprofil.open(ags,gen);
+            area_info.open(ags,gen);
         });
 
         $(document).on('click','#pop_up_diagramm_ags_'+id_popup,function(){
@@ -250,6 +248,10 @@ const indikator_json = {
             helper.enableElement(`#pop_up_diagramm_entwicklung_ags_${id_popup}`,$(`#pop_up_diagramm_entwicklung_ags_${id_popup}`).data("title"));
             helper.enableElement(`#pop_up_diagramm_ind_ags_${id_popup}`,$(`#pop_up_diagramm_ind_ags_${id_popup}`).data("title"));
         }
+        //disable chart for single time shift
+        if(zeit_slider.getTimes().length===1){
+            helper.disableElement(".dev_popup",exclude.disable_text);
+        }
     },
     closePopUp:function(){
         try {
@@ -281,43 +283,10 @@ const indikator_json = {
         }
     },
     highlightFeatureOnmouseover:function(e) {
-            let layer = e.target;
-            if (indikator_json.hover) {
-                layer.setStyle(style.getHover());
-                if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-                    layer.bringToFront();
-                }
-            }
-            //highlight element in legend
-            try {
-                let fillcolor = layer.options.fillColor.replace('#', '');
-                $('#legende_' + fillcolor + " i").css({
-                    "width": "20px",
-                    "height": "15px",
-                    "border": "2px solid " + farbschema.getColorHexActive()
-                });
-            } catch (err) {
-            }
+            indikator_json_group.highlight(e.target.feature.properties.ags);
     },
     resetHighlight: function(e) {
-        let layer = e.target,
-            ags = layer.feature.properties.ags,
-            ags_selection = table.selection,
-            test_select = function(){
-                return $.inArray(ags, ags_selection) >= 0;
-            };
-        if(!test_select()) {
-            layer.setStyle(style.getLayerStyle(layer.feature.properties.value));
-            $('#thead').show();
-            $('#' + ags).removeClass("hover");
-            additiveLayer.zusatzlayer.setForward();
-            try {
-                let fillcolor = layer.options.fillColor.replace('#', '');
-                $('#legende_' + fillcolor + " i").css({"width": "15px", "height": "10px", "border": ""});
-            } catch (err) {
-                //console.log(err);
-            }
-        }
+        indikator_json_group.resetHightlight(e.target.feature.properties.ags);
     },
     getStatistikArray:function(){
         let array = [];

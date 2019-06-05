@@ -47,6 +47,7 @@ const raeumliche_visualisierung = {
         $('#raster_label').css("color","black");
         raster_split.remove();
         exclude.setSpatialExtendelements();
+        panner.init();
     },
     setChecked:function(){
         this.getDOMObject()

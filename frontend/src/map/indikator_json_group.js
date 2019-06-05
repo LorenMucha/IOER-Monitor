@@ -15,10 +15,18 @@ const indikator_json_group = {
                         if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
                             layer.bringToFront();
                         }
+                        let fillcolor = layer.options.fillColor.replace('#', '');
+                        $('#legende_' + fillcolor + " i").css({
+                            "width": "20px",
+                            "height": "15px",
+                            "border": "2px solid " + farbschema.getColorHexActive()
+                        });
                     }
                 });
             });
-        }catch(err){}
+        }catch(err){
+            console.error(err);
+        }
     },
     resetHightlight:function(){
         try {
@@ -27,14 +35,20 @@ const indikator_json_group = {
                 layer.eachLayer(function (layer) {
                     let ags = layer.feature.properties.ags,
                         test_select = function(){
-                            return $.inArray(ags, ags_selection) >= 0;
+                            return $.inArray(ags.toString(), ags_selection) >= 0;
                         };
                     if(!test_select()) {
                         layer.setStyle(style.getLayerStyle(layer.feature.properties.value));
                     }
+                    let fillcolor = layer.options.fillColor.replace('#', '');
+                    $('#legende_' + fillcolor + " i").css({"width": "15px", "height": "10px", "border": ""});
                 });
             });
-        }catch(err){}
+        }catch(err){
+            console.error(err);
+        }finally {
+            additiveLayer.zusatzlayer.setForward();
+        }
     },
     fitBounds:function(){
         if (raeumliche_visualisierung.getRaeumlicheGliederung() === 'raster') {

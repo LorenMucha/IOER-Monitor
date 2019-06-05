@@ -58,11 +58,9 @@ const opacity_slider = {
             value_set = _value;
         }
         if(raeumliche_visualisierung.getRaeumlicheGliederung()=== 'gebiete'){
-            map.eachLayer(function(layer){
+            jsongroup.eachLayer(function(layer){
                 try {
-                    if (typeof layer.feature.properties.ags !== 'undefined') {
-                        layer.setStyle({fillOpacity:value_set});
-                    }
+                    layer.setStyle({fillOpacity:value_set});
                 }catch(err){}
             });
         }else if(raeumliche_visualisierung.getRaeumlicheGliederung() === 'raster'){

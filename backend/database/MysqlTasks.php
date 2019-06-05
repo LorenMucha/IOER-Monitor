@@ -2,15 +2,7 @@
 require_once("MysqlManager.php");
 
 class MysqlTasks extends MysqlManager {
-    protected static $instance = NULL;
-    //singelton pattern ->Creates exactly one instance of an object.
-    public static function get_instance()
-    {
-        if ( NULL === self::$instance )
-            self::$instance = new self;
 
-        return self::$instance;
-    }
     //Query all the existing categories for `gebiete`
     public function getAllCategoriesGebiete(){
         $sql= $sql_kategorie = "SELECT * FROM m_thematische_kategorien, m_them_kategorie_freigabe
@@ -56,28 +48,39 @@ class MysqlTasks extends MysqlManager {
     /*Get all indicator values in a spatial extend and the difference between BRD-AGS and KRS-AGS if set, needed for the dropdown menu
     -> result is a json with all the necessary information inside which are needed to create the map
     */
-    public function getAllIndicatorValuesInAGS($year,$ags,$diff_brd,$diff_krs){
+    public function getAllIndicatorValuesInAGS($year,$ags){
+       $length_ags = strlen($ags);
+       $sql_bld = "";
         $sql_krs = "";
-        $sql_brd="";
+        $grundakt_query = "";
+        $sql_brd = "";
         //create the subquery for brd
-        if($diff_brd){
-            $sql_brd="IFNULL((SELECT x.INDIKATORWERT FROM m_indikatorwerte_".$year." x WHERE x.ID_INDIKATOR = 'Z00AG' AND x.ags='99' AND x.INDIKATORWERT <=".$year."),0) as grundakt_year_brd,
-                      IFNULL((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS ='99' AND y.INDIKATORWERT <= ".$year."),0) as grundakt_month_brd,
-                      (select b.INDIKATORWERT from m_indikatorwerte_".$year." b where AGS='99' and b.ID_INDIKATOR=i.ID_INDIKATOR) as value_brd,
-                      INDIKATORWERT-(select b.INDIKATORWERT from m_indikatorwerte_".$year." b where AGS='99' and b.ID_INDIKATOR=i.ID_INDIKATOR) as diff_brd,";
+        $sql_brd="IFNULL((SELECT x.INDIKATORWERT FROM m_indikatorwerte_".$year." x WHERE x.ID_INDIKATOR = 'Z00AG' AND x.ags='99' AND x.INDIKATORWERT <=".$year."),0) as grundakt_year_brd,
+                  IFNULL((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS ='99' AND y.INDIKATORWERT <= ".$year."),0) as grundakt_month_brd,
+                  (select b.INDIKATORWERT from m_indikatorwerte_".$year." b where AGS='99' and b.ID_INDIKATOR=i.ID_INDIKATOR) as value_brd,
+                  INDIKATORWERT-(select b.INDIKATORWERT from m_indikatorwerte_".$year." b where AGS='99' and b.ID_INDIKATOR=i.ID_INDIKATOR) as diff_brd,";
+
+        if($length_ags>2){
+            $ags_bld = substr($ags, 0, 2);
+            $sql_bld = "IFNULL((SELECT x.INDIKATORWERT FROM m_indikatorwerte_".$year." x WHERE x.ID_INDIKATOR = 'Z00AG' AND x.ags='".$ags_bld."' AND x.INDIKATORWERT <=".$year."),0) as grundakt_year_bld,
+                        IFNULL((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS ='".$ags_bld."' AND y.INDIKATORWERT <= ".$year."),0) as grundakt_month_bld,
+                        (select l.INDIKATORWERT from m_indikatorwerte_".$year." l where AGS='".$ags_bld."' and l.ID_INDIKATOR=i.ID_INDIKATOR) as value_bld,
+                        INDIKATORWERT-(select k.INDIKATORWERT from m_indikatorwerte_".$year." k where AGS='".$ags_bld."' and k.ID_INDIKATOR=i.ID_INDIKATOR) as diff_bld,";
         }
-        if($diff_krs){
-            $ags_krs = substr($ags, 0, 2);
+
+        if($length_ags>5){
+            $ags_krs = substr($ags, 0, 5);
             $sql_krs = "IFNULL((SELECT x.INDIKATORWERT FROM m_indikatorwerte_".$year." x WHERE x.ID_INDIKATOR = 'Z00AG' AND x.ags='".$ags_krs."' AND x.INDIKATORWERT <=".$year."),0) as grundakt_year_krs,
                         IFNULL((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS ='".$ags_krs."' AND y.INDIKATORWERT <= ".$year."),0) as grundakt_month_krs,
                         (select l.INDIKATORWERT from m_indikatorwerte_".$year." l where AGS='".$ags_krs."' and l.ID_INDIKATOR=i.ID_INDIKATOR) as value_krs,
                         INDIKATORWERT-(select k.INDIKATORWERT from m_indikatorwerte_".$year." k where AGS='".$ags_krs."' and k.ID_INDIKATOR=i.ID_INDIKATOR) as diff_krs,";
         }
+
         $sql = "Select i.ID_INDIKATOR as id, i.INDIKATORWERT AS value,
                 IFNULL((SELECT x.INDIKATORWERT FROM m_indikatorwerte_".$year." x WHERE x.ID_INDIKATOR = 'Z00AG' AND x.ags=i.AGS AND x.INDIKATORWERT <=".$year."),0) as grundakt_year,
                 IFNULL((SELECT y.INDIKATORWERT FROM m_indikatorwerte_".$year." y WHERE y.ID_INDIKATOR = 'Z01AG' and y.AGS =i.AGS AND y.INDIKATORWERT <= ".$year."),0) as grundakt_month,
                 z.Einheit as einheit,
-                ".$sql_brd.$sql_krs."
+                ".$sql_brd.$sql_krs.$sql_bld."
                 (select j.ID_THEMA_KAT from m_thematische_kategorien j where z.ID_THEMA_KAT=j.ID_THEMA_KAT) as category
                 from m_indikatorwerte_".$year." i, m_indikatoren z, m_indikator_freigabe f
                 where i.ID_INDIKATOR=z.ID_INDIKATOR 

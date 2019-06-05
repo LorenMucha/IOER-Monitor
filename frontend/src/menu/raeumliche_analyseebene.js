@@ -106,7 +106,6 @@ const raeumliche_analyseebene = {
                     //set the ddm grob map
                     let callback=function(){
                         let ags_set = parameter_ags.split(',');
-                        console.log(ags_set);
                         page_init = true;
                         gebietsauswahl.getDOMObject()
                             .dropdown('refresh')

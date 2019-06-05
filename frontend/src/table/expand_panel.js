@@ -255,6 +255,7 @@ const expand_panel = {
                             </div>
                         </div>
                     </div>
+                    <!--Disabled: Kerngruppenbeschluss am 23.05.19
                     <div id="lineare_trend_expand_container">
                         <span><b>Lineare Trendfortschreibung</b><img id="expand_linear_tred"/> <b>für:</b></span>
                         <hr class="hr"/>
@@ -274,6 +275,7 @@ const expand_panel = {
                             </div>
                         </div>
                     </div>
+                    -->
                     <button type="button" class="btn btn-primary" id="btn_table_load_expand">Tabelle aktualisieren</button>
                     <button type="button" class="btn btn-primary" id="btn_table_clear_expand">
                         <i class="glyphicon glyphicon-trash"></i>
@@ -464,14 +466,24 @@ const expand_panel = {
                 .unbind()
                 .dropdown({
                     onAdd: function (addedValue, addedText, $addedChoice) {
-                        expand_panel.clear();
-                        expand_panel.expandArray.push({id:indikatorauswahl.getSelectedIndikator()+'|'+addedValue,text:'Trendfortschreibung ('+addedValue+')',time:addedValue,einheit:indikatorauswahl.getIndikatorEinheit(),count:30});
-                        helper.disableElement("#"+expand_panel.getZeitschnittAuswahlContainer().attr("id"));
-                        $('#hinweis_time_expand_linear').show();
-                        $(this).blur();
+                        try {
+                            expand_panel.expandArray.push({
+                                id: indikatorauswahl.getSelectedIndikator() + '|' + addedValue,
+                                text: 'Trendfortschreibung (' + addedValue + ')',
+                                time: addedValue,
+                                einheit: indikatorauswahl.getIndikatorEinheit(),
+                                count: 30
+                            });
+                            helper.disableElement("#" + expand_panel.getZeitschnittAuswahlContainer().attr("id"));
+                            $('#hinweis_time_expand_linear').show();
+                            $(this).blur();
+                        }catch(err){
+                            console.error(err);
+                            alert_manager.alertError();
+                        }
                     },
                     onLabelRemove: function (value) {
-                        expand_panel.expandArray = helper.removefromarray(panel.expandArray,indikatorauswahl.getSelectedIndikator()+'|'+value);
+                        expand_panel.expandArray = helper.removefromarray(expand_panel.expandArray,indikatorauswahl.getSelectedIndikator()+'|'+value);
                         let selection = expand_panel.getTrendfortschreibungauswahlDDMObject().dropdown('get value').split(',');
                         if(selection.length<= 1){
                             helper.enableElement("#"+expand_panel.getZeitschnittAuswahlContainer().attr("id"));

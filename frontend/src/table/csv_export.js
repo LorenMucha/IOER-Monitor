@@ -1,11 +1,11 @@
 const csv_export = {
-    ignoreClass:"tableexport-ignore",
-    state:false,
-    getButtonDomObject:function(){
+    ignoreClass: "tableexport-ignore",
+    state: false,
+    getButtonDomObject: function () {
         $elem = $('#csv_export');
         return $elem;
     },
-    init:function(){
+    init: function () {
         this.controller.set();
     },
     controller:{
@@ -19,7 +19,7 @@ const csv_export = {
                 }
             };
 
-            if(TableHelper.countTableRows()<=2500) {
+            if(TableHelper.countTableRows()<=1000) {
                 helper.enableElement("#"+csv_button.attr("id"),csv_button.data("title"));
                 csv_button
                     .unbind()
@@ -36,9 +36,9 @@ const csv_export = {
                             };
                         $.when(setLoadIcon())
                             .then(csv_export.state = true)
-                        //push all table header in array
-                        // Quelle:https://tableexport.v5.travismclarke.com
-                            .then(function(){let exportTable = table.getDOMObject()
+                            .then(function(){
+                                TableHelper.destroyStickyTableHeader();
+                                let exportTable = table.getDOMObject()
                                                         .tableExport({
                                                             formats: ['csv'],
                                                             headers: true,
@@ -57,6 +57,7 @@ const csv_export = {
                                                             clearInterval(interval);
                                                             Export_Helper.downloadFile(exportData.data, exportData.filename, exportData.fileExtension);
                                                             resetLoadIcon();
+                                                            TableHelper.setStickTableHeader();
                                                             setTimeout(function () {
                                                                 csv_export.state = false;
                                                             }, 1000);

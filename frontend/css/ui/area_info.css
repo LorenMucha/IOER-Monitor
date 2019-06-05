@@ -1,0 +1,54 @@
+
+#area_info_content .flex{
+    display:flex;
+    align-items: center;
+    flex-flow: row wrap;
+
+}
+
+#area_info_content .flexElement{
+    margin-top: 0;
+    margin-bottom:0;
+    white-space: pre;
+    vertical-align: middle;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+
+ th #firstHeaderRow{
+    border-bottom: 0;
+}
+
+#area_info_content .mainColor {
+    color: var(--main-color);
+}
+
+#area_info_content .change-height-of-dropdown {
+    min-height: auto !important;
+    height: 1em;
+}
+#area_info_csv_export {
+width: 30px;
+height: 30px;
+background: white url(../../assets/icon/csv-down.png) no-repeat center center;
+float: right;
+margin-right: 10px;
+cursor: pointer;
+margin-left: auto;
+}
+
+#area_info_content .noPaddingNoBorder{
+    padding:0px !important;
+    border-bottom:0px !important;
+}
+
+#area_info_content .centered{
+    text-align: center;
+}
+
+#area_info_content #dataTable_filter{
+    padding-bottom: 18px;
+}
+
+

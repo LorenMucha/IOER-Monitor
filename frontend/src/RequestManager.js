@@ -83,6 +83,7 @@ class RequestManager{
     //get the chart values to set up the line chart
     static getTrendValues(indicator_id,ags,settings){
         let json = JSON.parse('{"ind":{"id":"'+indicator_id+'","ags_array":"'+ags+'"},"set":'+JSON.stringify(settings)+',"query":"getTrend"}');
+        console.log(JSON.stringify(json));
         return this.sendRequestPHP({"file":json,"query":"getTrend","type":"POST","debug":false});
     }
     //get the stored map-Link parameters to create the map
@@ -90,9 +91,10 @@ class RequestManager{
         let json = JSON.parse(`{"query":"maplink","setting": {"id": "${setting.id}","val": "${setting.val}"}}`);
         return this.sendRequestPHP({"file":json,"query":"maplink","type":"POST","debug":false});
     }
+    //get all indicator values for a given indicator and AGS
     static getSpatialOverview(indicator_id,ags){
         let json = JSON.parse(`{"ind":{"id":"${indicator_id}","ags":"${ags}","time":"${zeit_slider.getTimeSet()}"},"query":"getvaluesags"}`);
-        return this.sendRequestPHP({"file":json,"query":"getvaluesags","type":"POST","debug":true})
+        return this.sendRequestPHP({"file":json,"query":"getvaluesags","type":"POST","debug":false});
     }
     static sendMailFeedback(name, sender, message){
         let json = {
@@ -129,9 +131,6 @@ class RequestManager{
             data: {
                 values: JSON.stringify(json.file)
             },
-            error:function(xhr, ajaxOptions, thrownError){
-                manager.onError( thrownError,json.query,this.url);
-            },
             success:function(data){
                 if(json.debug){
                     console.log(this.url,this.data,JSON.stringify(data));
@@ -148,7 +147,6 @@ class RequestManager{
             url: 'https://monitor.ioer.de/monitor_api/'+json.endpoint,
             data: json.data,
             error:function(xhr, ajaxOptions, thrownError){
-                manager.onError( thrownError,json.query,this.url);
                 alert_manager.alertError();
             },
             success:function(data){
@@ -162,18 +160,6 @@ class RequestManager{
     }
     static cancel(){
         call.abort();
-    }
-    static onError( thrownError,function_name,url) {
-        if (thrownError !== "abort") {
-            console.error(thrownError);
-            /*let message= error.getErrorMessage(`${thrownError} in function: ${function_name}`);
-            progressbar.remove();
-            alert_manager.alertError();
-            if(!window.location.href.includes("monitor_test")) {
-                this.sendMailError(message.name, message.message);
-            }
-           */
-        }
     }
     static getRasterMap(time,ind,_raumgliederung,klassifizierung,klassenanzahl,darstellung_map,_seite) {
         return $.ajax({

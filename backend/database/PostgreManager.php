@@ -1,9 +1,7 @@
 <?php
 require_once('DbSettings.php');
 
-class PostgreManager extends DbSettings {
-
-    protected static $instance = NULL;
+class PostgreManager{
 
     public function __construct() {
 
@@ -13,14 +11,6 @@ class PostgreManager extends DbSettings {
         $this->password = $settings['dbpassword'];
         $this->database = $settings['dbname'];
         $this->host = $settings['dbhost'];
-    }
-
-    public static function get_instance()
-    {
-        if ( NULL === self::$instance )
-            self::$instance = new self;
-
-        return self::$instance;
     }
 
     protected function connect() {

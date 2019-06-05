@@ -8,6 +8,8 @@ class ScriptLoader{
             "frontend/lib/jquery/plugin/jquery.progressTimer.js",
             "frontend/lib/jquery/plugin/jquery.splitter.js",
             "frontend/lib/jquery/plugin/he.js",
+            // Data Tables
+            "frontend/lib/dataTables/datatables.min.js",
             //spectrum
             "frontend/lib/spectrum/spectrum.js",
             //Bootstrap
@@ -30,7 +32,6 @@ class ScriptLoader{
             "frontend/lib/leaflet/plugin/togeojson.js",
             "frontend/lib/leaflet/plugin/leaflet.filelayer.js",
             "frontend/lib/leaflet/plugin/leaflet-image.js",
-            //"frontend/lib/leaflet/plugin/OSMBuildings-Leaflet.js",
             //Semantic UI
             "frontend/lib/semanticUi/semantic.min.js",
             "frontend/lib/semanticUi/components/transition.js",
@@ -80,11 +81,10 @@ class ScriptLoader{
             "frontend/src/menu/klassifzierung.js",
             "frontend/src/menu/klassenanzahl.js",
             "frontend/src/menu/farbliche_darstellungsart.js",
-            "frontend/src/menu/navbar.js",
+            "frontend/src/menu/NavBar.js",
             "frontend/src/menu/farbschema.js",
             "frontend/src/menu/MenuHelper.js",
             //map
-            "frontend/src/map/OsmBuildings.js",
             "frontend/src/map/additive_layer.js",
             "frontend/src/map/map_controller.js",
             "frontend/src/map/indikator_json.js",
@@ -103,7 +103,6 @@ class ScriptLoader{
             "frontend/src/map/tools/raster_split.js",
             "frontend/src/map/tools/zoom_in.js",
             "frontend/src/map/tools/zoom_out.js",
-            "frontend/src/map/tools/file_loader.js",
             "frontend/src/map/tools/center_map.js",
             "frontend/src/map/tools/geolocate.js",
             //table
@@ -120,12 +119,11 @@ class ScriptLoader{
             //dialog
             "frontend/src/dialog/dialog_manager.js",
             "frontend/src/dialog/dev_chart.js",
-            "frontend/src/dialog/feedback.js",
             "frontend/src/dialog/kennblatt.js",
             "frontend/src/dialog/DialogHelper.js",
             "frontend/src/dialog/statistics.js",
-            "frontend/src/dialog/gebietsprofil.js",
             "frontend/src/dialog/AdditiveLayerControl.js",
+            "frontend/src/dialog/area_info.js",
             //export
             "frontend/src/export/ogc_export.js",
             "frontend/src/export/map_link.js",
@@ -139,7 +137,7 @@ class ScriptLoader{
             "frontend/src/webtour.js",
             "frontend/src/track.js",
             "frontend/app.js",
-            "frontend/src/ToolLoader.js"
+            "frontend/src/map/tools/ToolLoader.js"
         ];
     }
     includeScripts(){
@@ -147,18 +145,6 @@ class ScriptLoader{
         $.getMultiScripts = function(arr) {
             var _arr = $.map(arr, function(scr) {
                 return $.getScript(  scr,function(){
-                    //script loaded
-                }).fail(function(){
-                    $('#loading_circle').remove();
-                    setTimeout(function(){
-                        swal({
-                            title:"Es ist ein Problem aufgetreten",
-                            text:`Bitte laden Sie die Anwendung über <b class="cursor" style="color:blue;" id="force_reload" onclick="location.reload(true)">STRG-F5</b> oder kontaktieren Sie uns über das Feedback Formular.`,
-                            type:"error",
-                            html:true
-                    });
-                        progressbar.remove();
-                    },500);
                 });
             });
 
@@ -171,6 +157,7 @@ class ScriptLoader{
 
         $.getMultiScripts(loader.scripts).done(function() {
             try {
+                localStorage.setItem("rel","false");
                 //init the map with all there Functions
                 App.main.call(this);
                 ToolLoader.initTools();
@@ -179,11 +166,15 @@ class ScriptLoader{
                 if(helper.checkIE()){
                     alert_manager.alertIE();
                 }else{
-                    console.log(err);
-                    if(!window.location.href.includes("monitor_test")) {
+                    //reload only one time
+                    if(localStorage.getItem("rel")==="false") {
+                        window.location.reload(true);
+                        localStorage.setItem("rel", "true");
+                    }else{
                         let message = error.getErrorMessage(err);
                         alert_manager.alertError();
                         RequestManager.sendMailError(message.name, message.message);
+                        localStorage.setItem("rel","false");
                     }
                 }
             }

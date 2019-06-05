@@ -38,6 +38,5 @@ const map_controller={
         //style
         $('.leaflet-control-scale-line').css({"border-bottom-color":"black","border-right-color": "black","border-left-color":"black"});
         //activate all the tools
-        //new OSMBuildings(map).load();
     }
 };

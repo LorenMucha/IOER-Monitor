@@ -1,26 +1,27 @@
 const webTour={
     tour: '',
-    getStartButtonDOMObject:function(){
-      $elem = $('#webtour');
-      return $elem;
+    getStartButtonID:function(){
+      return '#webtour';
     },
     init:function(){
         const object = this;
-    this.getStartButtonDOMObject()
-        .unbind()
-        .click(function(e){
-            e.preventDefault();
-            $('.navbar-collapse').hide();
-            object.create();
-            right_view.close();
-            object.tour.restart();
-        });
+        $(document).on("click",object.getStartButtonID(),function(){
+                $('.navbar-collapse').hide();
+                object.create();
+                right_view.close();
+                object.tour.restart();
+            });
     },
     create:function(){
         //Quelle und API: http://bootstraptour.com/api/
         //The script
         toolbar.close();
         this.tour = new Tour({
+            //Callbacks
+            onEnd:function(){
+                let url = window.location.href.replace(window.location.search,'');
+                window.open(url,"_self");
+            },
             steps:[
                 {
                     element: ".menu_m",
@@ -225,7 +226,8 @@ const webTour={
                 },
                 {
                     element:"#indikatoren_gebietsprofil12060",
-                    title: "gebietsprofil",
+                    title: "Area_info",
+
                     content: "Werteübersicht dieser Gebietseinheit für alle Indikatoren (mit Vergleich zu übergeordneten Raumeinheiten und mittleren Grundaktualitäten)",
                     placement: "left",
                     onShown: function(){
@@ -305,12 +307,7 @@ const webTour={
                     element: "#feedback_a",
                     title: "Feedback",
                     placement: "left",
-                    content: "Das war die kleine Tour durch die vielseitigen Möglichkeiten des IÖR-Monitors. Wir freuen über Ihr Feedback zu der Anwendung.",
-                    onHide:function(){
-                        $('#dropdown_grenzen_container').dropdown('clear');
-                        let url = window.location.href.replace(window.location.search,'');
-                        window.open(url,"_self");
-                    }
+                    content: "Das war die kleine Tour durch die vielseitigen Möglichkeiten des IÖR-Monitors. Wir freuen über Ihr Feedback zu der Anwendung."
                 }
             ]});
     },

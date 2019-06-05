@@ -47,6 +47,12 @@ const toolbar = {
                             </div>
                             <div class="results"></div>
                         </div>
+                        <!-- TimeSlider-->
+                        <div class="slider_container_time bottom_elements" id="slider_zeit_container">
+                                    <span><b>Zeitschnitt</b></span>
+                                    <hr class="hr"/>
+                                    <div class="zeit_slider" id="zeit_slider"></div>
+                        </div>
                         <!---Indicator choice--------------->
                         <div class="dropdown_choice">
                             <div class="hh_sf" id="indikator_auswahl">
@@ -64,11 +70,6 @@ const toolbar = {
                                     <i class="dropdown icon"></i>
                                     <div class="default text" id="ind_choice_info">Bitte wählen Sie einen Indikator</div>
                                     <div  id="kat_auswahl" class="menu"></div>
-                                </div>
-                                <div class="slider_container_time bottom_elements" id="slider_zeit_container">
-                                    <span><b>Zeitschnitt</b></span>
-                                    <hr class="hr"/>
-                                    <div class="zeit_slider" id="zeit_slider"></div>
                                 </div>
                                 <button class="btn btn-primary btn_dropdown kennblatt" onclick="kennblatt.open();">Kennblatt</button>
                             </div>
@@ -232,19 +233,13 @@ const toolbar = {
                             <ul class="tools">
                                 <li><div class="btn_container">
                                     <div id="measure" class="image cursor"></div>
-                                    <div class="btn_txt" id="measure_btn">Messen</div>
+                                    <div class="btn_txt" id="measure_btn" title="führen Sie Messungen durch">Messen</div>
                                 </div>
                                 </li>
                                 <li>
                                     <div class="btn_container">
-                                        <div id="lupe" class="image cursor"></div>
+                                        <div id="lupe" class="image cursor" title="Lupe um die darunter liegende Grundkarte hervorzuheben"></div>
                                         <div class="btn_txt" id="lupe_btn">Lupe</div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="btn_container">
-                                        <div id="import" class="image cursor"></div>
-                                        <div class="btn_txt" id="import_btn">Import</div>
                                     </div>
                                 </li>
                                  <li>
@@ -286,14 +281,6 @@ const toolbar = {
                                     </div>
                                 </li>
                             </ul>
-                            <!--<ul class="tools w-100">
-                                <li class="w-30">
-                                    <div class="btn_container">
-                                        <div id="${statistics.selector_toolbar.replace("#","")}" class="image cursor ${exclude.class_gebiete}" data-title="Statistik des Indikators" title="Statistik des Indikators"></div>
-                                        <div class="btn_txt wordbreak ${exclude.class_gebiete}">Statistik</div>
-                                    </div>
-                                </li>
-                            </ul>-->
                         </div>
                         <!--Export-->
                         <div class="dropdown_choice mobile_hidden" id="export_map">
@@ -369,11 +356,11 @@ const toolbar = {
                         }
                     });
                     //set the height og the overflow content inside the menu bar
-                    if(main_view.getHeight() <= 1000
-                        && view_state.getViewState() ==='mw'
-                        && toolbar.pinned.length >0) {
-                        let height = toolbar.getHeight() - $('#no_overflow').height() - 60;
-                        $('#overflow_content').css("max-height",height+50);
+                    if(main_view.getHeight() <= 1000) {
+                        setTimeout(function(){
+                            let height = toolbar.getHeight() - $('#no_overflow').height() - 60;
+                            $('#overflow_content').css("max-height",height+50);
+                        },500);
                     }
                 });
 

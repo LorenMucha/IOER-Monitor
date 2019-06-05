@@ -97,10 +97,10 @@ const indikatorauswahl ={
                     icon_set=icon;
                 }
                 //create the cat choices
-                if(main_view.getHeight()>=700) {
+                if(main_view.getHeight()>=600) {
                     menu.responsive=false;
                     html += `<div id="kat_item_${cat_id}"
-                                  title="${main_view.getHeight() >= 800 ? '':'durch erneutes anklicken ändern sie die horizontale Positionierung des Sub-Menü'}"
+                                  title="${main_view.getHeight() >= 1000 ? '':'durch erneutes anklicken ändern sie die horizontale Positionierung des Sub-Menü'}"
                                   class="ui left pointing dropdown link item link_kat" 
                                   data-value="${cat_id}"
                                   style="${background_color}">
@@ -170,8 +170,9 @@ const indikatorauswahl ={
         $.when(RequestManager.getAvabilityIndicator(ind)).done(function(data){
             $.each(data,function(key,value) {
                 if(value.ind === ind) {
-                    if(value.avability==false){
+                    if(value.avability===false){
                         alert_manager.alertNotAsRaster();
+                        console.log(ind,value.ind,value.avability);
                         return false;
                     }else{
                         if(!ind){
@@ -199,7 +200,7 @@ const indikatorauswahl ={
         }
         $('#ind_choice_info').css({"color": "black", "font-weight": "bold"});
         $('.kennblatt').show();
-        //reset the first init layer
+        //reset the first init layer if still visualized
         if(start_map.getState()){
             start_map.remove();
         }
@@ -228,9 +229,27 @@ const indikatorauswahl ={
         //highlight the elements inside the menu
         $('#kat_item_'+menu.getIndikatorKategorie(indicator_id)).css({"color": farbschema.getColorHexMain(), "font-weight": "bold"});
         $('#'+indicator_id+"_item").css({"color": farbschema.getColorHexMain(), "font-weight": "bold"});
+        //enable or disbale OGC Services
+        var interval = setInterval(function () {
+            let state_ogc = indikatorauswahl.getIndikatorInfo(indicator_id,"ogc");
+            //if all indictaor values are ready
+            if (state_ogc) {
+                clearInterval(interval);
+                if (state_ogc.wfs !=="1"){
+                    helper.disableElement("#wfs","");
+                }else{
+                    helper.enableElement("#wfs","");
+                }
+                if (state_ogc.wcs !=="1"){
+                    helper.disableElement(".raster_export","");
+                }else{
+                    helper.enableElement(".raster_export","");
+                }
+            }
+        }, 500);
     },
     getIndikatorInfo:function(indicator_id,key_name){
-        let val_found = null,
+        let val_found = false,
             id = indicator_id;
         if(typeof id==="undefined" || !id){
             id = this.getSelectedIndikator();
@@ -346,7 +365,7 @@ const indikatorauswahl ={
                 .dropdown({
                     onShow:function(){
                         let click = 0;
-                        if(main_view.getHeight()<= 800) {
+                        if(main_view.getHeight()<= 1000) {
                             $('.link_kat')
                                 .unbind()
                                 .click(function () {
@@ -362,24 +381,6 @@ const indikatorauswahl ={
                         }
                     },
                     onChange: function (value, text, $choice) {
-                        //enable or disbale OGC Services 
-                        let state_ogc = indikatorauswahl.getIndikatorInfo(value,"ogc");
-                        var interval = setInterval(function () {
-                            //if all indictaor values are ready
-                            if (state_ogc) {
-                                clearInterval(interval);
-                                if (state_ogc.wfs !=="1"){
-                                    helper.disableElement("#wfs","");
-                                }else{
-                                    helper.enableElement("#wfs","");
-                                }
-                                if (state_ogc.wcs !=="1"){
-                                    helper.disableElement(".raster_export","");
-                                }else{
-                                    helper.enableElement(".raster_export","");
-                                }
-                            }
-                        }, 100);
                         //clean the search field
                         $('#search_input_indikatoren').val('');
                         //save the prev selected indicator as paramter

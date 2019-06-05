@@ -39,7 +39,7 @@ const map_link={
             });
 
             $('#rid').keypress(function(e) {
-                if(e.which == 13) {
+                if(e.which === 13) {
                     e.preventDefault();
                     var link = $(this).val();
                     map_link.controller.loadRID(link);

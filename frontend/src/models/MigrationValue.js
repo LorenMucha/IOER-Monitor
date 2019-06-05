@@ -1,7 +1,6 @@
 class MigrationValue{
     static getValues(){
         return {
-
             "S11RG": {
                 "08": {
                     "min": 2009,
@@ -250,7 +249,6 @@ class MigrationValue{
                     "t": 2011
                 }
             },
-
             "S05RG": {
                 "08": {
                     "min":2009,
@@ -416,7 +414,6 @@ class MigrationValue{
                     "t": 2011
                 }
             },
-
             "S08RG": {
                 "08": {
                     "min":2009 ,
@@ -1455,7 +1452,7 @@ class MigrationValue{
                     "t": 2013
                 },
                 "03": {
-                    "min": 22010,
+                    "min": 2010,
                     "max":2014,
                     "t": 2011
                 },

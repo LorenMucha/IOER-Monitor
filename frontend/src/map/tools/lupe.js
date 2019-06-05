@@ -35,18 +35,16 @@ const lupe={
         }
     },
     show:function(){
-        if(this.info_leave==0){
+        if(this.info_leave===0){
             alert_manager.leaveESCInfo();
             this.info_leave=1;
         }
         $('.toolbar').toggleClass("toolbar_close",500);
-        this.getDOMContainer().css('background-color',farbschema.getColorHexActive());
         this.magnifyingGlass.addTo(map);
         this.set=true;
     },
     remove:function(){
         lupe.magnifyingGlass.remove();
-        lupe.getDOMContainer().css('background-color','#4E60AA;');
         lupe.set=false;
     }
 };

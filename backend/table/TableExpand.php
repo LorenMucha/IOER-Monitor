@@ -1,5 +1,7 @@
 <?php
 
+include_once "../database/DBFactory.php";
+
 class TableExpand{
     public function __construct($indicator_id,$time,$raumgliederung) {
         $this->id = $indicator_id;
@@ -27,7 +29,7 @@ class TableExpand{
             $length_ags = strlen($ags_array[0]);
 
              //get all the bld values in an array
-            $bldArray = PostgreManager::get_instance()->query("SELECT gen, ags FROM vg250_bld_2016_grob");
+            $bldArray = DBFactory::getPostgreSQLManager()->query("SELECT gen, ags FROM vg250_bld_2016_grob");
 
             //set the ABS IND
             if($ind_set==='ABS'){
@@ -60,8 +62,8 @@ class TableExpand{
                                         And LENGTH(i.AGS) = " . $length_ags . "
                                         Group by i.AGS";
 
-            $indicator_array = MysqlManager::get_instance()->query($sql);
-            $indikator_grundaktualitaet = MysqlTasks::get_instance()->getGrundaktState($this->id);
+            $indicator_array = DBFactory::getMySQLManager()->query($sql);
+            $indikator_grundaktualitaet = DBFactory::getMySQLTask()->getGrundaktState($this->id);
             $einheit =$indicator_array[0]->einheit;
 
             # get the FC Codes

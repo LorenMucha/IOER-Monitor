@@ -1,0 +1,101 @@
+#map {
+    width:100%;
+    height: 100%;
+    background-color: white;
+}
+#map .leaflet-popup-content{
+    width: max-content !important;
+}
+.indikator_header {
+    position: absolute;
+    top: 10px;
+    z-index: 500;
+    padding: 5px;
+    white-space: normal;
+    box-shadow: 0 0 3px gray;
+    background-color: white;
+    font-size: 13px;
+    max-width: 300px;
+    text-align: center;
+    left: 40%;
+}
+.indikator_header_rechts{
+    display: none;
+    position: absolute;
+    top: 10px;
+    z-index: 1000;
+    padding: 5px;
+    white-space: normal;
+    box-shadow: 0 0 3px gray;
+    background-color: white;
+    font-size: 13px;
+    max-width: 300px;
+    text-align: center;
+    right: 20%;
+}
+.header{
+    font-size: 13px;
+    font-weight: bold;
+}
+#mapwrap {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    xtouch-action: none;
+}
+/*Button group for legend and map choice*/
+.btn-group-map{
+    position:absolute;
+    z-index: 1000;
+    display: inline-block;
+    bottom: 20px;
+    right: 0;
+    filter: blur(0);
+}
+#map_compare{
+    display: none;
+    position:absolute;
+    z-index: 1000;
+    bottom: 110px;
+    right: 0;
+    filter: blur(0);
+}
+.map-btn:hover{
+    border:1px solid var(--active-color);
+}
+.map-btn{
+    background-color: var(--main-color);
+    transform: rotate(270deg);
+    margin-bottom: 20px;
+    height: 50px;
+    right: -20px;
+}
+#map_compare .map-btn{
+    background-color: var(--active-color);
+}
+/*
+Tools
+ */
+.btn_map {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    box-shadow: 0 0 3px gray;
+}
+.vergleich{
+    background: var(--main-color) url(../../assets/icon/split.png) no-repeat center;
+}
+.germany {
+    background: var(--main-color) url(../../assets/icon/germany.png) no-repeat center;
+}
+.zoomIn {
+    background: var(--main-color) url(../../assets/icon/plus.png) no-repeat center;
+}
+.zoomOut {
+    background: var(--main-color) url(../../assets/icon/minus.png) no-repeat center;
+}
+.locate{
+    background: var(--main-color) url(../../assets/icon/marker.png) no-repeat center;
+}

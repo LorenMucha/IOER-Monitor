@@ -75,7 +75,7 @@ const search={
                             var lat = result.value[0];
                             var lon = result.value[1];
                             var title = "<b>"+result.title+"</b></br>"+result.description;
-                            indikator_json.setMarker(lon,lat,title);
+                            MapHelper.setMarker(lon,lat,title);
                         }
                         setTimeout(function(){
                             $('#search_input_field').val('');

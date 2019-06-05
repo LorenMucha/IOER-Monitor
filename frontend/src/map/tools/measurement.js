@@ -46,7 +46,6 @@ const measurement={
                 this.info_leave+=1;
             }
             $('.toolbar').toggleClass("toolbar_close", 500);
-            this.getDOMContainer().css('background-color', farbschema.getColorHexActive());
             elementM.addTo(map);
             this.set = true;
             this.surveyElement = elementM;
@@ -60,7 +59,6 @@ const measurement={
         try {
             this.surveyElement.remove();
         }catch(err){}
-        measurement.getDOMContainer().css('background-color',farbschema.getColorHexMain());
         measurement.set=false;
         indikator_json.hover=true;
     }

@@ -55,8 +55,6 @@ const indikator_raster = {
                         id:"indicator_raster"
                     });
 
-                console.log(_seite);
-
                 if (_seite) {
                     //removeRasterBySide(_seite);
                     indikator_raster_group.clean(_seite);
@@ -96,120 +94,131 @@ const indikator_raster = {
     onClick:function(e){
         const object = indikator_raster;
         if(raeumliche_visualisierung.getRaeumlicheGliederung()==="raster") {
-            let mapOptions = object.getInfos(),
-                indikator = indikatorauswahl.getSelectedIndikator(),
-                X = map.layerPointToContainerPoint(e.layerPoint).x,
-                Y = map.layerPointToContainerPoint(e.layerPoint).y,
-                BBOX = map.getBounds().toBBoxString(),
-                SRS = 'EPSG:4326',
-                WIDTH,
-                HEIGHT = map.getSize().y,
-                lat = e.latlng.lat,
-                lng = e.latlng.lng;
+            try {
+                let mapOptions = object.getInfos(),
+                    indikator = indikatorauswahl.getSelectedIndikator(),
+                    X = map.layerPointToContainerPoint(e.layerPoint).x,
+                    Y = map.layerPointToContainerPoint(e.layerPoint).y,
+                    BBOX = map.getBounds().toBBoxString(),
+                    SRS = 'EPSG:4326',
+                    WIDTH,
+                    HEIGHT = map.getSize().y,
+                    lat = e.latlng.lat,
+                    lng = e.latlng.lng;
 
-            let windowWidth = $(window).width();
+                let windowWidth = $(window).width();
 
-            if (windowWidth > 2045) {
-                WIDTH = 2045;
-            } else {
-                WIDTH = map.getSize().x;
-            }
-
-            let devider = $(".leaflet-sbs-divider").offset();
-
-            //the requests
-            if(devider) {
-                if (X > devider.left) {
-                    indikator = $('#indicator_ddm_vergleich').dropdown('get value');
-                    mapOptions = object.getInfos('rechts');
-                }else{
-                    mapOptions = object.getInfos('links');
+                if (windowWidth > 2045) {
+                    WIDTH = 2045;
+                } else {
+                    WIDTH = map.getSize().x;
                 }
-            }
 
-            console.log(mapOptions);
+                let devider = $(".leaflet-sbs-divider").offset();
 
-            let URL = 'https://maps.ioer.de/cgi-bin/mapserv_dv?Map=' +
-                mapOptions[0].pfadmapfile + '&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&BBOX=' +
-                BBOX + '&SRS=' +
-                SRS + '&WIDTH=' + WIDTH + '&HEIGHT=' + HEIGHT + '&LAYERS=' + mapOptions[0].layername +
-                '&STYLES=&FORMAT=image/png&TRANSPARENT=true&QUERY_LAYERS=' +
-                mapOptions[0].layername + '&INFO_FORMAT=html&X=' + X + '&Y=' + Y;
+                //the requests
+                if (devider) {
+                    if (X > devider.left) {
+                        indikator = $('#indicator_ddm_vergleich').dropdown('get value');
+                        mapOptions = object.getInfos('rechts');
+                    } else {
+                        mapOptions = object.getInfos('links');
+                    }
+                }
 
-            let URL_WFS = 'https://sg.geodatenzentrum.de/wfs_vg250?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature&TYPENAME=vg250_gem&BBOX=' +
-                lng + ',' + lat + ',' + (lng + 0.000000000000100) + ',' + (lat + 0.000000000000100) +
-                '&srsName=' + SRS + '&MAXFEATURES=1';
+                let URL = 'https://maps.ioer.de/cgi-bin/mapserv_dv?Map=' +
+                    mapOptions[0].pfadmapfile + '&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&BBOX=' +
+                    BBOX + '&SRS=' +
+                    SRS + '&WIDTH=' + WIDTH + '&HEIGHT=' + HEIGHT + '&LAYERS=' + mapOptions[0].layername +
+                    '&STYLES=&FORMAT=image/png&TRANSPARENT=true&QUERY_LAYERS=' +
+                    mapOptions[0].layername + '&INFO_FORMAT=html&X=' + X + '&Y=' + Y;
 
-            let getPixelValue = $.ajax({
-                url: URL,
-                cache: false,
-                datatype: "html",
-                type: "GET"
-            });
-            getPixelValue.done(function (data) {
-                let html_value = $(data).text();
-                let html_float = parseFloat(html_value);
-                let pixel_value = null;
-                //get the Ags from the BKG WFS
-                let getGem = $.ajax({
-                    url: URL_WFS,
+                let URL_WFS = 'https://sg.geodatenzentrum.de/wfs_vg250?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetFeature&TYPENAME=vg250_gem&BBOX=' +
+                    lng + ',' + lat + ',' + (lng + 0.000000000000100) + ',' + (lat + 0.000000000000100) +
+                    '&srsName=' + SRS + '&MAXFEATURES=1';
+
+                let getPixelValue = $.ajax({
+                    url: URL,
                     cache: false,
-                    dataType: 'xml',
+                    datatype: "html",
                     type: "GET"
                 });
-                getGem.done(function (xml) {
-                    let gem = $(xml).find('vg250\\:gen,gen').text();
-                    let ags = $(xml).find('vg250\\:ags,ags').text();
-                    //query the gem statistic
-                    let getGemStat = $.ajax({
-                        type: "GET",
-                        url: urlparamter.getURL_RASTER() + "php/onClickQuery.php",
-                        dataType: 'json',
-                        data: {ags: ags, indikator: indikator, jahr: zeit_slider.getTimeSet()}
+                getPixelValue.done(function (data) {
+                    let html_value = $(data).text();
+                    let html_float = parseFloat(html_value);
+                    let pixel_value = null;
+                    //get the Ags from the BKG WFS
+                    let getGem = $.ajax({
+                        url: URL_WFS,
+                        cache: false,
+                        dataType: 'xml',
+                        type: "GET"
                     });
-                    getGemStat.done(function (json) {
-                        let data = JSON.parse(json);
-                        let layer = new L.GeoJSON(data)
-                            .setStyle({
-                                weight: 2,
-                                opacity: 1,
-                                color: 'black',
-                                fillOpacity: 0
+                    getGem.done(function (xml) {
+                        let gem = $(xml).find('vg250\\:gen,gen').text();
+                        let ags = $(xml).find('vg250\\:ags,ags').text();
+                        //query the gem statistic
+                        let getGemStat = $.ajax({
+                            type: "GET",
+                            url: urlparamter.getURL_RASTER() + "php/onClickQuery.php",
+                            dataType: 'json',
+                            data: {ags: ags, indikator: indikator, jahr: zeit_slider.getTimeSet()}
+                        });
+                        getGemStat.done(function (json) {
+                            let data = JSON.parse(json);
+                            let layer = new L.GeoJSON(data)
+                                .setStyle({
+                                    weight: 2,
+                                    opacity: 1,
+                                    color: 'black',
+                                    fillOpacity: 0
+                                });
+                            let gem_stat = data.features[0].properties.value;
+
+                            if (html_float === -9998) {
+                                pixel_value = "nicht Relevant"
+                            } else if (html_float < 0) {
+                                pixel_value = " keine Daten"
+                            } else {
+                                pixel_value = (Math.round(html_float * 100) / 100).toFixed(2) + ' ' + mapOptions[0].einheit;
+                            }
+
+                            let popup = new L.popup({
+                                maxWith: 300
                             });
-                        let gem_stat = data.features[0].properties.value;
 
-                        if (html_float === -9998) {
-                            pixel_value = "nicht Relevant"
-                        }
-                        else if (html_float < 0) {
-                            pixel_value = " keine Daten"
-                        }
-                        else {
-                            pixel_value = (Math.round(html_float * 100) / 100).toFixed(2) + ' ' + mapOptions[0].einheit;
-                        }
+                            popup.setContent('<b>Pixelwert: </b>' + pixel_value + '</br>' +
+                                '<span>Gemeinde: </span>' + gem + '</br>' +
+                                '<span>Gemeindewert: </span>' + gem_stat);
+                            popup.setLatLng(e.latlng);
 
-                        let popup = new L.popup({
-                            maxWith: 300
+                            //prevent onlick for devider
+                            switch(raster_split.getState()){
+                                case true:
+                                    let split_pos = Math.round(parseFloat($('.leaflet-sbs-divider').css("left").replace("px","")));
+                                    if(X !== split_pos){
+                                        layer.addTo(map).bringToFront();
+                                        map.openPopup(popup);
+                                    }
+                                    break;
+                                case false:
+                                    layer.addTo(map).bringToFront();
+                                    map.openPopup(popup);
+                                    break;
+
+                            }
+
+                            map.on('popupclose', function (e) {
+                                map.removeLayer(layer);
+                            });
+
+
                         });
-
-                        popup.setContent('<b>Pixelwert: </b>' + pixel_value + '</br>' +
-                            '<span>Gemeinde: </span>' + gem + '</br>' +
-                            '<span>Gemeindewert: </span>' + gem_stat);
-                        popup.setLatLng(e.latlng);
-
-                        if (!$('.map').hasClass('devider_move')) {
-                            layer.addTo(map).bringToFront();
-                            map.openPopup(popup);
-                        }
-
-                        map.on('popupclose', function (e) {
-                            map.removeLayer(layer);
-                        });
-
-
                     });
                 });
-            });
+            }catch(error){
+                console.error(error);
+            }
         }
     },
     getInfos:function(_seite){

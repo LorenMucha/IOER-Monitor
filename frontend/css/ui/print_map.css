@@ -1,0 +1,113 @@
+#print_container{
+    width:795.41px;
+    height:925.39px;
+    overflow-x: hidden;
+}
+#print_container .btn_dropdown{
+    width: 30%;
+    background-color: var(--main-color);;
+}
+#print_container .btn_dropdown i{
+    margin-right: 10px;
+}
+#print_container .print_map_content{
+    display: block;
+    padding: 2vh;
+}
+#print_container .print_map_content .print_header{
+    color: black;
+    margin-left: 10px;
+    margin-top: 20px;
+}
+#print_container .print_map_content .print_header hr{
+    margin-left: 0;
+    width: 95%;
+}
+#print_container .print_map_content .print_header .w-25{
+    position: absolute;
+    height: 105px;
+    right: 10px;
+    top: 40px;
+}
+#print_container .print_map_content .print_header .logo{
+    background-image: url("../../assets/kopf_v2.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 100%;
+    height:100%;
+}
+#print_container .map_print_container{
+    margin-top: 50px;
+    float: left;
+    height: 634.89px;
+    width: 526.05px;
+    position: absolute;
+    top:150px;
+}
+#print_container .print_map_content  .map_print_container #print_map{
+    height: 634.89px;
+    width: 526.05px;
+    background-color: white;
+    border: .5px solid lightgray;
+}
+#print_container .print_map_content  .map_print_container #print_map svg{
+    margin-top: 20px;
+}
+#print_container .print_map_content .map_print_container #print_map .leaflet-control-scale-line{
+    margin-left: 20px;
+}
+#print_container .print_map_content .map_print_container #print_map .leaflet-control-attribution{
+    margin-right: 20px;
+}
+#print_container .print_info_content{
+    display: block;
+    width: 140px;
+    margin-left: 30px;
+    position: absolute;
+    right: 35px;
+    top: 150px;
+    height:145px;
+
+}
+#print_container .highlight{
+    color: var(--active-color);
+    font-size: 2vh;
+    cursor: pointer !important;
+}
+#print_container .hover_close{
+    margin-top: 35px;
+}
+#print_container .hover_close:hover{
+    -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+    filter: grayscale(100%);
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+#print_container #print_histogramm_container{
+    margin-top: 250px;
+}
+#print_container .print_info_content #print_legende{
+    width: 100%;
+}
+#print_container .print_info_content .map_projection_print_container{
+    width: 100%;
+    margin-top: 20px;
+}
+#print_container .print_bottom{
+    width: 700px;
+    display: inline-block;
+    position: absolute;
+    top: 830px;
+    left: 10px;
+    padding: 2vh;
+}
+#print_container .print_bottom .datengrundlage_print_container{
+    margin-top: 10px;
+}
+#print_container .print_bottom .hr{
+    width:100%;
+}
+#print_container #export_pdf{
+    max-width: 300px;
+    width: 25%;
+}

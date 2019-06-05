@@ -6,18 +6,6 @@ class ChartHelper{
     {
         $this->array=$array;
     }
-
-    private function findMean()
-    {
-        $a = $this->value_array;
-        $sum = 0;
-        $n = sizeof($a);
-        for ($i = 0; $i < $n; $i++)
-            $sum += $a[$i];
-
-        return (double)$sum /
-            (double)$n;
-    }
     private function getFirst(){
         //sort array
         return $this->value_array[0];

@@ -3,18 +3,8 @@ require_once('PostgreManager.php');
 
 class PostgreTasks extends PostgreManager
 {
-    protected static $instance = NULL;
-    private $berechtigung = 3;
-    public static function get_instance()
-    {
-        if ( NULL === self::$instance )
-            self::$instance = new self;
-
-        return self::$instance;
-    }
     function getGeometry($year,$spatial_extend,$ags_array){
         $digit = '';
-        $sql = '';
         $geom = "x.the_geom ";
         $krs_col ="";
         $sql_join_krs = "";
@@ -28,10 +18,10 @@ class PostgreTasks extends PostgreManager
         }
         if (count($ags_array) == 0) {
             // Build SQL SELECT statement and return the geometry as a GeoJSON element in EPSG: 4326
-            $sql = "select x.gid, x.ags, x.des, replace(x.gen, '''','') as gen, st_asgeojson(transform(" .
+            $sql = "select x.ags, x.des, replace(x.gen, '''','') as gen, st_asgeojson(transform(" .
                 pg_escape_string($geom) . ",4326)) AS geojson ".$krs_col." from  vg250_" . $spatial_extend . "_" . $year . "_grob x".$sql_join_krs." where x.ags is not null";
         } else {
-            $sql = "select x.gid, x.ags, x.des, replace(x.gen, '''','') as gen, st_asgeojson(transform(" .
+            $sql = "select x.ags, x.des, replace(x.gen, '''','') as gen, st_asgeojson(transform(" .
                 pg_escape_string($geom) . ",4326)) AS geojson ".$krs_col." from  vg250_" . $spatial_extend . "_" . $year . "_grob x ".$sql_join_krs." where CAST(x.ags AS TEXT) Like'" . $ags_array[0] . "";
 
             foreach ($ags_array as $value) {
@@ -47,7 +37,7 @@ class PostgreTasks extends PostgreManager
         return $this->query($sql . $digit);
     }
     function countGeometries($year,$raumgl,$ags_array){
-        $year_pg = MysqlTasks::get_instance()->getPostGreYear($year);
+        $year_pg = DBFactory::getMySQLTask()->getPostGreYear($year);
         $query= "select COUNT(AGS) from vg250_".$raumgl."_".$year_pg."_grob";
         if (count($ags_array) > 0) {
             $sql_pg = "select COUNT(AGS) from  vg250_" . $raumgl . "_" . $year_pg . "_grob where AGS Like'" . $ags_array[0] . "";
@@ -87,11 +77,10 @@ class PostgreTasks extends PostgreManager
         return $value_return;
     }
     function getAGSName($raumgliederung,$ags,$year){
-        if(intval($year)==2017){
+        if(intval($year)==2018){
             $year= 2016;
         }
         $sql ="select gen from vg250_".$raumgliederung."_".$year."_grob where ags ='".$ags."'";
-
         $rs = $this->query($sql);
         return $rs[0]->gen;
     }

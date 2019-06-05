@@ -1,7 +1,7 @@
 <?php
 header('Access-Control-Allow-Origin: *');
 header('Content-type: application/json; charset=utf-8');
-require("../database/MysqlTasks.php");
+require("../database/DBFactory.php");
 require("../models/Helper.php");
 
 $q =  $_GET["values"];
@@ -19,7 +19,7 @@ $query = strtolower($json_obj['query']);
 try{
     //get all possible Extends for a indictaor
     if($query==="getspatialextend"){
-        $possibilities = MysqlTasks::get_instance()->getSpatialExtend($modus,$year,$indicator);
+        $possibilities = DBFactory::getMySQLTask()->getSpatialExtend($modus,$year,$indicator);
         $result = array();
         foreach($possibilities as $value){
             array_push($result,str_replace(array("Raster"," ","m"),array("","",""),$value->RAUMGLIEDERUNG));
@@ -29,14 +29,14 @@ try{
     //get all possible Indicators
     else if($query==='getallindicators'){
         $json = '{';
-        $kategories = MysqlTasks::get_instance()->getAllCategoriesGebiete();
+        $kategories = DBFactory::getMySQLTask()->getAllCategoriesGebiete();
         if($modus=='raster') {
-            $kategories = MysqlTasks::get_instance()->getAllCategoriesRaster();
+            $kategories = DBFactory::getMySQLTask()->getAllCategoriesRaster();
         }
 
         foreach($kategories as $row){
 
-            $erg_indikator = MysqlTasks::get_instance()->getAllIndicatorsByCategoryGebiete($row->ID_THEMA_KAT,$modus);
+            $erg_indikator = DBFactory::getMySQLTask()->getAllIndicatorsByCategoryGebiete($row->ID_THEMA_KAT,$modus);
 
             //only if indicators are avaliabke
             if (count($erg_indikator) != 0) {
@@ -55,7 +55,7 @@ try{
 
                     //get all possible times
                     $time_string = '';
-                    $times = MysqlTasks::get_instance()->getIndicatorPossibleTimeArray($row_ind->ID_INDIKATOR,$modus,false);
+                    $times = DBFactory::getMySQLTask()->getIndicatorPossibleTimeArray($row_ind->ID_INDIKATOR,$modus,false);
                     foreach($times as $value){$time_string .= $value["time"].",";};
                     $time_string = substr($time_string,0,-1);
                     //extend the json

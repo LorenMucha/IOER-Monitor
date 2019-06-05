@@ -1,5 +1,5 @@
 <?php
-include '../database/MysqlTasks.php';
+include '../database/DBFactory.php';
 
 class NOTES{
     private $notes;
@@ -15,7 +15,7 @@ class NOTES{
         if(count($this->notes)==0) {
             $notes = array();
             $sql = "SELECT  HC, HC_INFO FROM  m_hinweiscodes";
-            $rs = MysqlManager::get_instance()->query($sql);
+            $rs = DBFactory::getMySQLManager()->query($sql);
             foreach ($rs as $row) {
                 array_push($notes, array(
                     'HC' => $row->HC,

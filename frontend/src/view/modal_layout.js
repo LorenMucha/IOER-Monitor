@@ -1,7 +1,7 @@
 const modal_layout ={
-    geJDOMObject:function(){return $('#Modal');},
+    getJDOMObject:function(){return $('#Modal');},
     init:function(){
-        this.geJDOMObject().css(
+        this.getJDOMObject().css(
             {
                 "position":"absolute",
                 "width":"100%",
@@ -18,7 +18,7 @@ const modal_layout ={
         );
     },
     remove:function(){
-        this.geJDOMObject().css(
+        this.getJDOMObject().css(
             {
                 "position":"",
                 "width":"",

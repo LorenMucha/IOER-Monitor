@@ -201,9 +201,6 @@ const additiveLayer={
     getState:function(){
         return this.state;
     },
-    open:function(){
-
-    },
     init:function(){
         const controller = this;
         this.controller.set();
@@ -277,11 +274,6 @@ const additiveLayer={
                 name = $(`#zusatz_${_id}`).data("name");
 
             dialog_manager.close();
-
-            if(_id==="mdmap"){
-                OsmBuildings.addEngine();
-                return false;
-            }
             progressbar.init();
             progressbar.setHeaderText("Lade Layer");
 
@@ -292,6 +284,7 @@ const additiveLayer={
                 control.zusatzlayer.getLayerGroup_set().addLayer(layer);
                 control.zusatzlayer.setParameter();
                 layer.addTo(map);
+                layer.bringToFront();
                 control.zusatzlayer.setForward();
                 progressbar.remove();
                 legende.getLegendeColorsObject().append(`<div class="zusatzlayer" id="zusatz_${_id}"><div style="border-bottom: 3px solid ${style[_id].color};"></div>${name}</div>`);

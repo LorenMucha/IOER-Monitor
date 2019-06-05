@@ -1,5 +1,5 @@
 <?php
-include_once '../database/MysqlManager.php';
+include_once '../database/DBFactory.php';
 
 class Errors
 {
@@ -17,7 +17,7 @@ class Errors
        if (count($this->errors) == 0) {
            $fc_array = array();
            $sql = "SELECT FEHLERCODE,FEHLER_NAME,FEHLER_FARBCODE,FEHLER_BESCHREIBUNG FROM m_fehlercodes";
-           $rs_fc = MysqlManager::get_instance()->query($sql);
+           $rs_fc = DBFactory::getMySQLManager()->query($sql);
            foreach ($rs_fc as $row) {
                array_push($fc_array, array(
                    'FC' => $row->FEHLERCODE,

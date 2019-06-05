@@ -1,0 +1,372 @@
+.toolbar .content {
+    height: 100%;
+}
+.toolbar #content #overflow_content{
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 99%;
+}
+.toolbar #btn_reset {
+    background-color: grey !important;
+}
+.toolbar {
+    background: rgba(255, 255, 255, 1);
+    width: 335px;
+    bottom: 30px;
+    top: 0;
+    position: absolute;
+    left: 0;
+    z-index: 1000;
+    border:2px solid var(--main-color);
+    padding: 20px;
+    box-sizing: border-box;
+    opacity: 1;
+}
+.toolbar_close {
+    left: -335px;
+    opacity: 1;
+}
+.toolbar .menu_m {
+    height: 100px;
+    width: 25px;
+    background: var(--main-color);
+    box-shadow: 1px 0 2px rgba(0, 0, 0, .3);
+    position: absolute;
+    right: -25px;
+    top: 30%;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border: 1px solid #333;
+    cursor: pointer;
+    padding-left: 2px;
+}
+
+.toolbar .menu_m span {
+    color: #fff;
+    font-size: 1.5em;
+    font-weight: bold;
+    display: inline-block;
+    position: relative;
+    transform: rotate(90deg);
+    top: 39px;
+    left: -18px;
+}
+.toolbar .tools {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+.toolbar #content .dropdown_choice{
+    width: 100%;
+    border-radius: 5px;
+    background: var(--main-color);
+    display: inline-block;
+    padding: 7px;
+    height: 34px;
+    color:white;
+    margin-bottom: 10px;
+}
+.toolbar #content .dropdown_choice .hh_sf{
+    float: left;
+    width: 90%;
+    cursor: pointer;
+    height: 100%;
+}
+.toolbar #content .dropdown_choice .hh_sf i{
+    margin-right: 30px;
+}
+.toolbar #content .dropdown_choice .pin{
+    float: right;
+    cursor: pointer;
+}
+.arrow_pinned{
+    transform: rotate(45deg);
+    color: #8CB91B;
+}
+.toolbar #content .btn-primary:not(.secondary) {
+    width: 100%;
+    color: white;
+    margin-bottom: 1em;
+}
+
+.toolbar #content .dropdown_menu .dropdown_menu-toggle {
+    background-color: white;
+    color:grey;
+}
+.toolbar #content .dropdown_menu ul.dropdown_menu-menu{
+    width:100%;
+    margin-bottom: 5px;
+}
+.toolbar .dropdown_menu {
+    display: none;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+.toolbar #map-selection{
+    padding-right: 5px;
+}
+/*Indicator choices also for the cloned ones*/
+.indicator_ddm{
+    width: 100% !important;
+    background-color: white !important;
+    border: 1px solid black !important;
+}
+.indicator_ddm .indicator_ddm_item_bold{
+    font-weight: bold !important;
+}
+.indicator_ddm #kat_auswahl{
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--main-color) !important;
+}
+.indicator_ddm .menu .item{
+    border-left: 1px solid var(--main-color) !important;
+    border-right: 1px solid var(--main-color) !important;
+    background-color: white;
+}
+.indicator_ddm .menu .item:hover{
+    background-color:rgba(140,185,27,1) !important;
+}
+.indicator_ddm .menu .submenu{
+    z-index: 20000 !important;
+    height: auto;
+    min-height: 10px !important;
+    overflow-y: auto !important;
+    padding-bottom: 10px !important;
+    max-height: 40vh !important;
+}
+.toolbar #content #dropdown_raumgl{
+    margin-top: 0;
+}
+.toolbar #content #dropdown_raumgl .spatial_choice{
+    display: inline-block;
+    width: 90%;
+    margin: 10px;
+}
+.toolbar #content #dropdown_raumgl .spatial_choice .label_spatial_choice{
+    font-family: 'Roboto', sans-serif !important;
+    font-weight: normal;
+    font-size: 1.8rem !important;
+    margin-top: 0.5rem;
+}
+.toolbar #content #dropdown_raumgl .spatial_choice #gebiete_label{
+    float: left;
+}
+.toolbar #content #dropdown_raumgl .spatial_choice #spatial_choice_checkbox_container label:before{
+    width: 4.5rem !important;
+    height: 2.5rem !important;
+    background: #8CB91B !important;
+}
+.toolbar #content #dropdown_raumgl .spatial_choice #spatial_choice_checkbox_container label:after{
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+}
+.toolbar #content #dropdown_raumgl .spatial_choice #raster_label{
+    float: right;
+}
+.toolbar #content #dropdown_raumgl .spatial_choice .checkbox{
+    margin-top: 0 !important;
+}
+.toolbar #content #dropdown_raumgl #spatial_range_gebiete .dropdown_gebietsauswahl{
+    width:100%;
+}
+.toolbar #content #dropdown_raumgl #spatial_range_gebiete .dropdown_gebietsauswahl #dropdown_grenzen_container{
+    float:left;
+    width:90%;
+}
+.toolbar #content #dropdown_raumgl #spatial_range_gebiete .dropdown_gebietsauswahl #clear_gebietsauswahl{
+    font-size: 1.5rem;
+    padding-top: 0.5rem;
+    padding-left: 0.1rem;
+    cursor: pointer;
+}
+/*spatial slider inside the raster choices */
+.toolbar #content #dropdown_raumgl #spatial_range_raster #slider_raum_container {
+    display: block;
+    margin-bottom: 0;
+}
+.toolbar #content #dropdown_raumgl #spatial_range_raster{
+    display: none;
+}
+.toolbar #content #dropdown_raumgl #spatial_range_raster #slider_raum_container #raum_slider {
+    margin-left: 10px;
+    margin-right: 20px;
+    display: block;
+    margin-bottom: 50px !important;
+    margin-top: 20px;
+}
+/*Slider*/
+.toolbar #slider_zeit_container {
+    margin-top: 10px;
+    width:100%;
+    margin-bottom: 40px;
+}
+.toolbar #slider_zeit_container #zeit_slider{
+    margin: 20px;
+}
+.toolbar .kennblatt{
+    margin-top: 20px !important;
+}
+.toolbar #content .dropdown_menu .btn_container .full_screen{
+    width: 32px;
+    height: 32px;
+    background: var(--main-color) url(../../assets/icon/fullscreen-symbol.png) no-repeat center center;
+    margin-left: 7px;
+}
+.toolbar #content #dropdown_werkzeug ul li {
+    float: left;
+    width: 15%;
+    margin-left: 15px;
+}
+.toolbar #content  #dropdown_werkzeug ul li{
+    width:15%;
+}
+.toolbar #content  #dropdown_werkzeug ul li .image{
+    width: 32px;
+    height: 32px;
+    margin-left: 7px;
+}
+.toolbar #content #dropdown_werkzeug .btn_container #measure {
+    background: var(--main-color) url(../../assets/icon/ruler.png) no-repeat center center;
+}
+.toolbar #content #dropdown_werkzeug .btn_container #lupe {
+    background: var(--main-color) url(../../assets/icon/lupe.png) no-repeat center center;
+}
+.toolbar #content #dropdown_werkzeug #import {
+    background: var(--main-color) url(../../assets/icon/import.png) no-repeat center center;
+}
+#content #dropdown_werkzeug #import .leaflet-control-filelayer{
+    opacity: 0 !important;
+}
+.toolbar #content .dropdown_menu #btn_glaetten{
+    background: var(--main-color) url(../../assets/icon/smooth.png) no-repeat center center;
+}
+.toolbar #content #dropdown_analyse ul li{
+    float: left;
+}
+.toolbar #content #dropdown_analyse ul li .image{
+    width: 45px;
+    height: 45px;
+    margin-left: 7px;
+}
+.toolbar #content #dropdown_analyse #dev_chart{
+    background: white url(../../assets/icon/trend.png) no-repeat center center;
+}
+.toolbar #content #dropdown_analyse #dev_chart_compare{
+    background: white url(../../assets/icon/trend_compare.png) no-repeat center center;
+}
+.toolbar #content #dropdown_analyse #ind_compare{
+    background: var(--main-color) url(../../assets/icon/split.png) no-repeat center center;
+    height:40px;
+    margin-bottom: 5px;
+}
+.toolbar #content #dropdown_analyse #ind_stat{
+    background: white url(../../assets/icon/histogramm32.png) no-repeat center center;
+}
+/*
+color schema
+ */
+.toolbar #content #farbwahl #farbwahl_btn{
+    background-color: white;
+    color: #555 !important;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.toolbar #content #farbwahl_btn span{
+    color: black;
+    float: right;
+    margin-top: 5px;
+}
+.toolbar #content .klassifizierung form{
+    display: inline-block;
+    width: 100%;
+}
+.toolbar #content .klassifizierung form .radio_left{
+    float: left;
+    width: 50%;
+}
+.toolbar #content .klassifizierung form .radio_right{
+    float: left;
+    width: 50%;
+}
+.toolbar #content .dropdown_menu #layer_conainer hr {
+    border-top: 1px solid black;
+    margin-top:0;
+    margin-bottom: 5px;
+}
+.toolbar #content .dropdown_menu #layer_conainer form{
+    margin-top:0;
+}
+
+.toolbar #content #opacity_container {
+    margin-left: 10px;
+    margin-right:10px;
+    display: block;
+    margin-bottom: 40px;
+}
+.toolbar #content #opacity_slider {
+    margin-bottom: 10px;
+    margin-left:10px;
+    margin-top: 10px;
+}
+.toolbar #content #opacity_slider .ui-slider-range {
+    background-color: var(--main-color);
+}
+.toolbar #content #op_low {
+    float:left;
+}
+.toolbar #content #op_high {
+    float:right;
+
+}
+.toolbar #content hr.hr_export{
+    margin-bottom: 8px;
+}
+.toolbar #content #menu_raumgl select option:disabled{
+    color: #e6e6e6;
+}
+.toolbar #content #menu_raumgl_fein select option:disabled{
+    color: #e6e6e6;
+}
+.toolbar #content .dropdown_menu .btn_export {
+    background: #8CB91B;
+    color:white;
+    width: 40%;
+    margin-right: 10px;
+    margin-bottom: 1vh;
+}
+.toolbar #content .toolbar #content #wfs{
+    margin-top: 5px !important;
+}
+.toolbar #content .dropdown_menu #btn_kartenlink{
+    background: #8CB91B;
+    color:white;
+    width: 60%;
+    margin-right: 10px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+.toolbar #content .export_div{
+    margin-top: 10px;
+}
+.toolbar #content .dropdown_menu #wms {
+    float: left;
+    margin-right: 10px;
+}
+.toolbar #content .dropdown_menu #wcs {
+    margin-right: 10px;
+    margin-left: 10px;
+}
+.toolbar #content .dropdown_menu #kartenlink{
+    background: #8CB91B;
+    color: white;
+    margin-bottom: 10px;
+}
+.toolbar #content #btn_link_laden{
+    margin-top: 5px;
+    background:#8CB91B;
+}
+.toolbar #content .wfs_btn{
+    margin-right: 10px;
+}
